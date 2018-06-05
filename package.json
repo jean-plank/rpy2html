@@ -1,0 +1,32 @@
+{
+  "name": "rpy2html",
+  "version": "1.0.0",
+  "description": "Convert RenPy games to a single index.html",
+  "scripts": {
+    "convert-script": "utils/convert-script.sh",
+    "bundle": "utils/bundle.sh",
+    "convert": "utils/convert.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grimalkin8675/rpy2html.git"
+  },
+  "author": "Grimalkin8675",
+  "license": "MIT",
+  "dependencies": {
+    "css-loader": "^0.28.11",
+    "file-loader": "^1.1.11",
+    "html-webpack-inline-source-plugin": "0.0.10",
+    "html-webpack-plugin": "^3.2.0",
+    "jquery": "^3.3.1",
+    "lowdash": "^1.2.0",
+    "style-loader": "^0.21.0",
+    "uglifyjs-webpack-plugin": "^1.2.5",
+    "webpack": "^4.11.0",
+    "webpack-cli": "^3.0.2"
+  },
+  "devDependencies": {
+    "karma": "^2.0.2"
+  }
+}
