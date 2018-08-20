@@ -3,15 +3,15 @@
  */
 
 const _ = require('lodash');
-const utils = require('./utils');
+const utils = require('../utils');
 
 
 // checks if l can be reconized by one of the readers
+/** @type {Array<String => Any>} */
 const readers = [
     // generic define gui.something
     (l) => {
-        let found = l.match(
-            /^define\s+gui\.(\w+)\s*=\s*(.*)$/);
+        let found = l.match(/^define\s+gui\.(\w+)\s*=\s*(.*)$/);
         if (found === null) return null;
         const res = {};
         const val = utils.parsePython(found[2]);
@@ -27,7 +27,8 @@ const readers = [
  * @returns {Array<Any>} Recognized lines.
  */
 function parseGui(lines) {
-    const res = _.reduce(utils.parse(readers, lines, false),
+    const res = _.reduce(
+        utils.parseLines(readers, lines, false),
         (acc, o) => _.merge(acc, o), {});
 
     return _.pick(res, ['main_menu_background']);

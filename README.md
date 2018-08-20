@@ -26,7 +26,7 @@ Where `input_folder` is your RenPy exported game folder.
 
 * `bundle`: uses the two previously converted files and the `src/game-engine` to create a unique bundle in `dist/game`
 
-* `convert <input_folder> <output_folder>`: runs `convert-script` and `bundle`, remove `dist/game/bundle.js` (to keep only `index.html` and assets) and moves `dist/game` to `output_folder`
+* `convert <input_folder> <output_folder>`: runs `convert-script` and `bundle`, removes `dist/game/bundle.js` (to keep only `index.html` and assets) and moves `dist/game` to `output_folder`
 
 
 ## Project structure

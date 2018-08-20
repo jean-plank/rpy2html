@@ -3,8 +3,10 @@
  */
 
 const _ = require('lodash');
+const util = require('util');
 const path = require('path');
-const parseGame = require('./parser');
+const parseGame = require('./parsing/parser');
+const getJs = require('./converting/getJs');
 
 
 // parse input file $1
@@ -15,9 +17,12 @@ const converterCssOutput = path.join(__dirname, '../../dist/converted.css');
 
 if (process.argv.length === 3) {
     const fName = process.argv[2];
-    const res = parseGame(fName);
+    const actions = parseGame(fName);
+    const res = getJs(actions);
 
-    console.log('res =', res);
+    // console.log('actions.options =\n', actions.options, '\n');
+    // console.log('actions.script =\n', util.inspect(_.takeRight(actions.script, 12), false, null));
+    // console.log('res =', res);
 } else {
     console.error('Converter: illegal number of parameters, 1 required');
     process.exit(1);
