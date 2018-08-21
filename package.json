@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Convert RenPy games to a single index.html",
   "scripts": {
-    "convert-script": "utils/convert-script.sh",
-    "bundle": "utils/bundle.sh",
-    "convert": "utils/convert.sh",
+    "compile": "utils/compile.py",
+    "bundle": "utils/bundle.py",
+    "convert": "utils/convert.py",
     "test": "jasmine --config=jasmine.json"
   },
   "repository": {
@@ -19,7 +19,6 @@
     "file-loader": "^1.1.11",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^3.2.0",
-    "jasmine-core": "^3.1.0",
     "jquery": "^3.3.1",
     "lowdash": "^1.2.0",
     "style-loader": "^0.21.0",

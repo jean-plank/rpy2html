@@ -1,41 +1,38 @@
 # rpy2html
 
-Convert RenPy games to a single index.html
+Converts RenPy games to a single index.html
 
-## Usage
 
-You need to install [`nodejs`](https://nodejs.org) (which comes with `npm`).
+## Requirements
 
-Being at the root of this project:
+* [Node.js](https://nodejs.org)
 
-* First, install dependencies of the project: 
+* [Python 2](https://www.python.org/downloads/) (must be avaible in PATH)
+
+* [Ren'Py](https://www.renpy.org/latest.html) 
+
+
+Install dependencies of the project: 
 
         npm install
 
-* Then, to convert a RenPy game:
 
-        npm run convert <input_folder> <output_folder>
+## Use
 
-Where `input_folder` is your RenPy exported game folder.  
-`output_folder` is the folder where your web bundle should be exported.
+        npm run convert <path-to-renpy-executable> <path-to-renpy-game>
 
 
-### Commands details
+See also:
 
-* `convert-script <input_folder>`: takes all the `*.rpy` files in `input_folder/game` and outputs `converted.js` and `converted.css` bundled file in `dist`
+* Only generating `dist/converted.js` and `dist/converted.css`, but don't make the bundle:
 
-* `bundle`: uses the two previously converted files and the `src/game-engine` to create a unique bundle in `dist/game`
+        npm run compile <path-to-renpy-executable> <path-to-renpy-game>`
 
-* `convert <input_folder> <output_folder>`: runs `convert-script` and `bundle`, removes `dist/game/bundle.js` (to keep only `index.html` and assets) and moves `dist/game` to `output_folder`
-
-
-## Project structure
-
-### `src/converter`
-
-Parses and converts the `.rpy` files to a `script.js` and a `style.css`.
+* Making the bundle:
+  
+        npm run bundle
 
 
-### `src/game-engine`
+## What it does
 
-Implements the functions called by `script.js` created by the converter. Also includes a `defaut.css` and the `index.html`.
+![what it does](what_it_does.jpg)
