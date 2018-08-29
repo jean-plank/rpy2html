@@ -7,13 +7,24 @@ const HtmlWebpackInlineSourcePlugin =
 
 module.exports = {
     mode: 'development',
-    entry: './dist/converted.js',
+    entry: './src/converted/converted.ts',
+    // devtool: 'inline-source-map',
     output: {
-        path: path.resolve(__dirname, 'dist/game'),
+        path: path.resolve(__dirname, 'dist/'),
         filename: 'bundle.js',
     },
     module: {
         rules: [
+            // ts
+            {
+                test: /\.ts$/,
+                use: 'ts-loader',
+                exclude: [
+                    /node-modules/,
+                    "**/*.spec.ts",
+                ],
+            },
+            // css
             {
                 test: /\.css$/,
                 use: [
@@ -21,19 +32,49 @@ module.exports = {
                     'css-loader',
                 ]
             },
+            // fonts
             {
-                test: /\.(ttf|otf|png|jpg|opus|ogg|mp3|wav)$/,
+                test: /\.(ttf|otf)$/,
                 use: [
                     {
                         loader: 'file-loader',
                         options: {
-                            name: '[path][name].[ext]',
-                            // outputPath: 'images/',
+                            name: '[name]-[hash].[ext]',
+                            outputPath: 'fonts/',
+                        },
+                    },
+                ],
+            },
+            // images
+            {
+                test: /\.(png|jpg|jpeg|ico)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name]-[hash].[ext]',
+                            outputPath: 'images/',
+                        },
+                    },
+                ],
+            },
+            // sounds
+            {
+                test: /\.(opus|ogg|mp3|wav)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name]-[hash].[ext]',
+                            outputPath: 'sounds/',
                         },
                     },
                 ],
             },
         ],
+    },
+    resolve: {
+        extensions: ['.ts', '.js'],
     },
     plugins: [
         new UglifyJsPlugin(),

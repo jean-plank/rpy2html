@@ -1,3 +1,103 @@
-p {
-    color: red;
+* {
+    box-sizing: border-box;
+    line-height: 1em;
+    /* make it unselectable */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+body {
+    margin: 0;
+    background-color: black;
+    color: #eee;
+    overflow: hidden;
+}
+
+a {
+    text-decoration: none;
+    border: none;
+}
+
+button {
+    border: none;
+    color: inherit;
+    outline: 0;
+    background: none;
+    font-size: 1em;
+    text-align: left;
+    padding: 0;
+}
+
+#container {
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+#game {
+    position: relative;
+    height: 100vh;
+}
+
+#game>* {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+#scene>img, #char-img>img {
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+
+#textbox {
+    background-size: 100% 100%;
+}
+
+#namebox {
+    position: absolute;
+    color: #0099cc;
+}
+
+#dialog {
+    position: absolute;
+}
+
+#menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#main-menu {
+    display: flex;
+    background-size: 100% 100%;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+#main-menu>.items {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#game-infos {
+    color: #0099cc;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#game-version {
+    margin-top: 0.3em;
 }
