@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Convert RenPy games to a single index.html",
   "scripts": {
-    "compile": "utils/compile.py ~/renpy-sdk/renpy.sh",
+    "compile": "utils/compile.py",
     "bundle": "utils/bundle.py",
-    "convert": "utils/convert.py ~/renpy-sdk/renpy.sh",
+    "convert": "utils/convert.py",
     "test": "jasmine --config=jasmine.json",
     "clean-dist": "rm -rf dist/*",
     "clean-converted": "rm -rf src/converted/*"
