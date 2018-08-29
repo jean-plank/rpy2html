@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # This script should be run from the root folder of this project.
-# This is because compile.py will a create a `dist` folder in the cwd.
+# This is because compile.py will a create a `src/converted` folder in the cwd.
 
 from sys import argv
 from os import path
@@ -17,8 +17,13 @@ if __name__ == "__main__":
         compile = path.join(utils, "compile.py")
         bundle = path.join(utils, "bundle.py")
 
-        call([compile, renpy, game])
-        call([bundle])
+        code = call([compile, renpy, game])
+        if code == 0:
+            code = call([bundle])
+
+        if code != 0:
+            exit(1)
+
     else:
         print(
 """Illegal number of parameters, 2 required

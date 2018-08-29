@@ -2,6 +2,8 @@
 
 Converts RenPy games to a single index.html
 
+**Some code reused/inspired from: https://github.com/lolbot-iichan/rpy2wse**
+
 
 ## Requirements
 
@@ -35,4 +37,4 @@ See also:
 
 ## What it does
 
-![what it does](what_it_does.jpg)
+![what it does](what-it-does.jpg)
