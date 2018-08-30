@@ -26,7 +26,7 @@ Install dependencies of the project:
 
 See also:
 
-* Only generating `dist/converted.js` and `dist/converted.css`, but don't make the bundle:
+* Only generating `converted/converted.js` and `converted/converted.css`, but don't make the bundle:
 
         npm run compile <path-to-renpy-executable> <path-to-renpy-game>`
 

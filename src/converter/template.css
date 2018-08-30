@@ -44,14 +44,13 @@
     font-family: ${mmenubtn_ffamily};
     font-size: ${mmenubtn_fsize};
     color: ${mmenubtn_color};
-    width: ${mmenubtn_width};
-    height: ${mmenubtn_height};
-    text-align: ${mmenubtn_txtalign};
-    ${mmenubtn_bgtile};
 }
 
 #main-menu button {
+    width: ${mmenubtn_width};
+    height: ${mmenubtn_height};
     padding: ${mmenubtn_padding};
+    text-align: ${mmenubtn_txtalign};
 }
 
 #main-menu button:hover, #confirm button:hover {
@@ -75,7 +74,6 @@
 #choice>button {
     color: ${choicebtn_color};
     width: ${choicebtn_width};
-    height: ${choicebtn_height};
     ${choicebtn_bgtile};
     padding: ${choicebtn_padding};
     font-family: ${choicebtn_ffamily};

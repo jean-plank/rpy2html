@@ -77,6 +77,10 @@ button {
     justify-content: center;
 }
 
+#choice>button {
+    margin: 0.5em 0;
+}
+
 #main-menu {
     display: flex;
     background-size: 100% 100%;

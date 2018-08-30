@@ -541,15 +541,6 @@ init python:
             return "background-size: 100% 100%"
 
 
-    def choicebtn_height():
-        h = 49
-        btnbg = path.join(GAME_BASE_DIR, "gui/button/idle_background.png")
-        if path.isfile(btnbg):
-            image = pygame.image.load(btnbg)
-            (_w, h) = image.get_rect().size
-        return h
-
-
     def mmenubtn_borders():
         borders = guiattr("button_borders", Borders(6, 6, 6, 6))
         left = borders.left + 58
@@ -562,9 +553,9 @@ init python:
     def choicebtn_borders():
         borders = guiattr("choice_button_borders", Borders(6, 6, 6, 6))
         left = borders.left
-        top = borders.top + 8
+        top = borders.top + 2
         right = borders.right
-        bottom = borders.bottom + 8
+        bottom = borders.bottom + 2
         return Borders(left, top, right, bottom)
 
 
@@ -596,7 +587,6 @@ init python:
         ## main menu items
         mmenuitems_width = round(420.0 * GAME_WIDTH / 1920)
         ## main menu button
-        button_tile = guiattr("button_tile", False)
         button_text_hover_color = guiattr("button_text_hover_color", "#66c1e0")
         button_text_idle_color = guiattr("button_text_idle_color", "#888888")
         mmenubtn = fontsize(guiattr("button_text_size", 33))
@@ -654,7 +644,6 @@ init python:
             # main menu items
             "mmenuitems_width": percent(mmenuitems_width, GAME_WIDTH),
             # main menu button
-            "mmenubtn_bgtile": bgtile(button_tile),
             "mmenubtn_padding": padding(mmenubtn_borders(), mmenuitems_width),
             "mmenubtn_color_hover": button_text_hover_color,
             "mmenubtn_color": button_text_idle_color,
@@ -683,7 +672,6 @@ init python:
             "choicebtn_ffamily": the_fonts["dic"]["choicebtn"],
             "choicebtn_fsize_v": menubtn["v"],
             "choicebtn_fsize": menubtn["h"],
-            "choicebtn_height": percent(choicebtn_height() + 6, GAME_HEIGHT - textbox_height),
             "choicebtn_txtalign": textalign(choice_button_text_xalign),
             "choicebtn_width": get_or_else(percent(choice_button_width, GAME_WIDTH), "auto"),
             # confirm frame
