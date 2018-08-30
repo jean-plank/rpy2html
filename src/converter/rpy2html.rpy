@@ -406,9 +406,11 @@ init python:
             "main_menu_music": to_string(main_menu_music),
             "import_main_menu_overlay": import_img("gui/overlay/main_menu.png", "MAIN_MENU_OVERLAY"),
             "import_textbox": import_img("gui/textbox.png", "TEXTBOX_BG"),
-            "import_menu_btn_bg": import_img("gui/button/choice_idle_background.png", "MENU_BTN_BG"),
-            "import_menu_btn_hover": import_img("gui/button/choice_hover_background.png", "MENU_BTN_HOVER"),
+            "import_choice_btn_bg": import_img("gui/button/choice_idle_background.png", "CHOICE_BTN_BG"),
+            "import_choice_btn_hover": import_img("gui/button/choice_hover_background.png", "CHOICE_BTN_HOVER"),
             "import_namebox_bg": import_img("gui/namebox.png", "NAMEBOX_BG"),
+            "import_confirm_overlay": import_img("gui/overlay/confirm.png", "CONFIRM_OVERLAY"),
+            "import_frame_bg": import_img("gui/frame.png", "FRAME_BG"),
             "imgs_imports": imgs["imports"],
             "imgs_dic": imgs["dic"],
             "fonts_imports": fonts["imports"],
@@ -461,7 +463,7 @@ init python:
         }
 
         add_font("dialog", "text_font", res)
-        add_font("menubtn", "choice_button_text_font", res)
+        add_font("choicebtn", "choice_button_text_font", res)
         add_font("mmenu", "interface_text_font", res)
         add_font("mmenubtn", "button_text_font", res)
         add_font("namebox", "name_text_font", res)
@@ -522,7 +524,7 @@ init python:
         return val if val else els
 
 
-    def margin(borders, parent_w):
+    def padding(borders, parent_w):
         # margin in percentage is relative to the width of the containing block
         return " ".join([
             percent(borders.top, parent_w),
@@ -539,7 +541,7 @@ init python:
             return "background-size: 100% 100%"
 
 
-    def menubtn_height():
+    def choicebtn_height():
         h = 49
         btnbg = path.join(GAME_BASE_DIR, "gui/button/idle_background.png")
         if path.isfile(btnbg):
@@ -557,7 +559,7 @@ init python:
         return Borders(left, top, right, bottom)
 
 
-    def menubtn_borders():
+    def choicebtn_borders():
         borders = guiattr("choice_button_borders", Borders(6, 6, 6, 6))
         left = borders.left
         top = borders.top + 8
@@ -601,21 +603,21 @@ init python:
         button_width = guiattr("button_width", None)
         button_height = guiattr("button_height", None)
         button_text_xalign = guiattr("button_text_xalign", 0.0)
-        hover_muted_color = guiattr("hover_muted_color", "#005b7a")
-        muted_color = guiattr("muted_color", "#003d51")
+        insensitive_color = guiattr("insensitive_color", "#555555")
         ## game infos in main menu
         infos_marginright = round(24.0 * GAME_WIDTH / 1788)
         infos_marginbottom = round(32.0 * GAME_HEIGHT / 1006)
         ## game title in main menu
         title = fontsize(guiattr("title_text_size", 75))
-        ## menu button
+        ## choice button
         choice_button_tile = guiattr("choice_button_tile", False)
         choice_button_text_hover_color = guiattr("choice_button_text_hover_color", "#ffffff")
         choice_button_text_idle_color = guiattr("choice_button_text_idle_color", "#cccccc")
         menubtn = fontsize(guiattr("choice_button_text_size", 33))
         choice_button_text_xalign = guiattr("choice_button_text_xalign", 0.5)
         choice_button_width = guiattr("choice_button_width", 1185)
-
+        # confirm frame
+        confirmframe_borders = guiattr("confirm_frame_borders", Borders(60, 60, 60, 60))
 
 
         datas = {
@@ -627,7 +629,7 @@ init python:
             "textbox_yalign": yalign(textbox_yalign, textbox_height, GAME_HEIGHT),
             # namebox
             "namebox_bgtile": bgtile(namebox_tile),
-            "namebox_margin": margin(namebox_borders, GAME_WIDTH),
+            "namebox_padding": padding(namebox_borders, GAME_WIDTH),
             "namebox_ffamily": the_fonts["dic"]["namebox"],
             "namebox_fsize_v": namebox["v"],
             "namebox_fsize": namebox["h"],
@@ -653,7 +655,7 @@ init python:
             "mmenuitems_width": percent(mmenuitems_width, GAME_WIDTH),
             # main menu button
             "mmenubtn_bgtile": bgtile(button_tile),
-            "mmenubtn_margin": margin(mmenubtn_borders(), mmenuitems_width),
+            "mmenubtn_padding": padding(mmenubtn_borders(), mmenuitems_width),
             "mmenubtn_color_hover": button_text_hover_color,
             "mmenubtn_color": button_text_idle_color,
             "mmenubtn_ffamily": the_fonts["dic"]["mmenubtn"],
@@ -662,29 +664,30 @@ init python:
             "mmenubtn_width": get_or_else(percent(button_width, mmenuitems_width), "auto"),
             "mmenubtn_height": get_or_else(percent(button_height, GAME_HEIGHT), "auto"),
             "mmenubtn_txtalign": textalign(button_text_xalign),
-            "disabledbtn_color_hover": hover_muted_color,
-            "disabledbtn_color": muted_color,
+            "disabledbtn_color": insensitive_color,
             # game infos in main menu
             "infos_marginright": percent(infos_marginright, GAME_WIDTH),
             "infos_marginbottom": percent(infos_marginbottom, GAME_WIDTH),
             # game title in main menu
             "title_fsize_v": title["v"],
             "title_fsize": title["h"],
-            # menu
-            "menu_height": percent(GAME_HEIGHT - textbox_height, GAME_HEIGHT),
-            "menu_yalign": yalign(1.0 - textbox_yalign, GAME_HEIGHT - textbox_height, GAME_HEIGHT),
-            # menu button
-            "menubtn_bgtile": bgtile(choice_button_tile),
-            "menubtn_bgtile": bgtile(choice_button_tile),
-            "menubtn_margin": margin(menubtn_borders(), GAME_WIDTH),
-            "menubtn_color_hover": choice_button_text_hover_color,
-            "menubtn_color": choice_button_text_idle_color,
-            "menubtn_ffamily": the_fonts["dic"]["menubtn"],
-            "menubtn_fsize_v": menubtn["v"],
-            "menubtn_fsize": menubtn["h"],
-            "menubtn_height": percent(menubtn_height() + 6, GAME_HEIGHT - textbox_height),
-            "menubtn_txtalign": textalign(choice_button_text_xalign),
-            "menubtn_width": get_or_else(percent(choice_button_width, GAME_WIDTH), "auto")
+            # choice
+            "choice_height": percent(GAME_HEIGHT - textbox_height, GAME_HEIGHT),
+            "choice_yalign": yalign(1.0 - textbox_yalign, GAME_HEIGHT - textbox_height, GAME_HEIGHT),
+            # choice button
+            "choicebtn_bgtile": bgtile(choice_button_tile),
+            "choicebtn_bgtile": bgtile(choice_button_tile),
+            "choicebtn_padding": padding(choicebtn_borders(), GAME_WIDTH),
+            "choicebtn_color_hover": choice_button_text_hover_color,
+            "choicebtn_color": choice_button_text_idle_color,
+            "choicebtn_ffamily": the_fonts["dic"]["choicebtn"],
+            "choicebtn_fsize_v": menubtn["v"],
+            "choicebtn_fsize": menubtn["h"],
+            "choicebtn_height": percent(choicebtn_height() + 6, GAME_HEIGHT - textbox_height),
+            "choicebtn_txtalign": textalign(choice_button_text_xalign),
+            "choicebtn_width": get_or_else(percent(choice_button_width, GAME_WIDTH), "auto"),
+            # confirm frame
+            "confirmframe_padding": padding(confirmframe_borders, GAME_WIDTH),
         }
 
         return file_template(TEMPLATE_CSS, **datas), fonts_imports(the_fonts)

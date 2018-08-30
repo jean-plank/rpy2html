@@ -8,6 +8,7 @@ import { Sound, Sounds } from  './Sound';
 import { Chars } from  './Char';
 import { Node, Nodes, Menu } from  './nodes';
 import { MainMenu } from './MainMenu';
+import { ConfirmHandler } from './ConfirmHandler';
 
 
 class StoryElements {
@@ -17,8 +18,9 @@ class StoryElements {
     textbox: JQuery<HTMLElement>;
     namebox: JQuery<HTMLElement>;
     dialog: JQuery<HTMLElement>;
-    menu: JQuery<HTMLElement>;
+    choice: JQuery<HTMLElement>;
     mainMenu: JQuery<HTMLElement>;
+    confirm: JQuery<HTMLElement>;
 }
 
 
@@ -38,10 +40,12 @@ export class StoryDatas {
     main_menu_bg: string;
     main_menu_music: string;
     main_menu_overlay: string;
-    menu_btn_bg: string;
-    menu_btn_hover: string;
+    choice_btn_bg: string;
+    choice_btn_hover: string;
     textbox_bg: string;
     namebox_bg: string;
+    confirm_overlay: string;
+    frame_bg: string;
     images: Images;
     fonts: Fonts;
     sounds: Sounds;
@@ -63,8 +67,6 @@ function getBgOrElse(urlBg: string, color?: string): string {
 export class Story {
     private static _instance: Story;
 
-    mainMenu: MainMenu;
-
     $: StoryElements;
     state: StoryState;
     chans: Channels;
@@ -72,20 +74,13 @@ export class Story {
     images: Images;
     sounds: Sounds;
     chars: Chars;
+    confirmHandler: ConfirmHandler;
+    mainMenu: MainMenu;
 
     nodes: Nodes;
 
     private constructor() {
-        this.$ = {
-            container: $('#container'),
-            scene: $('#scene'),
-            charImg: $('#char-img'),
-            textbox: $('#textbox'),
-            namebox: $('#namebox'),
-            dialog: $('#dialog'),
-            menu: $('#menu'),
-            mainMenu: $('#main-menu')
-        }
+        this._initElts();
 
         this.state = {
             scene: null,
@@ -101,6 +96,43 @@ export class Story {
         }
     }
 
+    private _initElts(): void {
+        this.$ = {
+            container: $('#container'),
+            scene: $('#scene'),
+            charImg: $('#char-img'),
+            textbox: $('#textbox'),
+            namebox: $('#namebox'),
+            dialog: $('#dialog'),
+            choice: $('#choice'),
+            mainMenu: $('#main-menu'),
+            confirm: $('#confirm'),
+        }
+
+        // Main menu buttons
+        class Btn {
+            id: string;
+            txt: string;
+            disabled: boolean;
+        }
+
+        const btns: Array<Btn> = [
+            { id: "start-btn", txt: "Start", disabled: false },
+            { id: "load-btn", txt: "Load", disabled: true },
+            { id: "pref-btn", txt: "Preferences", disabled: true },
+            { id: "about-btn", txt: "About", disabled: true },
+            { id: "help-btn", txt: "Help", disabled: true },
+            { id: "quit-btn", txt: "Quit", disabled: false },
+        ];
+
+        _.forEach(btns, (btn: Btn) =>
+            this.$.mainMenu.children(".items").first().append(
+                $('<button>')
+                    .attr("id", btn.id)
+                    .prop("disabled", btn.disabled)
+                    .text(btn.txt)));
+    }
+
     public static getInstance(): Story {
         return this._instance || (this._instance = new this());
     }
@@ -114,17 +146,15 @@ export class Story {
                && _.has(this.chans, chanName));
     }
 
-    initiateStory(datas: StoryDatas): void {
+    setDatas(datas: StoryDatas): void {
         this.images = datas.images;
         this.sounds = datas.sounds;
         this.chars = datas.chars;
+        this.confirmHandler = new ConfirmHandler();
+        this.mainMenu = new MainMenu(datas);
 
         this._initHead(datas);
         this._initCss(datas);
-        this._initEvents();
-        this.mainMenu = new MainMenu(this, datas);
-
-        this.mainMenu.show();
     }
 
     private _initHead(datas: StoryDatas): void {
@@ -154,12 +184,20 @@ ${fonts}
     ${getBgOrElse(datas.main_menu_overlay, "rgba(0,0,0,0.5)")}
 }
 
-#${this.$.menu.attr("id")}>button {
-    ${getBgOrElse(datas.menu_btn_bg, "rgba(0,0,0,0.8)")}
+#${this.$.choice.attr("id")}>button {
+    ${getBgOrElse(datas.choice_btn_bg, "rgba(0,0,0,0.8)")}
 }
 
-#${this.$.menu.attr("id")}>button:hover {
-    ${getBgOrElse(datas.menu_btn_hover, "rgba(0,0.6,0.8,0.8)")}
+#${this.$.choice.attr("id")}>button:hover {
+    ${getBgOrElse(datas.choice_btn_hover, "rgba(0,0.6,0.8,0.8)")}
+}
+
+#${this.$.confirm.attr("id")} {
+    ${getBgOrElse(datas.confirm_overlay, "rgba(0,0,0,0.6)")}
+}
+
+.frame {
+    ${getBgOrElse(datas.frame_bg, "black")};
 }
 </style>`);
 
@@ -176,15 +214,55 @@ ${fonts}
         }
 
         function keyup(event: any): void {
-            if (event.which === 37) {
-                // left arrow
-            } else if (event.which === 39) {
-                nextIfNotNode();
+            /*
+            Ren'Py help:
+
+            * `Enter`: Advances dialogue and activates the interface.
+            * `Space`: Advances dialogue without selecting choices.
+            * `Arrow Keys`: Navigate the interface.
+            * `Escape`: Accesses the game menu.
+            * `Ctrl`: Skips dialogue while held down.
+            * `Tab`: Toggles dialogue skipping.
+            * `Page Up`: Rolls back to earlier dialogue.
+            * `Page Down`: Rolls forward to later dialogue.
+            * `H`: Hides the user interface.
+            * `S`: Takes a screenshot.
+            * `V`: Toggles assistive self-voicing.
+
+            * `Left Click`: Advances dialogue and activates the interface.
+            * `Middle Click`: Hides the user interface.
+            * `Right Click`: Accesses the game menu.
+            * `Mouse Wheel Up`, `Click Rollbalck Side`: Rolls back to earlier dialogue.
+            * `Mouse Wheel Down`: Rolls forward to later dialogue.
+             */
+
+
+            const keyEvents: { [id: number]: (e: any) => void } = {
+                // 38: () => {},   // up arrow
+                // 40: () => {},   // down arrow
+                // 37: () => {},   // left arrow
+                39: nextIfNotNode, // right arrow
+                27: () => {        // escape
+                    if (siht.confirmHandler.hidden) {
+                        siht._quit();
+                    } else {
+                        siht.confirmHandler.hide();
+                    }},
+                32: nextIfNotNode, // space
+                // 13: () => {},   // enter
+                // 17: () => {},   // control
+                // 9: () => {},    // tab
+                // 33: () => {},   // page up
+                // 72: () => {},   // h
+                // 86: () => {},   // v
+
             }
+            const f: (e: any) => void = keyEvents[event.which];
+
+            if (f != undefined) f(event);
         }
 
         function wheel(event: any): void {
-
             if (event.originalEvent.deltaY < 0) {
                 // console.log("scroll up");
             } else if (event.originalEvent.deltaY > 0) {
@@ -192,15 +270,29 @@ ${fonts}
             }
         }
 
+        // navigation events
         this.$.container.on("click", nextIfNotNode);
         $(document).on("keyup", keyup);
         this.$.container.on("wheel", wheel);
+
+        // main menu button
+        $('#start-btn').click(this.startStory());
+        $('#quit-btn').click(() => this._quit());
+    }
+
+    private _quit(): void {
+        this.confirmHandler.confirm(
+            "Are you sure you want to quit?",
+            {   "Yes": () => window.location.assign(".."),
+                "No": () => {} })
     }
 
     setNodes(nodes: Nodes): void {
         this.nodes = nodes;
+
+        this.mainMenu.show();
         nodes[0].loadBlock();
-        $('#start-btn').click(this.startStory());
+        this._initEvents();
     }
 
     startStory(): (e: any) => void {

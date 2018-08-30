@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 
+import { Story } from './Story';
 import { Sound } from './Sound';
 
 
@@ -19,17 +20,25 @@ export class Channel {
      * Stop current channel and plays sound.
      */
     play(sound: Sound | Array<Sound>): void {
+        let promise: Promise<void>;
         this.stop();
 
         if (_.isArray(sound)) {
-            this._play(_.head(sound));
+            promise = this._play(_.head(sound));
             this.pending = _.tail(sound);
         } else {
-            this._play(sound);
+            promise = this._play(sound);
+        }
+
+        if (promise != undefined) {
+            const siht = this;
+
+            promise.catch(() =>
+                Story.getInstance().confirmHandler.notifyAudio(siht, sound));
         }
     }
 
-    private _play(sound: Sound): void {
+    private _play(sound: Sound): Promise<void> {
         if (this.currentlyPlaying != undefined) {
             this.currentlyPlaying.stop();
         }
@@ -39,10 +48,11 @@ export class Channel {
             console.error(`Sound ${sound} didn't preload correctly. Loaded now.`);
         }
 
-        sound.play(this.volume);
+        const res: Promise<void> = sound.play(this.volume);
         sound.oneEnded(this.oneEnded());
-
         this.currentlyPlaying = sound;
+
+        return res;
     }
 
     /**

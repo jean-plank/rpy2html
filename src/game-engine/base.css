@@ -70,7 +70,7 @@ button {
     position: absolute;
 }
 
-#menu {
+#choice {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -100,4 +100,22 @@ button {
 
 #game-version {
     margin-top: 0.3em;
+}
+
+#confirm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#confirm>.frame {
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#confirm .items {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1.67em;
 }

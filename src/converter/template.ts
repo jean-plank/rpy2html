@@ -27,9 +27,11 @@ const MAIN_MENU_MUSIC: string = ${main_menu_music};
 ${import_game_icon}
 ${import_main_menu_overlay}
 ${import_textbox}
-${import_menu_btn_bg}
-${import_menu_btn_hover}
+${import_choice_btn_bg}
+${import_choice_btn_hover}
 ${import_namebox_bg}
+${import_confirm_overlay}
+${import_frame_bg}
 
 ${imgs_imports}
 
@@ -66,17 +68,19 @@ const datas: StoryDatas = {
     main_menu_bg: MAIN_MENU_BG,
     main_menu_music: MAIN_MENU_MUSIC,
     main_menu_overlay: MAIN_MENU_OVERLAY,
-    menu_btn_bg: MENU_BTN_BG,
-    menu_btn_hover: MENU_BTN_HOVER,
+    choice_btn_bg: CHOICE_BTN_BG,
+    choice_btn_hover: CHOICE_BTN_HOVER,
     textbox_bg: TEXTBOX_BG,
     namebox_bg: NAMEBOX_BG,
+    confirm_overlay: CONFIRM_OVERLAY,
+    frame_bg: FRAME_BG,
     images: IMAGES,
     fonts: FONTS,
     sounds: SOUNDS,
     chars: CHARS
 };
 
-STORY.initiateStory(datas);
+STORY.setDatas(datas);
 
 
 // nodes

@@ -11,9 +11,9 @@ export class MainMenu {
     background: Image;
     music: Sound;
 
-
-    constructor (story: Story, datas: StoryDatas) {
-        this.story = story;
+    constructor (datas: StoryDatas) {
+        this.story = Story.getInstance();
+        this.story.$.mainMenu.hide();
 
         $('#game-name').text(datas.name);
 

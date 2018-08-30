@@ -16,7 +16,7 @@
     font-size: ${namebox_fsize};
     width: ${namebox_width};
     height: ${namebox_height};
-    margin: ${namebox_margin};
+    padding: ${namebox_padding};
     text-align: ${namebox_txtalign};
     ${namebox_bgtile};
 }
@@ -31,7 +31,7 @@
     text-align: ${dialog_txtalign};
 }
 
-#main-menu {
+#main-menu, #confirm {
     font-family: ${mmenu_ffamily};
     font-size: ${mmenu_fsize};
 }
@@ -40,18 +40,21 @@
     width: ${mmenuitems_width};
 }
 
-#main-menu button {
+#main-menu button, #confirm button {
     font-family: ${mmenubtn_ffamily};
     font-size: ${mmenubtn_fsize};
     color: ${mmenubtn_color};
-    margin: ${mmenubtn_margin};
     width: ${mmenubtn_width};
     height: ${mmenubtn_height};
     text-align: ${mmenubtn_txtalign};
     ${mmenubtn_bgtile};
 }
 
-#main-menu button:hover {
+#main-menu button {
+    padding: ${mmenubtn_padding};
+}
+
+#main-menu button:hover, #confirm button:hover {
     color: ${mmenubtn_color_hover};
 }
 
@@ -64,32 +67,32 @@
     font-size: ${title_fsize};
 }
 
-#menu {
-    height: ${menu_height};
-    ${menu_yalign};
+#choice {
+    height: ${choice_height};
+    ${choice_yalign};
 }
 
-#menu>button {
-    color: ${menubtn_color};
-    width: ${menubtn_width};
-    height: ${menubtn_height};
-    ${menubtn_bgtile};
-    margin: ${menubtn_margin};
-    font-family: ${menubtn_ffamily};
-    font-size: ${menubtn_fsize};
-    text-align: ${menubtn_txtalign};
+#choice>button {
+    color: ${choicebtn_color};
+    width: ${choicebtn_width};
+    height: ${choicebtn_height};
+    ${choicebtn_bgtile};
+    padding: ${choicebtn_padding};
+    font-family: ${choicebtn_ffamily};
+    font-size: ${choicebtn_fsize};
+    text-align: ${choicebtn_txtalign};
 }
 
-#menu>button:hover {
-    color: ${menubtn_color_hover};
+#choice>button:hover {
+    color: ${choicebtn_color_hover};
 }
 
-#main-menu button:disabled, #menu>button:disabled {
+#main-menu button:disabled, #choice>button:disabled {
     color: ${disabledbtn_color};
 }
 
-#main-menu button:disabled:hover, #menu>button:disabled:hover {
-    color: ${disabledbtn_color_hover};
+#confirm>.frame {
+    padding: ${confirmframe_padding};
 }
 
 
@@ -112,8 +115,8 @@
         font-size: ${dialog_fsize_v};
     }
 
-    #menu>button {
-        font-size: ${menubtn_fsize_v};
+    #choice>button {
+        font-size: ${choicebtn_fsize_v};
     }
 
     #main-menu>button {

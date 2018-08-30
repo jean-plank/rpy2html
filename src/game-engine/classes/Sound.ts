@@ -24,9 +24,10 @@ export class Sound {
         return this.$audio != undefined;
     }
 
-    play(volume: number): void {
+    play(volume: number): Promise<void> {
         this.$audio[0].volume = volume;
-        this.$audio[0].play();
+
+        return this.$audio[0].play();
     }
 
     stop(): void {

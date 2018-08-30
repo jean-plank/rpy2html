@@ -30,11 +30,12 @@ See also:
 
         npm run compile <path-to-renpy-executable> <path-to-renpy-game>`
 
+
 * Making the bundle:
   
         npm run bundle
 
 
-## What it does
+## What it does (without any waranty)
 
 ![what it does](what-it-does.jpg)

@@ -100,7 +100,7 @@ export class Menu extends Node {
             return (event: any) => {
                 event.stopPropagation();
                 siht.story.$.namebox.show();
-                siht.story.$.menu.empty();
+                siht.story.$.choice.empty();
                 siht.story.executeNextNodes(i);
             }
         }
@@ -110,7 +110,7 @@ export class Menu extends Node {
             const btn: JQuery<HTMLButtonElement> = $(document.createElement("button"))
                 .text(next.text)
                 .one("click", click(this, i));
-            this.story.$.menu.append(btn);
+            this.story.$.choice.append(btn);
             i++;
         });
 
