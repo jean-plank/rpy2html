@@ -207,8 +207,9 @@ ${fonts}
     private _initEvents(): void {
         const siht = this;
 
-        function nextIfNotNode(): void {
-            if (!(siht.state.currentNode instanceof Menu)) {
+        function nextIfNotMenu(): void {
+            if (  !(siht.state.currentNode instanceof Menu)
+               && siht.confirmHandler.hidden) {
                 siht.executeNextNodes();
             }
         }
@@ -241,14 +242,14 @@ ${fonts}
                 // 38: () => {},   // up arrow
                 // 40: () => {},   // down arrow
                 // 37: () => {},   // left arrow
-                39: nextIfNotNode, // right arrow
+                39: nextIfNotMenu, // right arrow
                 27: () => {        // escape
                     if (siht.confirmHandler.hidden) {
                         siht._quit();
                     } else {
                         siht.confirmHandler.hide();
                     }},
-                32: nextIfNotNode, // space
+                32: nextIfNotMenu, // space
                 // 13: () => {},   // enter
                 // 17: () => {},   // control
                 // 9: () => {},    // tab
@@ -266,12 +267,12 @@ ${fonts}
             if (event.originalEvent.deltaY < 0) {
                 // console.log("scroll up");
             } else if (event.originalEvent.deltaY > 0) {
-                nextIfNotNode();
+                nextIfNotMenu();
             }
         }
 
         // navigation events
-        this.$.container.on("click", nextIfNotNode);
+        this.$.container.on("click", nextIfNotMenu);
         $(document).on("keyup", keyup);
         this.$.container.on("wheel", wheel);
 
