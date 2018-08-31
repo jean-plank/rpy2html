@@ -51,3 +51,4 @@ if __name__ == "__main__":
 
 Usage:
     compile.py <path-to-renpy-executable> <path-to-renpy-game-folder>""")
+        exit(1)

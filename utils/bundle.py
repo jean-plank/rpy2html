@@ -11,6 +11,7 @@ if __name__ == "__main__":
         webpack = path.join(utils, "../node_modules/.bin/webpack")
         game_config = path.join(utils, "../game.config.js")
 
-        call([webpack, "--config", game_config])
+        exit(call([webpack, "--config", game_config]))
     else:
         print("Illegal number of parameters, none required")
+        exit(1)

@@ -1,0 +1,31 @@
+# Needed environment variables:
+# HOST
+# SSH_PUBKEY
+# SSH_USER
+# SSHPASS
+
+addons:
+  apt:
+    packages:
+      - sshpass
+
+install:
+  - echo "$SSH_PUBKEY" >> $HOME/.ssh/known_hosts
+
+jobs:
+  include:
+    # - stage: test
+    #   script:
+    #     - echo "tests should go here"
+
+    # pre prod
+    - stage: 'deploy dev'
+      if: branch = develop
+      script:
+        - 'sshpass -e ssh $SSH_USER@$HOST -t "/home/travis/rpy2html-dev/deploy.sh"'
+
+    # prod
+    - stage: 'deploy prod'
+      if: branch = master
+      script:
+        - 'sshpass -e ssh $SSH_USER@$HOST -t "/home/travis/rpy2html/deploy.sh"'

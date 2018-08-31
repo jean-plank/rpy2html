@@ -30,7 +30,8 @@ if __name__ == "__main__":
 
         # moving to output dir
         if output_dir != DEFAULT_OUTPUT:
-            move(DEFAULT_OUTPUT, output_dir)
+            if path.isdir(DEFAULT_OUTPUT):
+                move(DEFAULT_OUTPUT, output_dir)
 
         exit(code)
 
@@ -40,3 +41,4 @@ if __name__ == "__main__":
 
 Usage:
     convert.py <path-to-renpy-executable> <path-to-renpy-game-folder> [output-folder=dist]""")
+        exit(1)
