@@ -43,8 +43,7 @@ if __name__ == "__main__":
 
         [remove_from_game(f) for f in to_be_removed]
 
-        if code != 0:
-            exit(1)
+        exit(code)
 
     else:
         print(

@@ -21,7 +21,7 @@ Install dependencies of the project:
 
 ## Use
 
-        npm run convert <path-to-renpy-executable> <path-to-renpy-game>
+        npm run convert <path-to-renpy-executable> <path-to-renpy-game> [output-folder=dist]
 
 
 See also:
