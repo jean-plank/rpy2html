@@ -5,6 +5,8 @@ init python:
     import pygame
     import re
 
+    config.debug_sound = False
+
     TEMPLATE_CSS = "template.css"
 
     TEMPLATE_OLD_CSS = "template-old.css"
