@@ -1,4 +1,7 @@
+import * as _ from 'lodash';
+
 import { Story, StoryDatas } from './classes/Story';
+import { Font } from './classes/Font';
 
 
 function getBgOrElse(urlBg: string, color?: string): string {
@@ -12,9 +15,23 @@ background-image: url("${urlBg}");`;
     }
 }
 
+function getFonts(fonts: Array<Font>): string {
+    return _.reduce(fonts,
+        (acc: string, font: Font, name: string) => {
+            console.log('name =', name);
+            if (name === "dejavusans_bold_ttf") {
+                return `${acc}${font.face("dejavusans_ttf")}\n`;
+            } else {
+                return `${acc}${font.face(name)}\n`;
+            }
+        },
+        "");
+}
 
-export function getStyle(datas: StoryDatas, fonts: string): string {
+
+export function getStyle(datas: StoryDatas): string {
     const story = Story.getInstance();
+    const fonts = getFonts(datas.fonts);
 
     return `#${story.$.textbox.attr("id")} {
     ${getBgOrElse(datas.textbox_bg)}

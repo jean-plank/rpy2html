@@ -9,6 +9,7 @@ import { Chars } from  './Char';
 import { Node, Nodes, Menu } from  './nodes';
 import { MainMenu } from './MainMenu';
 import { ConfirmHandler } from './ConfirmHandler';
+import { EventsHandler } from './EventsHandler';
 import * as utils from '../utils';
 
 
@@ -65,6 +66,7 @@ export class Story {
     sounds: Sounds;
     chars: Chars;
     confirmHandler: ConfirmHandler;
+    eventsHandler: EventsHandler;
     mainMenu: MainMenu;
 
     nodes: Nodes;
@@ -143,116 +145,13 @@ export class Story {
         this.confirmHandler = new ConfirmHandler();
         this.mainMenu = new MainMenu(datas);
 
-        this._initHead(datas);
-        this._initCss(datas);
-    }
-
-    private _initHead(datas: StoryDatas): void {
+        // init head
         document.title = datas.name;
-
         if (datas.icon != undefined) {
             $("link[rel='shortcut icon']").attr("href", datas.icon);
         }
-    }
 
-    private _initCss(datas: StoryDatas): void {
-        const fonts: string = _.reduce(datas.fonts,
-            (acc: string, font: Font, name: string) => {
-                console.log('name =', name);
-                if (name === "dejavusans_bold_ttf") {
-                    return `${acc}${font.face("dejavusans_ttf")}\n`;
-                } else {
-                    return `${acc}${font.face(name)}\n`;
-                }
-            },
-            "");
-        const style= $(`<style>${utils.getStyle(datas, fonts)}</style>`);
-
-        $("head").append(style);
-    }
-
-    private _initEvents(): void {
-        const siht = this;
-
-        function nextIfNotMenu(): void {
-            if (  !(siht.state.currentNode instanceof Menu)
-               && siht.confirmHandler.hidden) {
-                siht.executeNextNodes();
-            }
-        }
-
-        function keyup(event: any): void {
-            /*
-            Ren'Py help:
-
-            * `Enter`: Advances dialogue and activates the interface.
-            * `Space`: Advances dialogue without selecting choices.
-            * `Arrow Keys`: Navigate the interface.
-            * `Escape`: Accesses the game menu.
-            * `Ctrl`: Skips dialogue while held down.
-            * `Tab`: Toggles dialogue skipping.
-            * `Page Up`: Rolls back to earlier dialogue.
-            * `Page Down`: Rolls forward to later dialogue.
-            * `H`: Hides the user interface.
-            * `S`: Takes a screenshot.
-            * `V`: Toggles assistive self-voicing.
-
-            * `Left Click`: Advances dialogue and activates the interface.
-            * `Middle Click`: Hides the user interface.
-            * `Right Click`: Accesses the game menu.
-            * `Mouse Wheel Up`, `Click Rollbalck Side`: Rolls back to earlier dialogue.
-            * `Mouse Wheel Down`: Rolls forward to later dialogue.
-             */
-
-
-            const keyEvents: { [id: number]: (e: any) => void } = {
-                // 38: () => {},   // up arrow
-                // 40: () => {},   // down arrow
-                // 37: () => {},   // left arrow
-                39: nextIfNotMenu, // right arrow
-                27: () => {        // escape
-                    if (siht.confirmHandler.hidden) {
-                        siht._quit();
-                    } else {
-                        siht.confirmHandler.hide();
-                    }},
-                32: nextIfNotMenu, // space
-                // 13: () => {},   // enter
-                // 17: () => {},   // control
-                // 9: () => {},    // tab
-                // 33: () => {},   // page up
-                // 72: () => {},   // h
-                // 86: () => {},   // v
-
-            }
-            const f: (e: any) => void = keyEvents[event.which];
-
-            if (f != undefined) f(event);
-        }
-
-        function wheel(event: any): void {
-            if (event.originalEvent.deltaY < 0) {
-                // console.log("scroll up");
-            } else if (event.originalEvent.deltaY > 0) {
-                nextIfNotMenu();
-            }
-        }
-
-        // navigation events
-        this.$.container.on("click", nextIfNotMenu);
-        $(document).on("keyup", keyup);
-        this.$.container.on("wheel", wheel);
-
-        // main menu button
-        $('#start-btn').click(this.startStory());
-        $('#quit-btn').click(() => this._quit());
-    }
-
-    private _quit(): void {
-        this.confirmHandler.confirm(
-            "Are you sure you want to quit?",
-            {   "Yes": () => window.location.assign(".."),
-                "No": () => {} })
+        $("head").append($(`<style>${utils.getStyle(datas)}</style>`));
     }
 
     setNodes(nodes: Nodes): void {
@@ -260,7 +159,7 @@ export class Story {
 
         this.mainMenu.show();
         nodes[0].loadBlock();
-        this._initEvents();
+        this.eventsHandler = new EventsHandler();
     }
 
     startStory(): (e: any) => void {
