@@ -9,6 +9,7 @@ import { Chars } from  './Char';
 import { Node, Nodes, Menu } from  './nodes';
 import { MainMenu } from './MainMenu';
 import { ConfirmHandler } from './ConfirmHandler';
+import * as utils from '../utils';
 
 
 class StoryElements {
@@ -50,17 +51,6 @@ export class StoryDatas {
     fonts: Fonts;
     sounds: Sounds;
     chars: Chars;
-}
-
-
-function getBgOrElse(urlBg: string, color?: string): string {
-    if (urlBg != undefined) {
-        return `background-image: url("${urlBg}");`;
-    } else if (color != undefined) {
-        return `background-color: ${color};`;
-    } else {
-        return "";
-    }
 }
 
 
@@ -167,39 +157,16 @@ export class Story {
 
     private _initCss(datas: StoryDatas): void {
         const fonts: string = _.reduce(datas.fonts,
-            (acc: string, font: Font, name: string) => acc + font.face(name),
+            (acc: string, font: Font, name: string) => {
+                console.log('name =', name);
+                if (name === "dejavusans_bold_ttf") {
+                    return `${acc}${font.face("dejavusans_ttf")}\n`;
+                } else {
+                    return `${acc}${font.face(name)}\n`;
+                }
+            },
             "");
-        const style: JQuery<HTMLElement> = $(`<style>
-#${this.$.textbox.attr("id")} {
-    ${getBgOrElse(datas.textbox_bg, "rgba(0,0,0,0.8)")}
-}
-
-#${this.$.namebox.attr("id")} {
-    ${getBgOrElse(datas.namebox_bg)}
-}
-
-${fonts}
-
-#${this.$.mainMenu.attr("id")} {
-    ${getBgOrElse(datas.main_menu_overlay, "rgba(0,0,0,0.5)")}
-}
-
-#${this.$.choice.attr("id")}>button {
-    ${getBgOrElse(datas.choice_btn_bg, "rgba(0,0,0,0.8)")}
-}
-
-#${this.$.choice.attr("id")}>button:hover {
-    ${getBgOrElse(datas.choice_btn_hover, "rgba(0,0.6,0.8,0.8)")}
-}
-
-#${this.$.confirm.attr("id")} {
-    ${getBgOrElse(datas.confirm_overlay, "rgba(0,0,0,0.6)")}
-}
-
-.frame {
-    ${getBgOrElse(datas.frame_bg, "black")};
-}
-</style>`);
+        const style= $(`<style>${utils.getStyle(datas, fonts)}</style>`);
 
         $("head").append(style);
     }

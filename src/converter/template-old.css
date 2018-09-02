@@ -1,0 +1,161 @@
+/* horizontal device, vertical black bands, w >= 1920, h == 1080 */
+#game {
+    width: calc(100vh * ${game_width} / ${game_height});
+}
+
+#textbox {
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75);
+    height: ${textbox_height};
+    padding: ${textbox_padding};
+}
+
+#namebox {
+    position: static;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    font-family: ${namebox_ffamily};
+    font-size: ${namebox_fsize};
+}
+
+#dialog {
+    position: static;
+    font-family: ${dialog_ffamily};
+    font-size: ${dialog_fsize};
+}
+
+#main-menu, #confirm {
+    font-family: ${mmenu_ffamily};
+}
+
+#main-menu>.items {
+    height: auto;
+    position: absolute;
+    bottom: 1em;
+    right: 2em;
+    opacity: 0.9;
+    padding: 0.8em;
+    background-color: #926841;
+}
+
+#main-menu button, #confirm button {
+    color: #b99d83;
+    padding: 0.1em 1.5em;
+    font-size: ${mmenubtn_fsize};
+    font-family: ${mmenubtn_ffamily};
+}
+
+#main-menu button {
+    background-color: #4d3b29;
+    width: 100%;
+}
+
+#main-menu button:not(:last-of-type) {
+    margin-bottom: 0.1em;
+}
+
+#main-menu button:hover {
+    background-color: #996e45;
+}
+
+/* #main-menu button {
+    width: {mmenubtn_width};
+    height: {mmenubtn_height};
+    padding: {mmenubtn_padding};
+    text-align: {mmenubtn_txtalign};
+}
+
+#main-menu button:hover {
+    color:#b99d83hover};
+} */
+/*
+#game-infos {
+    margin-right: {infos_marginright};
+    margin-bottom: {infos_marginbottom};
+}
+
+#game-name {
+    font-size: {title_fsize};
+}
+
+#choice {
+    height: {choice_height};
+    {choice_yalign};
+}
+
+#choice>button {
+    color: {choicebtn_color};
+    width: {choicebtn_width};
+    {choicebtn_bgtile};
+    padding: {choicebtn_padding};
+    font-family: {choicebtn_ffamily};
+    font-size: {choicebtn_fsize};
+    text-align: {choicebtn_txtalign};
+}
+
+#choice>button:hover {
+    color: {choicebtn_color_hover};
+}
+*/
+#main-menu button:disabled, #main-menu button:hover:disabled {
+    color: #80654d;
+    background-color: none;
+}
+
+#confirm {
+    background-color: #1a140e;
+}
+
+#confirm>.frame {
+    width: 90%;
+    padding: 3em;
+    background-color: #745335;
+}
+
+#confirm-msg {
+    text-align: center;
+    font-size: ${mmenubtn_fsize};
+}
+
+#confirm button {
+    background-color: #57412c;
+}
+
+#confirm button:hover {
+    background-color: #8f6741;
+}
+
+
+/* vertical device, horizontal black bands, w == 1920, h >= 1080 */
+@media (max-aspect-ratio: ${game_width} / ${game_height}) {
+    #container {
+        flex-direction: column;
+    }
+
+    #game {
+        width: 100vw;
+        height: calc(100vw * ${game_height} / ${game_width});
+    }
+    #namebox {
+        font-size: ${namebox_fsize_v};
+    }
+
+    #dialog {
+        font-size: ${dialog_fsize_v};
+    }
+
+    /*
+
+    #choice>button {
+        font-size: {choicebtn_fsize_v};
+    }
+*/
+    #main-menu button, #confirm button, #confirm-msg {
+        font-size: ${mmenubtn_fsize_v};
+    }
+
+    /*
+    #game-name {
+        font-size: {title_fsize_v};
+    } */
+}

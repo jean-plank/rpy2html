@@ -7,6 +7,8 @@ init python:
 
     TEMPLATE_CSS = "template.css"
 
+    TEMPLATE_OLD_CSS = "template-old.css"
+
     TEMPLATE_TS = "template.ts"
 
     OUTPUT_DIR = "src/converted"
@@ -395,7 +397,7 @@ init python:
 
         main_menu_bg = "main_menu_bg" if MAIN_MENU_BG else None
         main_menu_music = "main_menu_music" if MAIN_MENU_MUSIC else None
-        show_name = guiattr("show_name", True)
+        show_name = guiattr("show_name", False)
 
         datas = {
             "game_name": to_string(config.name),
@@ -435,18 +437,23 @@ init python:
 
 
     def fonts():
-        def add_font(name, gui_attr, fonts):
-            file = guiattr(gui_attr, DEFAULT_FONT)
+        def find_font(file):
             res = path.join(GAME_BASE_DIR, file)
             if path.isfile(res):
-                really_add_font(name, res, fonts)
+                return res
             else:
                 res = path.join(RENPY_BASE_DIR, "common", file)
                 if path.isfile(res):
-                    really_add_font(name, res, fonts)
-                else:
-                    print("[WARNING] couldn't find font %s" % res)
-                    fonts["dic"][name] = "DejaVuSans"
+                    return res
+
+        def add_font(name, gui_attr, fonts):
+            file = guiattr(gui_attr, DEFAULT_FONT)
+            res = find_font(file)
+            if res:
+                really_add_font(name, res, fonts)
+            else:
+                print("[WARNING] couldn't find font %s" % res)
+                fonts["dic"][name] = "dejavusans_ttf"
 
         def really_add_font(name, file, fonts):
             if file in fonts["imports"]:
@@ -467,6 +474,12 @@ init python:
         add_font("mmenu", "interface_text_font", res)
         add_font("mmenubtn", "button_text_font", res)
         add_font("namebox", "name_text_font", res)
+
+        font = find_font("DejaVuSans-Bold.ttf")
+        if font:
+            if not font in res["imports"]:
+                res["imports"][font] = "dejavusans_bold_ttf"
+
         return res
 
     def fonts_imports(fonts):
@@ -474,20 +487,18 @@ init python:
         dic = "{\n"
         for path, fname in fonts["imports"].iteritems():
             imports += "import %s from '%s';\n" % (fname, path)
-            dic += "    %s: new Font(%s),\n" % (fname, fname)
+            if fname == "dejavusans_bold_ttf":
+                dic += "    %s: new Font(%s, true),\n" % (fname, fname)
+            else:
+                dic += "    %s: new Font(%s),\n" % (fname, fname)
         dic += "}"
 
         return { "imports": imports, "dic": dic }
 
 
-    def game_width_height():
-        w, h = 1920, 1080
-        if MAIN_MENU_BG:
-            image = pygame.image.load(MAIN_MENU_BG)
-            (w, h) = image.get_rect().size
-        return w, h
+    GAME_WIDTH = config.screen_width
 
-    GAME_WIDTH, GAME_HEIGHT = game_width_height()
+    GAME_HEIGHT = config.screen_height
 
 
     def fontsize(fsize):
@@ -542,101 +553,59 @@ init python:
 
 
     def mmenubtn_borders():
-        borders = guiattr("button_borders", Borders(6, 6, 6, 6))
-        left = borders.left + 58
-        top = borders.top + 6
-        right = borders.right + 145
-        bottom = borders.bottom + 6
+        left = gui.button_borders.left + 58
+        top = gui.button_borders.top + 6
+        right = gui.button_borders.right + 145
+        bottom = gui.button_borders.bottom + 6
         return Borders(left, top, right, bottom)
 
 
     def choicebtn_borders():
-        borders = guiattr("choice_button_borders", Borders(6, 6, 6, 6))
-        left = borders.left
-        top = borders.top + 2
-        right = borders.right
-        bottom = borders.bottom + 2
+        left = gui.choice_button_borders.left
+        top = gui.choice_button_borders.top + 2
+        right = gui.choice_button_borders.right
+        bottom = gui.choice_button_borders.bottom + 2
         return Borders(left, top, right, bottom)
 
 
-    def css():
-        the_fonts = fonts()
-
-        # retrieve (default) values
-        ## textbox
-        textbox_height = guiattr("textbox_height", 278)
-        textbox_yalign = guiattr("textbox_yalign", 1.0)
-        ## namebox
-        namebox_tile = guiattr("namebox_tile", False)
-        namebox_borders = guiattr("namebox_borders", Borders(5, 5, 5, 5))
-        namebox = fontsize(guiattr("name_text_size", 45))
-        namebox_width = guiattr("namebox_width", None)
-        namebox_height = guiattr("namebox_height", None)
-        name_xpos = guiattr("name_xpos", 360)
-        name_ypos = guiattr("name_ypos", 0)
-        name_xalign = guiattr("name_xalign", 0.0)
-        ## dialog
-        text_color = guiattr("text_color", "#ffffff")
-        dialog = fontsize(guiattr("text_size", 33))
-        dialogue_xpos = guiattr("dialogue_xpos", 402)
-        dialogue_ypos = guiattr("dialogue_ypos", 75)
-        dialogue_text_xalign = guiattr("dialogue_text_xalign", 0.0)
-        dialogue_width = guiattr("dialogue_width", 1116)
-        ## main menu
-        mmenu = fontsize(guiattr("interface_text_size", 33))
-        ## main menu items
+    def new_style(the_fonts):
+        namebox = fontsize(gui.name_text_size)
+        dialog = fontsize(gui.text_size)
+        mmenu = fontsize(gui.interface_text_size)
         mmenuitems_width = round(420.0 * GAME_WIDTH / 1920)
-        ## main menu button
-        button_text_hover_color = guiattr("button_text_hover_color", "#66c1e0")
-        button_text_idle_color = guiattr("button_text_idle_color", "#888888")
-        mmenubtn = fontsize(guiattr("button_text_size", 33))
-        button_width = guiattr("button_width", None)
-        button_height = guiattr("button_height", None)
-        button_text_xalign = guiattr("button_text_xalign", 0.0)
-        insensitive_color = guiattr("insensitive_color", "#555555")
-        ## game infos in main menu
+        mmenubtn = fontsize(gui.button_text_size)
         infos_marginright = round(24.0 * GAME_WIDTH / 1788)
         infos_marginbottom = round(32.0 * GAME_HEIGHT / 1006)
-        ## game title in main menu
-        title = fontsize(guiattr("title_text_size", 75))
-        ## choice button
-        choice_button_tile = guiattr("choice_button_tile", False)
-        choice_button_text_hover_color = guiattr("choice_button_text_hover_color", "#ffffff")
-        choice_button_text_idle_color = guiattr("choice_button_text_idle_color", "#cccccc")
-        menubtn = fontsize(guiattr("choice_button_text_size", 33))
-        choice_button_text_xalign = guiattr("choice_button_text_xalign", 0.5)
-        choice_button_width = guiattr("choice_button_width", 1185)
-        # confirm frame
-        confirmframe_borders = guiattr("confirm_frame_borders", Borders(60, 60, 60, 60))
-
+        title = fontsize(gui.title_text_size)
+        menubtn = fontsize(gui.choice_button_text_size)
 
         datas = {
             # game
             "game_height": GAME_HEIGHT,
             "game_width": GAME_WIDTH,
             # textbox
-            "textbox_height": percent(textbox_height, GAME_HEIGHT),
-            "textbox_yalign": yalign(textbox_yalign, textbox_height, GAME_HEIGHT),
+            "textbox_height": percent(gui.textbox_height, GAME_HEIGHT),
+            "textbox_yalign": yalign(gui.textbox_yalign, gui.textbox_height, GAME_HEIGHT),
             # namebox
-            "namebox_bgtile": bgtile(namebox_tile),
-            "namebox_padding": padding(namebox_borders, GAME_WIDTH),
+            "namebox_bgtile": bgtile(gui.namebox_tile),
+            "namebox_padding": padding(gui.namebox_borders, GAME_WIDTH),
             "namebox_ffamily": the_fonts["dic"]["namebox"],
             "namebox_fsize_v": namebox["v"],
             "namebox_fsize": namebox["h"],
-            "namebox_width": get_or_else(percent(namebox_width, GAME_WIDTH), "auto"),
-            "namebox_height": get_or_else(percent(namebox_height, textbox_height), "auto"),
-            "namebox_left": percent(name_xpos, GAME_WIDTH),
-            "namebox_top": get_or_else(percent(name_ypos + 5, textbox_height), percent(5, textbox_height)),
-            "namebox_txtalign": textalign(name_xalign),
+            "namebox_width": get_or_else(percent(gui.namebox_width, GAME_WIDTH), "auto"),
+            "namebox_height": get_or_else(percent(gui.namebox_height, gui.textbox_height), "auto"),
+            "namebox_left": percent(gui.name_xpos, GAME_WIDTH),
+            "namebox_top": get_or_else(percent(gui.name_ypos + 5, gui.textbox_height), percent(5, gui.textbox_height)),
+            "namebox_txtalign": textalign(gui.name_xalign),
             # dialog
-            "dialog_color": text_color,
+            "dialog_color": gui.text_color,
             "dialog_ffamily": the_fonts["dic"]["dialog"],
             "dialog_fsize_v": dialog["v"],
             "dialog_fsize": dialog["h"],
-            "dialog_left": percent(dialogue_xpos, GAME_WIDTH),
-            "dialog_top": percent(dialogue_ypos + 5, textbox_height),
-            "dialog_txtalign": textalign(dialogue_text_xalign),
-            "dialog_width": percent(dialogue_width, GAME_WIDTH),
+            "dialog_left": percent(gui.dialogue_xpos, GAME_WIDTH),
+            "dialog_top": percent(gui.dialogue_ypos + 5, gui.textbox_height),
+            "dialog_txtalign": textalign(gui.dialogue_text_xalign),
+            "dialog_width": percent(gui.dialogue_width, GAME_WIDTH),
             # main menu
             "mmenu_ffamily": the_fonts["dic"]["mmenu"],
             "mmenu_fsize_v": mmenu["v"],
@@ -645,15 +614,15 @@ init python:
             "mmenuitems_width": percent(mmenuitems_width, GAME_WIDTH),
             # main menu button
             "mmenubtn_padding": padding(mmenubtn_borders(), mmenuitems_width),
-            "mmenubtn_color_hover": button_text_hover_color,
-            "mmenubtn_color": button_text_idle_color,
+            "mmenubtn_color_hover": gui.button_text_hover_color,
+            "mmenubtn_color": gui.button_text_idle_color,
             "mmenubtn_ffamily": the_fonts["dic"]["mmenubtn"],
             "mmenubtn_fsize": mmenubtn["h"],
             "mmenubtn_fsize_v": mmenubtn["v"],
-            "mmenubtn_width": get_or_else(percent(button_width, mmenuitems_width), "auto"),
-            "mmenubtn_height": get_or_else(percent(button_height, GAME_HEIGHT), "auto"),
-            "mmenubtn_txtalign": textalign(button_text_xalign),
-            "disabledbtn_color": insensitive_color,
+            "mmenubtn_width": get_or_else(percent(gui.button_width, mmenuitems_width), "auto"),
+            "mmenubtn_height": get_or_else(percent(gui.button_height, GAME_HEIGHT), "auto"),
+            "mmenubtn_txtalign": textalign(gui.button_text_xalign),
+            "disabledbtn_color": gui.insensitive_color,
             # game infos in main menu
             "infos_marginright": percent(infos_marginright, GAME_WIDTH),
             "infos_marginbottom": percent(infos_marginbottom, GAME_WIDTH),
@@ -661,24 +630,71 @@ init python:
             "title_fsize_v": title["v"],
             "title_fsize": title["h"],
             # choice
-            "choice_height": percent(GAME_HEIGHT - textbox_height, GAME_HEIGHT),
-            "choice_yalign": yalign(1.0 - textbox_yalign, GAME_HEIGHT - textbox_height, GAME_HEIGHT),
+            "choice_height": percent(GAME_HEIGHT - gui.textbox_height, GAME_HEIGHT),
+            "choice_yalign": yalign(1.0 - gui.textbox_yalign, GAME_HEIGHT - gui.textbox_height, GAME_HEIGHT),
             # choice button
-            "choicebtn_bgtile": bgtile(choice_button_tile),
-            "choicebtn_bgtile": bgtile(choice_button_tile),
+            "choicebtn_bgtile": bgtile(gui.choice_button_tile),
             "choicebtn_padding": padding(choicebtn_borders(), GAME_WIDTH),
-            "choicebtn_color_hover": choice_button_text_hover_color,
-            "choicebtn_color": choice_button_text_idle_color,
+            "choicebtn_color_hover": gui.choice_button_text_hover_color,
+            "choicebtn_color": gui.choice_button_text_idle_color,
             "choicebtn_ffamily": the_fonts["dic"]["choicebtn"],
             "choicebtn_fsize_v": menubtn["v"],
             "choicebtn_fsize": menubtn["h"],
-            "choicebtn_txtalign": textalign(choice_button_text_xalign),
-            "choicebtn_width": get_or_else(percent(choice_button_width, GAME_WIDTH), "auto"),
+            "choicebtn_txtalign": textalign(gui.choice_button_text_xalign),
+            "choicebtn_width": get_or_else(percent(gui.choice_button_width, GAME_WIDTH), "auto"),
             # confirm frame
-            "confirmframe_padding": padding(confirmframe_borders, GAME_WIDTH),
+            "confirmframe_padding": padding(gui.confirm_frame_borders, GAME_WIDTH),
         }
 
-        return file_template(TEMPLATE_CSS, **datas), fonts_imports(the_fonts)
+        return file_template(TEMPLATE_CSS, **datas)
+
+
+    def old_style(the_fonts):
+        # I didn't manage to retrieve the colors automatically, so I hard coded them in template-old.css
+        textbox_height = round(232.0 * GAME_HEIGHT / 1080)
+        textbox_padding = round(16.0 * GAME_WIDTH / 1920)
+        namebox = fontsize(32)
+        dialog = fontsize(32)
+        mmenubtn = fontsize(34)
+
+        datas = {
+            # game
+            "game_height": GAME_HEIGHT,
+            "game_width": GAME_WIDTH,
+            # textbox
+            "textbox_height": percent(textbox_height, GAME_HEIGHT),
+            "textbox_padding": percent(textbox_padding, GAME_WIDTH),
+            # namebox
+            "namebox_ffamily": the_fonts["dic"]["namebox"],
+            "namebox_fsize": namebox["h"],
+            "namebox_fsize_v": namebox["v"],
+            # dialog
+            "dialog_ffamily": the_fonts["dic"]["dialog"],
+            "dialog_fsize": dialog["h"],
+            "dialog_fsize_v": dialog["v"],
+            # main menu
+            "mmenu_ffamily": the_fonts["dic"]["mmenu"],
+            # main menu button
+            "mmenubtn_fsize": mmenubtn["h"],
+            "mmenubtn_fsize_v": mmenubtn["v"],
+            "mmenubtn_ffamily": the_fonts["dic"]["mmenubtn"],
+        }
+
+        return file_template(TEMPLATE_OLD_CSS, **datas)
+
+
+    def css():
+        the_fonts = fonts()
+
+        try:
+            return new_style(the_fonts), fonts_imports(the_fonts)
+        except AttributeError as e:
+            print()
+            print("[ERROR] %s" % e)
+            print("You should define the concerned gui attribute.")
+            print()
+            print("[INFO] falling back to default look")
+            return old_style(the_fonts), fonts_imports(the_fonts)
 
 
     # generate css and js, and write it to file

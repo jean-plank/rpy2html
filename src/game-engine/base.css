@@ -15,6 +15,7 @@ body {
     background-color: black;
     color: #eee;
     overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 a {
@@ -28,7 +29,6 @@ button {
     outline: 0;
     background: none;
     font-size: 1em;
-    text-align: left;
     padding: 0;
 }
 

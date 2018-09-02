@@ -19,7 +19,7 @@ if __name__ == "__main__":
         game = path.join(game_base, "game")
         converter = path.join(path.dirname(__file__), "../src/converter")
 
-        to_be_copied = ["rpy2html.rpy", "template.css", "template.ts"]
+        to_be_copied = ["rpy2html.rpy", "template.css", "template-old.css", "template.ts"]
         to_be_removed = to_be_copied + ["rpy2html.rpyc"]
 
         # initial copy
@@ -32,10 +32,12 @@ if __name__ == "__main__":
 
         # compilation
         code = call([renpy, game_base, "compile"])
-        print("Compilation finished.")
-        print("")
 
-        # cleanup
+        if code == 0:
+            print("Compilation finished.")
+            print("")
+
+        # cleanup anyway
         def remove_from_game(fname):
             f = path.join(game, fname)
             if path.isfile(f):
