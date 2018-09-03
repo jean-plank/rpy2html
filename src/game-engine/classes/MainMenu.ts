@@ -32,7 +32,7 @@ export class MainMenu {
     }
 
     show(): void {
-        this.story.state.currentNode = null;
+        this.story.history = null;
         this.story.$.mainMenu.show();
         this.story.scene(this.background);
 

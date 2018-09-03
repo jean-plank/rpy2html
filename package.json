@@ -6,7 +6,7 @@
     "compile": "utils/compile.py",
     "bundle": "utils/bundle.py",
     "convert": "utils/convert.py",
-    "test": "jasmine --config=jasmine.json",
+    "test": "node_modules/.bin/karma start",
     "clean-dist": "rm -rf dist/*",
     "clean-converted": "rm -rf src/converted/*"
   },
@@ -32,7 +32,5 @@
     "webpack": "^4.11.1",
     "webpack-cli": "^3.0.3"
   },
-  "devDependencies": {
-    "jasmine": "^3.1.0"
-  }
+  "devDependencies": {}
 }

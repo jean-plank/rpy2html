@@ -3,10 +3,11 @@ import * as $ from 'jquery';
 
 import { Channel, Channels } from  './Channel';
 import { Image, Images } from  './Image';
-import { Font, Fonts } from './Font';
+import { Fonts } from './Font';
 import { Sound, Sounds } from  './Sound';
 import { Chars } from  './Char';
 import { Node, Nodes, Menu } from  './nodes';
+import { StoryHistory } from './StoryHistory';
 import { MainMenu } from './MainMenu';
 import { ConfirmHandler } from './ConfirmHandler';
 import { EventsHandler } from './EventsHandler';
@@ -30,7 +31,6 @@ class StoryState {
     scene: Image;
     shownImgs: Array<Image>;
     audio: Array<Sound>;
-    currentNode: Node;
 }
 
 
@@ -65,6 +65,8 @@ export class Story {
     images: Images;
     sounds: Sounds;
     chars: Chars;
+    currentNode: Node;
+    history: StoryHistory;
     confirmHandler: ConfirmHandler;
     eventsHandler: EventsHandler;
     mainMenu: MainMenu;
@@ -78,7 +80,6 @@ export class Story {
             scene: null,
             shownImgs: [],
             audio: [],
-            currentNode: null,
         }
 
         this.chans = {
@@ -177,37 +178,46 @@ export class Story {
                 console.error(`Story must have its nodes set before starting.`);
             } else {
                 siht.mainMenu.hide();
+                siht.history = new StoryHistory();
                 siht.nodes[0].execute();
-                if (!siht.state.currentNode.stopExecution) {
-                    siht.executeNextNodes();
+                if (!siht.currentNode.stopExecution) {
+                    siht.executeNextBlock(undefined, [siht.nodes[0]]);
                 }
             }
         };
     }
 
-    executeNextNodes(id?: number): void {
-        if (this.state.currentNode != undefined) {
-            const nexts = this.state.currentNode.nexts();
+    executeNextBlock(id?: number, acc: Array<Node>=[]): void {
+        if (this.currentNode != undefined) {
+            const nexts = this.currentNode.nexts();
 
             if (nexts.length === 0) {
                 this.mainMenu.show();
             } else {
                 let next: Node;
-                if (this.state.currentNode instanceof Menu) {
-                    if (id !== undefined) {
-                        next = nexts[id];
-                    } else {
+
+                if (this.currentNode instanceof Menu) {
+                    if (id === undefined) {
                         console.error(`Missing id for next of menu.`);
+                    } else {
+                        next = nexts[id];
                     }
                 } else if (nexts.length === 1) {
                     next = nexts[0];
                 } else {
                     console.error(`Current node has more than one next node.`);
                 }
-                if (next != undefined) {
-                    next.execute(this.state.currentNode);
-                    if (!next.stopExecution) {
-                        this.executeNextNodes();
+
+                if (next === undefined) {
+                    this.history.addBlock(acc);
+                } else {
+                    next.execute();
+                    acc.push(next);
+
+                    if (next.stopExecution) {
+                        this.history.addBlock(acc);
+                    } else {
+                        this.executeNextBlock(undefined, acc);
                     }
                 }
             }

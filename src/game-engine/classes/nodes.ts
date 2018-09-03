@@ -8,7 +8,6 @@ import { Char } from './Char';
 
 
 export abstract class Node {
-    previous: Node;
     story: Story;
     idNext: number | number[];
     next: Node | Node[];
@@ -32,11 +31,14 @@ export abstract class Node {
         }
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
         console.log(`%cexecuting ${this}`, 'color: blue; font-wheight: bold');
 
-        this.previous = previous;
-        this.story.state.currentNode = this;
+        this.story.currentNode = this;
+
+        // choice cleanup
+        this.story.$.textbox.show();
+        this.story.$.choice.empty();
 
         if (this.stopExecution) {
             _.forEach(this.nexts(), (next: Node) => next.loadBlock());
@@ -89,7 +91,9 @@ export class Menu extends Node {
         return `Menu(${args})`;
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
+        super.execute();
+
         if (this.displayTxt != undefined && this.displayTxt !== "") {
             this.story.$.dialog.text(this.displayTxt);
         } else {
@@ -101,7 +105,7 @@ export class Menu extends Node {
                 event.stopPropagation();
                 siht.story.$.namebox.show();
                 siht.story.$.choice.empty();
-                siht.story.executeNextNodes(i);
+                siht.story.executeNextBlock(i);
             }
         }
 
@@ -113,8 +117,6 @@ export class Menu extends Node {
             this.story.$.choice.append(btn);
             i++;
         });
-
-        super.execute(previous);
     }
 
     nexts(): MenuItem[] {
@@ -188,7 +190,9 @@ export class Say extends Node {
         return `Say(${this.who?`"${this.who.name}", `:""}"${this.what}")`;
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
+        super.execute();
+
         this.story.$.textbox.show();
         this.story.$.namebox.text("");
         if (this.who != undefined) {
@@ -198,8 +202,6 @@ export class Say extends Node {
                 .css("color", color);
         }
         this.story.$.dialog.text(this.what);
-
-        super.execute(previous);
     }
 }
 
@@ -253,14 +255,14 @@ export class PyExpr extends Node {
         return `PyExpr(${this.code})`;
     }
 
-    execute(previous?: Node) {
+    execute(): void {
+        super.execute();
+
         try {
             eval(this.code);
         } catch (e) {
             console.error('e =', e);
         }
-
-        super.execute(previous);
     }
 }
 
@@ -291,10 +293,10 @@ export class Scene extends Node {
         if (this.image != undefined) this.image.load();
     }
 
-    execute(previous?: Node): void {
-        this.story.scene(this.image);
+    execute(): void {
+        super.execute();
 
-        super.execute(previous);
+        this.story.scene(this.image);
     }
 }
 
@@ -325,7 +327,9 @@ export class Show extends Node {
         if (this.image != undefined) this.image.load();
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
+        super.execute();
+
         if (this.image != undefined
            && this.story.state.shownImgs.indexOf(this.image) === -1)
         {
@@ -336,8 +340,6 @@ export class Show extends Node {
             this.image.addTo(this.story.$.charImg);
             this.story.state.shownImgs.push(this.image);
         }
-
-        super.execute(previous);
     }
 }
 
@@ -362,14 +364,14 @@ export class Hide extends Node {
         return `Hide(${this.imgName})`;
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
+        super.execute();
+
         var i = this.story.state.shownImgs.indexOf(this.image);
         if (i !== -1) {
             this.image.detach();
             this.story.state.shownImgs.splice(i, 1);
         }
-
-        super.execute(previous);
     }
 }
 
@@ -402,7 +404,9 @@ export class Play extends Node {
         if (this.sound != undefined) this.sound.load();
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
+        super.execute();
+
         if (this.story.isAllowedChan(this.chanName)) {
             // Normal channels support playing and queueing audio, but only play back one audio file at a time.
             this.story.chans[this.chanName].play(this.sound);
@@ -410,8 +414,6 @@ export class Play extends Node {
             // The audio channel supports playing back multiple audio files at one time, but does not support queueing sound or stopping playback.
             // TODO
         }
-
-        super.execute(previous);
     }
 }
 
@@ -431,13 +433,13 @@ export class Stop extends Node {
         return `Stop(${this.chanName})`;
     }
 
-    execute(previous?: Node): void {
+    execute(): void {
+        super.execute();
+
         if (this.story.isAllowedChan(this.chanName)) {
             this.story.chans[this.chanName].stop();
         } else if (this.chanName === "audio") {
             // TODO
         }
-
-        super.execute(previous);
     }
 }
