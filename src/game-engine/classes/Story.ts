@@ -224,11 +224,17 @@ export class Story {
         }
     }
 
+    cleanup() {
+        this.$.scene.empty();
+        this.state.scene = null;
+
+        this.$.charImg.empty();
+        this.state.shownImgs = [];
+    }
+
     scene(img: Image): void {
         if (img != undefined && this.state.scene !== img) {
-            this.$.scene.empty();
-            this.$.charImg.empty();
-            this.state.shownImgs = [];
+            this.cleanup();
 
             if (!img.isLoaded()) {
                 img.load();

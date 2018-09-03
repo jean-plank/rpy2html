@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 
 import { Node } from "./nodes";
+import { Story } from './Story';
 
 
 export class StoryHistory {
@@ -37,6 +38,10 @@ export class StoryHistory {
 
     previousFrame(): void {
         if (this.iCurrentBlock > 0) {
+            // cleanup
+            const story: Story = Story.getInstance();
+            story.cleanup();
+
             const newI: number = this.iCurrentBlock - 1;
 
             for (let i = 0; i <= newI; i++) {
