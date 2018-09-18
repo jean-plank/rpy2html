@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 
+import * as utils from '../utils';
 import { Story } from './Story';
 import { Image } from './Image';
 import { Sound } from './Sound';
@@ -36,10 +37,6 @@ export abstract class Node {
 
         this.story.currentNode = this;
 
-        // choice cleanup
-        this.story.$.textbox.show();
-        this.story.$.choice.empty();
-
         if (this.stopExecution) {
             _.forEach(this.nexts(), (next: Node) => next.loadBlock());
         }
@@ -68,7 +65,7 @@ export abstract class Node {
 }
 
 
-export class Nodes {
+export type Nodes = {
     [key: string]: Node;
 }
 
@@ -100,20 +97,18 @@ export class Menu extends Node {
             this.story.$.textbox.hide();
         }
 
-        function click(siht: Menu, i: number): (e: any) => void {
-            return (event: any) => {
-                event.stopPropagation();
-                siht.story.$.namebox.show();
-                siht.story.$.choice.empty();
-                siht.story.executeNextBlock(i);
-            }
-        }
+        // function click(siht: Menu, i: number): (e: any) => void {
+        //     return (event: any) => {
+        //         event.stopPropagation();
+        //         siht.story.executeNextBlock(i);
+        //     }
+        // }
 
         let i: number = 0;
         _.forEach(this.nexts(), (next: MenuItem) => {
             const btn: JQuery<HTMLButtonElement> = $(document.createElement("button"))
                 .text(next.text)
-                .one("click", click(this, i));
+                // .one("click", click(this, i));
             this.story.$.choice.append(btn);
             i++;
         });
@@ -122,29 +117,6 @@ export class Menu extends Node {
     nexts(): MenuItem[] {
         return _.filter(this.next, (next: MenuItem) => eval(next.condition) === true);
     }
-}
-
-
-const word = /\W([a-zA-Z_]\w*)\W/g;
-const kwords = [
-    // "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield",
-    // "null", "undefined",
-    "true", "false",
-];
-
-function convertToJs(code: string): string {
-    const match = ` ${code} `.match(word);
-
-    return _.reduce(match, (acc: string, m: string) => {
-            const trimedM: string = m.trim();
-
-            if (kwords.indexOf(trimedM) === -1) {
-                return acc.replace(trimedM, `window.${trimedM}`);
-            } else {
-                return acc;
-            }
-        }, code)
-        .replace("==", "===");
 }
 
 
@@ -158,11 +130,18 @@ export class MenuItem extends Node {
         super(idNext);
 
         this.text = text;
-        this.condition = convertToJs(condition);
+        this.condition = utils.convertToJs(condition);
     }
 
     toString(): string {
         return `MenuItem("${this.text}")`;
+    }
+
+    execute(): void {
+        super.execute();
+
+        this.story.$.textbox.show();
+        this.story.$.choice.empty();
     }
 }
 
@@ -231,7 +210,7 @@ export class IfBlock extends Node {
     constructor (condition: string, idNext?: number) {
         super(idNext);
 
-        this.condition = convertToJs(condition);
+        this.condition = utils.convertToJs(condition);
     }
 
     toString(): string {
@@ -248,7 +227,7 @@ export class PyExpr extends Node {
     constructor (code: string, idNext?: number) {
         super(idNext);
 
-        this.code = convertToJs(code);
+        this.code = utils.convertToJs(code);
     }
 
     toString() {
@@ -331,14 +310,14 @@ export class Show extends Node {
         super.execute();
 
         if (this.image != undefined
-           && this.story.state.shownImgs.indexOf(this.image) === -1)
+           && this.story.shownImgs.indexOf(this.image) === -1)
         {
             if (!this.image.isLoaded()) {
                 this.image.load();
                 console.error(`Image ${this.image} didn't preload correctly. Loaded now.`);
             }
             this.image.addTo(this.story.$.charImg);
-            this.story.state.shownImgs.push(this.image);
+            this.story.shownImgs.push(this.image);
         }
     }
 }
@@ -367,10 +346,10 @@ export class Hide extends Node {
     execute(): void {
         super.execute();
 
-        var i = this.story.state.shownImgs.indexOf(this.image);
+        var i = this.story.shownImgs.indexOf(this.image);
         if (i !== -1) {
             this.image.detach();
-            this.story.state.shownImgs.splice(i, 1);
+            this.story.shownImgs.splice(i, 1);
         }
     }
 }

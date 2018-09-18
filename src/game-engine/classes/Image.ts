@@ -33,6 +33,6 @@ export class Image {
 }
 
 
-export class Images {
+export type Images = {
     [key: string]: Image;
 }

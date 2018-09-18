@@ -20,21 +20,23 @@ export class Channel {
      * Stop current channel and plays sound.
      */
     play(sound: Sound | Array<Sound>): void {
-        let promise: Promise<void>;
-        this.stop();
+        if (sound != undefined) {
+            let promise: Promise<void>;
+            this.stop();
 
-        if (_.isArray(sound)) {
-            promise = this._play(_.head(sound));
-            this.pending = _.tail(sound);
-        } else {
-            promise = this._play(sound);
-        }
+            if (_.isArray(sound)) {
+                promise = this._play(_.head(sound));
+                this.pending = _.tail(sound);
+            } else {
+                promise = this._play(sound);
+            }
 
-        if (promise != undefined) {
-            const siht = this;
+            if (promise != undefined) {
+                const siht = this;
 
-            promise.catch(() =>
-                Story.getInstance().confirmHandler.notifyAudio(siht, sound));
+                promise.catch(() =>
+                    Story.getInstance().views.confirm.confirmAudio(siht, sound));
+            }
         }
     }
 
@@ -87,6 +89,6 @@ export class Channel {
 }
 
 
-export class Channels {
+export type Channels = {
     [key: string]: Channel;
 }

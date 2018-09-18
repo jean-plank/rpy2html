@@ -1,116 +1,99 @@
-import * as $ from 'jquery';
+// import * as $ from 'jquery';
 
-import { Story } from "./Story";
-import { Menu } from "./nodes";
+// import { Story } from "./Story";
+// import { Menu } from "./nodes";
 
 
-/*
-    Ren'Py help:
+// /*
+//  */
+// export class EventsHandler {
+//     private story: Story;
+//     private keyEvents: { [id: number]: (e: any) => void };
 
-    * `Enter`: Advances dialogue and activates the interface.
-    * `Space`: Advances dialogue without selecting choices.
-    * `Arrow Keys`: Navigate the interface.
-    * `Escape`: Accesses the game menu.
-    * `Ctrl`: Skips dialogue while held down.
-    * `Tab`: Toggles dialogue skipping.
-    * `Page Up`: Rolls back to earlier dialogue.
-    * `Page Down`: Rolls forward to later dialogue.
-    * `H`: Hides the user interface.
-    * `S`: Takes a screenshot.
-    * `V`: Toggles assistive self-voicing.
+//     constructor() {
+//         this.story = Story.getInstance();
 
-    * `Left Click`: Advances dialogue and activates the interface.
-    * `Middle Click`: Hides the user interface.
-    * `Right Click`: Accesses the game menu.
-    * `Mouse Wheel Up`, `Click Rollbalck Side`: Rolls back to earlier dialogue.
-    * `Mouse Wheel Down`: Rolls forward to later dialogue.
- */
-export class EventsHandler {
-    private story: Story;
-    private keyEvents: { [id: number]: (e: any) => void };
 
-    constructor() {
-        this.story = Story.getInstance();
 
-        const story = this.story;
-        const siht = this;
+//         // const keyEvents = {
+//         //     // 38: () => {},                        // up arrow
+//         //     // 40: () => {},                        // down arrow
+//         //     // 37: () => {},                        // left arrow
+//         //     // 39: () => {},                        // right arrow
+//         //     27: () => {                             // escape
+//         //         if (story.confirmHandler.hidden) {
+//         //             siht._quit();
+//         //         } else {
+//         //             story.confirmHandler.hide();
+//         //         }},
+//         //     32: () => siht._nextIfNotMenu(),        // space
+//         //     13: () => siht._nextIfNotMenu(),        // enter
+//         //     // 17: () => {},                        // control
+//         //     // 9: () => {},                         // tab
+//         //     33: () => siht._historyPrevious(),      // page up
+//         //     34: () => siht._historyNext(),          // page down
+//         //     // 72: () => {},                        // h
+//         //     // 86: () => {},                        // v
+//         // }
 
-        this.keyEvents = {
-            // 38: () => {},                        // up arrow
-            // 40: () => {},                        // down arrow
-            // 37: () => {},                        // left arrow
-            // 39: () => {},                        // right arrow
-            27: () => {                             // escape
-                if (story.confirmHandler.hidden) {
-                    siht._quit();
-                } else {
-                    story.confirmHandler.hide();
-                }},
-            32: () => siht._nextIfNotMenu(),        // space
-            13: () => siht._nextIfNotMenu(),        // enter
-            // 17: () => {},                        // control
-            // 9: () => {},                         // tab
-            33: () => siht._historyPrevious(),      // page up
-            34: () => siht._historyNext(),          // page down
-            // 72: () => {},                        // h
-            // 86: () => {},                        // v
-        }
+//         // navigation events
+//         // story.$.container.on("click", () => siht._nextIfNotMenu());
+//         // $(document).on("keyup", this._onkeyup());
+//         // story.$.container.on("wheel", this._onwheel());
 
-        // navigation events
-        story.$.container.on("click", () => siht._nextIfNotMenu());
-        $(document).on("keyup", this._onkeyup());
-        story.$.container.on("wheel", this._onwheel());
+//         // main menu button
+//         // $('#start-btn').click(story.startStory());
+//         // $('#quit-btn').click(() => siht._quit());
+//     }
 
-        // main menu button
-        $('#start-btn').click(story.startStory());
-        $('#quit-btn').click(() => siht._quit());
-    }
+//     // private _nextIfNotMenu(): void {
+//     //     if (  !(this.story.currentNode instanceof Menu)
+//     //        && this.story.confirmHandler.hidden) {
+//     //         this.story.executeNextBlock();
+//     //     }
+//     // }
 
-    private _nextIfNotMenu(): void {
-        if (  !(this.story.currentNode instanceof Menu)
-           && this.story.confirmHandler.hidden) {
-            this.story.executeNextBlock();
-        }
-    }
+//     // private _historyPrevious(): void {
+//     //     if (this.story.confirmHandler.hidden) {
+//     //         this.story.history.previousFrame();
+//     //     }
+//     // }
 
-    private _historyPrevious(): void {
-        if (this.story.confirmHandler.hidden) {
-            this.story.history.previousFrame();
-        }
-    }
+//     // private _historyNext(): void {
+//     //     if (this.story.confirmHandler.hidden) {
+//     //         this.story.history.nextFrame();
+//     //     }
+//     // }
 
-    private _historyNext(): void {
-        if (this.story.confirmHandler.hidden) {
-            this.story.history.nextFrame();
-        }
-    }
+//     // private _onKeyup(): (e: any) => void {
+//     //     // const siht = this;
 
-    private _onkeyup(): (e: any) => void {
-        const siht = this;
+//     //     // return (event: any) => {
+//     //     //     const f: (e: any) => void = siht.keyEvents[event.which];
 
-        return (event: any) => {
-            const f: (e: any) => void = siht.keyEvents[event.which];
+//     //     //     if (f != undefined) f(event);
+//     //     // };
+//     //     const story = this.story;
 
-            if (f != undefined) f(event);
-        };
-    }
+//     //     return (event: any) => story.currentView.onKeyup(event);
+//     // }
 
-    private _onwheel(): (e: any) => void {
-        const siht = this;
+//     // private _onwheel(): (e: any) => void {
+//     //     const siht = this;
 
-        return (event: any) => {
-            if (event.originalEvent.deltaY < 0) {        // scroll up
-                siht._historyPrevious();
-            } else if (event.originalEvent.deltaY > 0) { // scroll down
-                siht._historyNext();
-            }
-        };
-    }
+//     //     return (event: any) => {
+//     //         if (event.originalEvent.deltaY < 0) {        // scroll up
+//     //             siht._historyPrevious();
+//     //         } else if (event.originalEvent.deltaY > 0) { // scroll down
+//     //             siht._historyNext();
+//     //         }
+//     //     };
+//     // }
 
-    private _quit(): void {
-        this.story.confirmHandler.confirm(
-            "Are you sure you want to quit?",
-            {   "Yes": () => window.location.assign(".."),
-                "No": () => {} })
-    }
-}
+//     // private _quit(): void {
+//     //     this.story.confirmHandler.confirm(
+//     //         "Are you sure you want to quit?",
+//     //         {   "Yes": () => window.location.assign(".."),
+//     //             "No": () => {} })
+//     // }
+// }

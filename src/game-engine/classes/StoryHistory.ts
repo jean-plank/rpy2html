@@ -26,7 +26,7 @@ export class StoryHistory {
         this.iCurrentBlock = this.history.length - 1;
     }
 
-    nextFrame(): void {
+    nextBlock(): void {
         const newI: number = this.iCurrentBlock + 1
         const block: Array<Node> = this.history[newI];
 
@@ -36,7 +36,7 @@ export class StoryHistory {
         }
     }
 
-    previousFrame(): void {
+    previousBlock(): void {
         if (this.iCurrentBlock > 0) {
             // cleanup
             const story: Story = Story.getInstance();

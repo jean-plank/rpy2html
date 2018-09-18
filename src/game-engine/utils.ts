@@ -63,3 +63,26 @@ ${fonts}
 }
 `;
 }
+
+
+const word = /\W([a-zA-Z_]\w*)\W/g;
+const kwords = [
+    // "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield",
+    // "null", "undefined",
+    "true", "false",
+];
+
+export function convertToJs(code: string): string {
+    const match = ` ${code} `.match(word);
+
+    return _.reduce(match, (acc: string, m: string) => {
+            const trimedM: string = m.trim();
+
+            if (kwords.indexOf(trimedM) === -1) {
+                return acc.replace(trimedM, `window.${trimedM}`);
+            } else {
+                return acc;
+            }
+        }, code)
+        .replace("==", "===");
+}

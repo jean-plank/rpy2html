@@ -40,6 +40,6 @@ export class Sound {
     }
 }
 
-export class Sounds {
+export type Sounds = {
     [key: string]: Sound;
 }

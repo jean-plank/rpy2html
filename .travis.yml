@@ -22,10 +22,10 @@ jobs:
     - stage: 'deploy dev'
       if: branch = develop
       script:
-        - 'sshpass -e ssh $SSH_USER@$HOST -t "/home/travis/rpy2html-dev/deploy.sh"'
+        - 'sshpass -e ssh $SSH_USER@$HOST -t "/home/travis/rpy2html-dev/deploy.sh" >/dev/null 2>&1'
 
     # prod
     - stage: 'deploy prod'
       if: branch = master
       script:
-        - 'sshpass -e ssh $SSH_USER@$HOST -t "/home/travis/rpy2html/deploy.sh"'
+        - 'sshpass -e ssh $SSH_USER@$HOST -t "/home/travis/rpy2html/deploy.sh" >/dev/null 2>&1'

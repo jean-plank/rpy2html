@@ -1,8 +1,3 @@
-export class Fonts {
-    [key: string]: Font;
-}
-
-
 export class Font {
     private url: string;
     private bold: boolean;
@@ -19,4 +14,9 @@ export class Font {
     ${this.bold?"font-weight: bold;":""}
 }`;
     }
+}
+
+
+export type Fonts = {
+    [key: string]: Font;
 }

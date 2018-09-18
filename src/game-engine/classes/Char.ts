@@ -9,6 +9,6 @@ export class Char {
 }
 
 
-export class Chars {
+export type Chars = {
     [key: string]: Char;
 }
