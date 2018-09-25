@@ -1,5 +1,3 @@
-* Rollback to previous dialog
-* Correct implementation of mouse wheel
 * Navigation buttons
 * Saves
 * Fade for scenes
@@ -8,3 +6,5 @@
 
         [ERROR] 'StoreModule' object has no attribute 'name_text_size'
         You should define the concerned gui attribute.
+
+* Update README.md (and what-it-does.jpg) for language support.
