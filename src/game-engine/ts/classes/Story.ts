@@ -19,6 +19,7 @@ import { GameMenu } from './views/GameMenu';
 export class StoryDatas {
     name="Some Ren'Py Game";
     version="1.0";
+    lang="en";
     showName: boolean;
     icon: string;
     main_menu_bg: string;
@@ -108,7 +109,7 @@ export class Story {
         this.chars = datas.chars;
 
         this.views = {
-            confirm: new Confirm(),
+            confirm: new Confirm(datas.lang),
             game: new Game(),
             gameMenu: new GameMenu(),
             mainMenu: new MainMenu(datas),

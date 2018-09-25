@@ -3,18 +3,20 @@ import '../game-engine/base.css';
 import './converted.css';
 
 // classes
-import { Story, StoryDatas } from '../game-engine/classes/Story';
-import { Image, Images } from '../game-engine/classes/Image';
-import { Font, Fonts } from '../game-engine/classes/Font';
-import { Sound, Sounds } from '../game-engine/classes/Sound';
-import { Char, Chars } from '../game-engine/classes/Char';
-import { Nodes, Menu, MenuItem, Say, If, IfBlock, PyExpr, Scene, Show, Hide, Play, Stop } from '../game-engine/classes/nodes';
+import { Story, StoryDatas } from '../game-engine/ts/classes/Story';
+import { Image, Images } from '../game-engine/ts/classes/Image';
+import { Font, Fonts } from '../game-engine/ts/classes/Font';
+import { Sound, Sounds } from '../game-engine/ts/classes/Sound';
+import { Char, Chars } from '../game-engine/ts/classes/Char';
+import { Nodes, Menu, MenuItem, Say, If, IfBlock, PyExpr, Scene, Show, Hide, Play, Stop } from '../game-engine/ts/classes/nodes';
 
 
 // const
 const GAME_NAME: string = ${game_name};
 
 const GAME_VERSION: string = ${game_version};
+
+const LANG: string = ${game_lang};
 
 const SHOW_NAME: boolean = ${show_name};
 
@@ -63,6 +65,7 @@ console.log('STORY =', STORY);
 const datas: StoryDatas = {
     name: GAME_NAME,
     version: GAME_VERSION,
+    lang: LANG,
     showName: SHOW_NAME,
     icon: GAME_ICON,
     main_menu_bg: MAIN_MENU_BG,

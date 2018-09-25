@@ -5,7 +5,7 @@ import { StoryDatas, Story } from "../Story";
 import { Image } from '../Image';
 import { Sound } from '../Sound';
 import { View } from './View';
-import { StoryHistory } from '../StoryHistory';
+import { translations as transl, Language as Lang } from '../../translations';
 
 
 export class MainMenu extends View {
@@ -18,24 +18,25 @@ export class MainMenu extends View {
         this.story.$.mainMenu.hide();
 
         type Btn = {
-            id: string;
+            // id: string;
             txt: string;
             disabled: boolean;
-        }
+        };
 
+        const lang: Lang =
+            _.has(transl, datas.lang)?transl[datas.lang]:transl["en"];
         const btns: Array<Btn> = [
-            { id: "start-btn", txt: "Start", disabled: false },
-            { id: "load-btn", txt: "Load", disabled: true },
-            { id: "pref-btn", txt: "Preferences", disabled: true },
-            { id: "about-btn", txt: "About", disabled: true },
-            { id: "help-btn", txt: "Help", disabled: true },
-            { id: "quit-btn", txt: "Quit", disabled: false },
+            { /*id: "start-btn",*/ txt: lang.mainMenu.start, disabled: false },
+            { /*id: "load-btn",*/ txt: lang.mainMenu.load, disabled: true },
+            { /*id: "prefs-btn",*/ txt: lang.mainMenu.prefs, disabled: true },
+            { /*id: "help-btn",*/ txt: lang.mainMenu.help, disabled: true },
+            { /*id: "quit-btn",*/ txt: lang.mainMenu.quit, disabled: false },
         ];
 
         _.forEach(btns, (btn: Btn) =>
             this.story.$.mainMenu.children(".items").first().append(
                 $('<button>')
-                    .attr("id", btn.id)
+                    // .attr("id", btn.id)
                     .prop("disabled", btn.disabled)
                     .text(btn.txt)));
 

@@ -30,6 +30,8 @@ button {
     background: none;
     font-size: 1em;
     padding: 0;
+    text-overflow: unset;
+    white-space: nowrap;
 }
 
 #container {

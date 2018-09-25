@@ -404,6 +404,7 @@ init python:
         datas = {
             "game_name": to_string(config.name),
             "game_version": to_string(config.version),
+            "game_lang": to_string(game_lang),
             "show_name": to_string(show_name),
             "import_game_icon": import_img(config.window_icon, "GAME_ICON"),
             "main_menu_bg": to_string(main_menu_bg),

@@ -5,6 +5,7 @@ import { Channel } from '../Channel';
 import { Sound } from '../Sound';
 import { Story } from '../Story';
 import { View } from './View';
+import { translations as transl, Language as Lang } from "../../translations";
 
 
 class Btn {
@@ -25,8 +26,9 @@ export class Confirm extends View {
     private buttons: Array<Btn>;
     private escapeAction: (e: any) => void;
     private confirmAudioShown: boolean;
+    private lang: Lang;
 
-    constructor () {
+    constructor (strLang: string) {
         super();
 
         this.confirmAudioShown = false;
@@ -34,6 +36,8 @@ export class Confirm extends View {
         this.$message = $("#confirm-msg");
         this.$items = this.story.$.confirm.find(".items").first();
         this.hide();
+
+        this.lang = _.has(transl, strLang)?transl[strLang]:transl["en"];
     }
 
     show(): void {
@@ -55,16 +59,11 @@ export class Confirm extends View {
             const siht = this;
 
             this.confirm(
-                "Be aware that this page is playing audio.",
-                [
-                    new Btn(
-                        "STFU and take me to the game",
-                        () => chan.play(snd))
-                ],
+                this.lang.confirm.audio,
+                [new Btn(this.lang.confirm.audioBtn, () => chan.play(snd))],
                 () => {
                     siht.hide();
-                    chan.play(snd);
-                });
+                    chan.play(snd); });
         }
     }
 
@@ -72,17 +71,16 @@ export class Confirm extends View {
         const siht = this;
 
         this.confirm(
-            "Are you sure you want to quit?",
-            [
-                new Btn("Yes", () =>
-                    window.location.assign(
+            this.lang.confirm.quit,
+            [   new Btn(
+                    this.lang.confirm.yes,
+                    () => window.location.assign(
                         window.location.protocol+"//"+window.location.host)),
-                new Btn("No", () => {})
-            ],
+                new Btn(this.lang.confirm.no, () => {})],
             () => siht.hide());
     }
 
-    confirm(msg: string, buttons: Array<Btn>, escapeAction: (e: any) => void): void {
+    private confirm(msg: string, buttons: Array<Btn>, escapeAction: (e: any) => void): void {
         this.show();
 
         this.buttons = buttons;
