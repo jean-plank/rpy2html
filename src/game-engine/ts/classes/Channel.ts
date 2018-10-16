@@ -6,7 +6,7 @@ import { Sound } from './Sound';
 
 export class Channel {
     private currentlyPlaying: Sound;
-    private pending: Array<Sound>;
+    private pending: Sound[];
     private loop: boolean;
     private volume: number;
 
@@ -19,23 +19,20 @@ export class Channel {
     /**
      * Stop current channel and plays sound.
      */
-    play(sound: Sound | Array<Sound>): void {
+    play(...sound: Sound[]): void {
         if (sound != undefined) {
             let promise: Promise<void>;
             this.stop();
 
-            if (_.isArray(sound)) {
-                promise = this._play(_.head(sound));
-                this.pending = _.tail(sound);
-            } else {
-                promise = this._play(sound);
-            }
+            promise = this._play(_.head(sound));
+            this.pending = _.tail(sound);
 
             if (promise != undefined) {
                 const siht = this;
 
                 promise.catch(() =>
-                    Story.getInstance().views.confirm.confirmAudio(siht, sound));
+                    Story.getInstance().views.confirm
+                         .confirmAudio(siht, ...sound));
             }
         }
     }

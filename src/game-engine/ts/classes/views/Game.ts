@@ -3,29 +3,7 @@ import * as $ from 'jquery';
 import { View } from "./View";
 import { StoryHistory } from "../StoryHistory";
 import { Node, Menu } from "../nodes";
-import { Story } from "../Story";
-
-/*
-    Ren'Py help:
-
-    * `Enter`: Advances dialogue and activates the interface.
-    * `Space`: Advances dialogue without selecting choices.
-    * `Arrow Keys`: Navigate the interface.
-    * `Escape`: Accesses the game menu.
-    * `Ctrl`: Skips dialogue while held down.
-    * `Tab`: Toggles dialogue skipping.
-    * `Page Up`: Rolls back to earlier dialogue.
-    * `Page Down`: Rolls forward to later dialogue.
-    * `H`: Hides the user interface.
-    * `S`: Takes a screenshot.
-    * `V`: Toggles assistive self-voicing.
-
-    * `Left Click`: Advances dialogue and activates the interface.
-    * `Middle Click`: Hides the user interface.
-    * `Right Click`: Accesses the game menu.
-    * `Mouse Wheel Up`, `Click Rollbalck Side`: Rolls back to earlier dialogue.
-    * `Mouse Wheel Down`: Rolls forward to later dialogue.
- */
+import { actionKey } from "../../utils";
 
 
 export class Game extends View {
@@ -41,6 +19,7 @@ export class Game extends View {
             this.story.currentView.hide();
             this.show();
 
+            this.story.cleanup();
             this.story.history = new StoryHistory();
             this.story.nodes[0].execute();
 
@@ -50,7 +29,7 @@ export class Game extends View {
         }
     }
 
-    private _executeNextBlock(id?: number, acc: Array<Node>=[]): void {
+    private _executeNextBlock(id?: number, acc: Node[]=[]): void {
         if (this.story.currentNode != undefined) {
             const nexts = this.story.currentNode.nexts();
 
@@ -92,75 +71,56 @@ export class Game extends View {
         super.show();
     }
 
-    hide(): void {
-        super.hide();
-
-        this.story.history = null;
-    }
-
-    onClick(story: Story, event: any): void {
-        if (story.currentNode instanceof Menu) {
+    onLeftClick(event: any): void {
+        if (this.story.currentNode instanceof Menu) {
             const btn = $(event.target).closest("button");
 
             if (btn.length !== 0) {
-                story.views.game._executeNextBlock(btn.index());
+                this._executeNextBlock(btn.index());
             }
         } else {
-            story.views.game._executeNextBlock()
+            this._executeNextBlock()
         }
     }
 
-    onKeyup(story: Story, event: any): void {
-        switch (event.which) {
-            case 38: // up arrow
-                break;
+    onMiddleClick(event: any): void {}
 
-            case 40: // down arrow
-                break;
+    onRightClick(event: any): void {
+        this.story.views.gameMenu.show();
+    }
 
-            case 37: // left arrow
-                break;
+    onKeyup(event: any): void {
+        const siht = this;
+        function enterOrSpace() {
+            if (!(siht.story.currentNode instanceof Menu)) {
+                siht._executeNextBlock();
+            }
+        }
 
-            case 39: // right arrow
-                break;
-
-            case 13: // enter
-            case 32: // space
-                if (!(story.currentNode instanceof Menu)) {
-                    story.views.game._executeNextBlock();
-                }
-                break;
-
-            case 27: // escape
+        actionKey(event, {
+            38: () => {}, // up arrow
+            40: () => {}, // down arrow
+            37: () => {}, // left arrow
+            39: () => {}, // right arrow
+            13: enterOrSpace, // enter
+            32: enterOrSpace, // space
+            27: () => { // escape
                 event.preventDefault();
-                story.views.confirm.confirmQuit();
-                break;
-
-            case 33: // page up
-                story.history.previousBlock();
-                break;
-
-            case 34: // page down
-                story.history.nextBlock();
-                break;
-
-            case 17: // control
-                break;
-
-            case 9:  // tab
-                break;
-
-            case 72: // h
-                break;
-        }
+                this.story.views.gameMenu.show();
+            },
+            33: () => this.story.history.previousBlock(), // page up
+            34: () => this.story.history.nextBlock(), // page down
+            17: () => {}, // control
+            9: () => {}, // tab
+            72: () => {}, // h
+        });
     }
 
-    onWheel(story: Story, event: any): void {
+    onWheel(event: any): void {
         if (event.originalEvent.deltaY < 0) {        // scroll up
-            story.history.previousBlock();
+            this.story.history.previousBlock();
         } else if (event.originalEvent.deltaY > 0) { // scroll down
-            story.history.nextBlock();
-
+            this.story.history.nextBlock();
         }
     }
 }

@@ -16,7 +16,9 @@ export abstract class View {
         this.story.currentView = null;
     }
 
-    abstract onKeyup(story: Story, event: any): void;
-    abstract onClick(story: Story, event: any): void;
-    abstract onWheel(story: Story, event: any): void;
+    abstract onKeyup(event: any): void;
+    abstract onLeftClick(event: any): void;
+    abstract onMiddleClick(event: any): void;
+    abstract onRightClick(event: any): void;
+    abstract onWheel(event: any): void;
 }

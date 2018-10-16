@@ -4,6 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInlineSourcePlugin =
     require('html-webpack-inline-source-plugin');
 
+// markdown convert to html
+// const marked = require("marked");
+// const renderer = new marked.Renderer();
+
 
 module.exports = {
     mode: 'development',
@@ -70,6 +74,22 @@ module.exports = {
                         },
                     },
                 ],
+            },
+            // md
+            {
+                test: /\.md$/,
+                use: [
+                    {
+                        loader: "html-loader"
+                    },
+                    {
+                        loader: "markdown-loader",
+                        //those options are optional
+                        options: {
+                            // renderer
+                        }
+                    }
+                ]
             },
         ],
     },

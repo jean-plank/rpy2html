@@ -20,20 +20,30 @@ const LANG: string = ${game_lang};
 
 const SHOW_NAME: boolean = ${show_name};
 
-const MAIN_MENU_BG: string = ${main_menu_bg};
-
 const MAIN_MENU_MUSIC: string = ${main_menu_music};
+
+let HELP: string;
+try {
+    HELP = require("../game-engine/help/"+LANG+".md");
+} catch (error) {
+    HELP = require("../game-engine/help/en.md");
+}
 
 
 // images
-${import_game_icon}
-${import_main_menu_overlay}
-${import_textbox}
-${import_choice_btn_bg}
-${import_choice_btn_hover}
-${import_namebox_bg}
-${import_confirm_overlay}
-${import_frame_bg}
+import GAME_ICON from ${path_game_icon};
+import MAIN_MENU_BG from ${path_main_menu_bg};
+import MAIN_MENU_OVERLAY from ${path_main_menu_overlay};
+import GAME_MENU_BG from ${path_game_menu_bg};
+import GAME_MENU_OVERLAY from ${path_game_menu_overlay};
+import TEXTBOX_BG from ${path_textbox};
+import CHOICE_BTN_BG from ${path_choice_btn_bg};
+import CHOICE_BTN_HOVER from ${path_choice_btn_hover};
+import SLOT_BG from ${path_slot_bg};
+import SLOT_HOVER from ${path_slot_hover};
+import NAMEBOX_BG from ${path_namebox_bg};
+import CONFIRM_OVERLAY from ${path_confirm_overlay};
+import FRAME_BG from ${path_frame_bg};
 
 ${imgs_imports}
 
@@ -58,7 +68,6 @@ const CHARS: Chars = ${chars};
 
 // story
 const STORY: Story = Story.getInstance();
-console.log('STORY =', STORY);
 
 
 // reference ressources in story object
@@ -66,13 +75,18 @@ const datas: StoryDatas = {
     name: GAME_NAME,
     version: GAME_VERSION,
     lang: LANG,
+    help: HELP,
     showName: SHOW_NAME,
     icon: GAME_ICON,
     main_menu_bg: MAIN_MENU_BG,
     main_menu_music: MAIN_MENU_MUSIC,
     main_menu_overlay: MAIN_MENU_OVERLAY,
+    game_menu_bg: GAME_MENU_BG,
+    game_menu_overlay: GAME_MENU_OVERLAY,
     choice_btn_bg: CHOICE_BTN_BG,
     choice_btn_hover: CHOICE_BTN_HOVER,
+    slot_bg: SLOT_BG,
+    slot_hover: SLOT_HOVER,
     textbox_bg: TEXTBOX_BG,
     namebox_bg: NAMEBOX_BG,
     confirm_overlay: CONFIRM_OVERLAY,

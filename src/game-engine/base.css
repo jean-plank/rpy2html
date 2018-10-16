@@ -83,21 +83,64 @@ button {
     margin: 0.5em 0;
 }
 
-#main-menu {
+#main-menu, #game-menu {
     display: flex;
     background-size: 100% 100%;
-    justify-content: space-between;
-    align-items: flex-end;
 }
 
-#main-menu>.items {
+/* #main-menu>img {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+} */
+
+.menu-items {
     display: flex;
     height: 100%;
     flex-direction: column;
     justify-content: center;
 }
 
+.submenu {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.submenu>div {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.submenu thead {
+    display: none;
+}
+
+.submenu td {
+    padding: 0.5em 0;
+}
+
+.submenu td:first-child {
+    text-align: right;
+    padding-right: 1em;
+}
+
+.slot {
+    background-size: 100% 100%;
+}
+
+.slot>img {
+    width: 100%;
+}
+
 #game-infos {
+    position: absolute;
     color: #0099cc;
     display: flex;
     flex-direction: column;
@@ -124,4 +167,8 @@ button {
     display: flex;
     justify-content: space-around;
     margin-top: 1.67em;
+}
+
+#confirm-msg {
+    text-align: center;
 }

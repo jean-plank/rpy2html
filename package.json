@@ -6,7 +6,6 @@
     "compile": "utils/compile.py",
     "bundle": "utils/bundle.py",
     "convert": "utils/convert.py",
-    "test": "node_modules/.bin/karma start",
     "clean-dist": "rm -rf dist/*",
     "clean-converted": "rm -rf src/converted/*"
   },
@@ -19,12 +18,15 @@
   "dependencies": {
     "@types/jquery": "^3.3.6",
     "@types/lodash": "^4.14.116",
+    "@types/webpack-env": "^1.13.6",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
+    "html-loader": "^0.5.5",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^3.2.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
+    "markdown-loader": "^4.0.0",
     "style-loader": "^0.21.0",
     "ts-loader": "^4.5.0",
     "typescript": "^3.0.1",

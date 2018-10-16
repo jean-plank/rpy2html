@@ -3,9 +3,9 @@ import * as $ from 'jquery';
 
 import { Channel } from '../Channel';
 import { Sound } from '../Sound';
-import { Story } from '../Story';
 import { View } from './View';
 import { translations as transl, Language as Lang } from "../../translations";
+import { actionKey } from "../../utils";
 
 
 class Btn {
@@ -23,7 +23,7 @@ export class Confirm extends View {
     private $message: JQuery<HTMLElement>;
     private $items: JQuery<HTMLElement>;
     private previousView: View;
-    private buttons: Array<Btn>;
+    private buttons: Btn[];
     private escapeAction: (e: any) => void;
     private confirmAudioShown: boolean;
     private lang: Lang;
@@ -51,19 +51,22 @@ export class Confirm extends View {
         super.hide();
         this.story.$.confirm.hide();
 
-        if (this.previousView != undefined) this.previousView.show();
+        if (this.previousView != undefined) {
+            this.story.currentView = this.previousView;
+        }
     }
 
-    confirmAudio(chan: Channel, snd: Sound | Array<Sound>): void {
+    confirmAudio(chan: Channel, ...snd: Sound[]): void {
         if (!this.confirmAudioShown) {
             const siht = this;
 
+            this.confirmAudioShown = true;
             this.confirm(
                 this.lang.confirm.audio,
-                [new Btn(this.lang.confirm.audioBtn, () => chan.play(snd))],
+                [new Btn(this.lang.confirm.audioBtn, () => chan.play(...snd))],
                 () => {
-                    siht.hide();
-                    chan.play(snd); });
+                    chan.play(...snd);
+                    siht.hide(); });
         }
     }
 
@@ -80,20 +83,37 @@ export class Confirm extends View {
             () => siht.hide());
     }
 
-    private confirm(msg: string, buttons: Array<Btn>, escapeAction: (e: any) => void): void {
+    confirmMMenu(): void {
+        const siht = this;
+
+        this.confirm(
+            this.lang.confirm.mmenu,
+            [   new Btn(
+                    this.lang.confirm.yes,
+                    () => {
+                        siht.story.currentView.hide();
+                        siht.story.views.mainMenu.show();
+                    }),
+                new Btn(
+                    this.lang.confirm.no,
+                    () => {})],
+            () => siht.hide());
+    }
+
+    private confirm(msg: string, buttons: Btn[], escapeAction: (e: any) => void): void {
         this.show();
 
         this.buttons = buttons;
         this.escapeAction = escapeAction;
 
-        this.$message.text(msg);
+        this.$message.html(msg);
         this.$items.empty();
 
         _.forEach(buttons, (btn: Btn) =>
             this.$items.append($("<button>").text(btn.txt)));
     }
 
-    onClick(story: Story, event: any): void {
+    onLeftClick(event: any): void {
         const $btn = $(event.target).closest("button");
 
         if ($btn.length === 0) {
@@ -101,37 +121,31 @@ export class Confirm extends View {
 
             if ($confirmFrame.length === 0) {
                 // if click wasn't on #confirm>.frame
-                story.views.confirm.escapeAction(event);
+                this.escapeAction(event);
             }
         } else {
-            story.views.confirm.buttons[$btn.index()].action(event);
-            story.currentView.hide();
+            this.story.currentView.hide();
+            this.buttons[$btn.index()].action(event);
         }
     }
 
-    onKeyup(story: Story, event: any): void {
-        switch (event.which) {
-            case 38: // up arrow
-                break;
+    onMiddleClick(event: any): void {}
 
-            case 40: // down arrow
-                break;
+    onRightClick(event: any): void {}
 
-            case 37: // left arrow
-                break;
-
-            case 39: // right arrow
-                break;
-
-            case 13: // enter
-                break;
-
-            case 27: // escape
+    onKeyup(event: any): void {
+        actionKey(event, {
+            38: () => {}, // up arrow
+            40: () => {}, // down arrow
+            37: () => {}, // left arrow
+            39: () => {}, // right arrow
+            13: () => {}, // enter
+            27: () => { // escape
                 event.preventDefault();
-                story.views.confirm.escapeAction(event);
-                break;
-        }
+                this.escapeAction(event);
+            },
+        });
     }
 
-    onWheel(story: Story, event: any): void {}
+    onWheel(event: any): void {}
 }

@@ -58,8 +58,6 @@ init python:
         else:
             print("[WARNING] couldn't find main menu background")
 
-    MAIN_MENU_BG = main_menu_bg()
-
 
     def main_menu_music():
         if config.main_menu_music:
@@ -68,13 +66,24 @@ init python:
     MAIN_MENU_MUSIC = main_menu_music()
 
 
-    def import_img(relpath, varname):
+    def game_menu_bg():
+        res = path.join(GAME_BASE_DIR, gui.game_menu_background)
+        if res and path.isfile(res):
+            return res
+        else:
+            print("[WARNING] couldn't find main menu background")
+
+
+    # def import_img(relpath, varname):
+    def import_img(relpath):
         if relpath:
             res = path.join(GAME_BASE_DIR, relpath)
             if path.isfile(res):
-                return "import %s from '%s';" % (varname, res)
-        print("[WARNING] couldn't import %s" % varname)
-        return "const %s: string = null;" % varname
+                # return "import %s from '%s';" % (varname, res)
+                return to_string(res)
+        # print("[WARNING] couldn't import %s" % varname)
+        # return "const %s: string = null;" % varname
+        raise ValueError("Couldn't import %s" % relpath)
 
 
     INVALID_CHARS = re.compile(r"[^0-9a-zA-Z_]")
@@ -121,8 +130,6 @@ init python:
 
         # retrieve all images (removes double assignments)
         imgs = {}
-        if MAIN_MENU_BG:
-            imgs["main_menu_bg"] = MAIN_MENU_BG
 
         for key, value in renpy.game.script.namemap.iteritems():
             if isinstance(value, renpy.ast.Image):
@@ -397,7 +404,6 @@ init python:
         imgs = images()
         nodes, snds = nodes_sounds()
 
-        main_menu_bg = "main_menu_bg" if MAIN_MENU_BG else None
         main_menu_music = "main_menu_music" if MAIN_MENU_MUSIC else None
         show_name = guiattr("show_name", False)
 
@@ -406,16 +412,20 @@ init python:
             "game_version": to_string(config.version),
             "game_lang": to_string(game_lang),
             "show_name": to_string(show_name),
-            "import_game_icon": import_img(config.window_icon, "GAME_ICON"),
-            "main_menu_bg": to_string(main_menu_bg),
+            "path_game_icon": import_img(config.window_icon),
+            "path_main_menu_bg": to_string(main_menu_bg()),
             "main_menu_music": to_string(main_menu_music),
-            "import_main_menu_overlay": import_img("gui/overlay/main_menu.png", "MAIN_MENU_OVERLAY"),
-            "import_textbox": import_img("gui/textbox.png", "TEXTBOX_BG"),
-            "import_choice_btn_bg": import_img("gui/button/choice_idle_background.png", "CHOICE_BTN_BG"),
-            "import_choice_btn_hover": import_img("gui/button/choice_hover_background.png", "CHOICE_BTN_HOVER"),
-            "import_namebox_bg": import_img("gui/namebox.png", "NAMEBOX_BG"),
-            "import_confirm_overlay": import_img("gui/overlay/confirm.png", "CONFIRM_OVERLAY"),
-            "import_frame_bg": import_img("gui/frame.png", "FRAME_BG"),
+            "path_game_menu_bg": to_string(game_menu_bg()),
+            "path_main_menu_overlay": import_img("gui/overlay/main_menu.png"),
+            "path_game_menu_overlay": import_img("gui/overlay/game_menu.png"),
+            "path_textbox": import_img("gui/textbox.png"),
+            "path_choice_btn_bg": import_img("gui/button/choice_idle_background.png"),
+            "path_choice_btn_hover": import_img("gui/button/choice_hover_background.png"),
+            "path_slot_bg": import_img("gui/button/slot_idle_background.png"),
+            "path_slot_hover": import_img("gui/button/slot_hover_background.png"),
+            "path_namebox_bg": import_img("gui/namebox.png"),
+            "path_confirm_overlay": import_img("gui/overlay/confirm.png"),
+            "path_frame_bg": import_img("gui/frame.png"),
             "imgs_imports": imgs["imports"],
             "imgs_dic": imgs["dic"],
             "fonts_imports": fonts["imports"],
@@ -577,10 +587,11 @@ init python:
         mmenu = fontsize(gui.interface_text_size)
         mmenuitems_width = round(420.0 * GAME_WIDTH / 1920)
         mmenubtn = fontsize(gui.button_text_size)
-        infos_marginright = round(24.0 * GAME_WIDTH / 1788)
-        infos_marginbottom = round(32.0 * GAME_HEIGHT / 1006)
+        infos_right = round(24.0 * GAME_WIDTH / 1788)
+        infos_bottom = round(32.0 * GAME_HEIGHT / 1006)
         title = fontsize(gui.title_text_size)
         menubtn = fontsize(gui.choice_button_text_size)
+        slot = fontsize(gui.slot_button_text_size)
 
         datas = {
             # game
@@ -615,6 +626,7 @@ init python:
             "mmenu_fsize": mmenu["h"],
             # main menu items
             "mmenuitems_width": percent(mmenuitems_width, GAME_WIDTH),
+            "selected_color": gui.selected_color,
             # main menu button
             "mmenubtn_padding": padding(mmenubtn_borders(), mmenuitems_width),
             "mmenubtn_color_hover": gui.button_text_hover_color,
@@ -626,9 +638,10 @@ init python:
             "mmenubtn_height": get_or_else(percent(gui.button_height, GAME_HEIGHT), "auto"),
             "mmenubtn_txtalign": textalign(gui.button_text_xalign),
             "disabledbtn_color": gui.insensitive_color,
+            "accent_color": gui.accent_color,
             # game infos in main menu
-            "infos_marginright": percent(infos_marginright, GAME_WIDTH),
-            "infos_marginbottom": percent(infos_marginbottom, GAME_WIDTH),
+            "infos_right": percent(infos_right, GAME_WIDTH),
+            "infos_bottom": percent(infos_bottom, GAME_HEIGHT),
             # game title in main menu
             "title_fsize_v": title["v"],
             "title_fsize": title["h"],
@@ -645,6 +658,17 @@ init python:
             "choicebtn_fsize": menubtn["h"],
             "choicebtn_txtalign": textalign(gui.choice_button_text_xalign),
             "choicebtn_width": get_or_else(percent(gui.choice_button_width, GAME_WIDTH), "auto"),
+            # slot
+            "slot_width": percent(gui.slot_button_width, GAME_WIDTH - mmenuitems_width),
+            "slot_height": percent(gui.slot_button_height, GAME_HEIGHT),
+            "slot_padding": padding(gui.slot_button_borders, GAME_WIDTH - mmenuitems_width),
+            "slot_fsize_v": slot["v"],
+            "slot_fsize": slot["h"],
+            "slot_txtalign": textalign(gui.slot_button_text_xalign),
+            "slot_color": gui.slot_button_text_idle_color,
+            "thumb_width": percent(config.thumbnail_width, gui.slot_button_width),
+            "thumb_height": percent(config.thumbnail_height, gui.slot_button_height),
+            "thumb_margin_top": percent(gui.slot_button_borders.top, GAME_HEIGHT-config.thumbnail_height),
             # confirm frame
             "confirmframe_padding": padding(gui.confirm_frame_borders, GAME_WIDTH),
         }

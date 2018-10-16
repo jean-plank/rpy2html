@@ -1,55 +1,51 @@
-import * as _ from 'lodash';
-import * as $ from 'jquery';
+import * as _ from "lodash";
+import * as $ from "jquery";
 
 import { StoryDatas, Story } from "../Story";
-import { Image } from '../Image';
-import { Sound } from '../Sound';
-import { View } from './View';
-import { translations as transl, Language as Lang } from '../../translations';
+import { Sound } from "../Sound";
+import { Menu } from "./Menu";
+import { translations as transl, Language as Lang } from "../../translations";
+import { actionBtn, actionKey } from "../../utils";
+import { MenuButton } from "./MenuButton";
 
 
-export class MainMenu extends View {
-    private background: Image;
+export class MainMenu extends Menu {
+    private gameMenuOverlay: string;
     private music: Sound;
 
     constructor (datas: StoryDatas) {
-        super();
+        super(datas);
 
+        this.$menuItems = this.story.$.mainMenu.find(".menu-items").first();
+        this.$submenu = this.story.$.mainMenu.find(".submenu>div").first();
         this.story.$.mainMenu.hide();
-
-        type Btn = {
-            id: string;
-            txt: string;
-            disabled: boolean;
-        };
 
         const lang: Lang =
             _.has(transl, datas.lang)?transl[datas.lang]:transl["en"];
-        const btns: Array<Btn> = [
-            { id: "start-btn", txt: lang.mainMenu.start, disabled: false },
-            { id: "load-btn", txt: lang.mainMenu.load, disabled: true },
-            { id: "prefs-btn", txt: lang.mainMenu.prefs, disabled: true },
-            { id: "help-btn", txt: lang.mainMenu.help, disabled: true },
-            { id: "quit-btn", txt: lang.mainMenu.quit, disabled: false },
+        const btns: MenuButton[] = [
+            new MenuButton("start", lang.menu.start),
+            new MenuButton("load", lang.menu.load),
+            // new MenuButton("prefs", lang.menu.prefs),
+            new MenuButton("help", lang.menu.help),
+            new MenuButton("quit", lang.menu.quit),
         ];
 
-        _.forEach(btns, (btn: Btn) =>
-            this.story.$.mainMenu.children(".items").first().append(
-                $('<button>')
-                    .attr("id", btn.id)
+        _.forEach(btns, (btn: MenuButton) =>
+            this.$menuItems.append(
+                $("<button>")
+                    .attr("name", btn.name)
                     .prop("disabled", btn.disabled)
                     .text(btn.txt)));
 
-
         if (datas.showName) {
-            $('#game-name').text(datas.name);
-            $('#game-version').text(datas.version);
+            $("#game-name").text(datas.name);
+            $("#game-version").text(datas.version);
         }
 
-        if (datas.main_menu_bg != undefined) {
-            this.background = this.story.images[datas.main_menu_bg];
-            if (this.background != undefined) this.background.load();
-        }
+        this.background = datas.main_menu_bg;
+        this.overlay = datas.main_menu_overlay;
+        this.gameMenuOverlay = datas.game_menu_overlay;
+
         if (datas.main_menu_music != undefined) {
             this.music = this.story.sounds[datas.main_menu_music];
             if (this.music != undefined) this.music.load();
@@ -57,63 +53,65 @@ export class MainMenu extends View {
     }
 
     show(): void {
-        this.story.hideCurrentView();
         super.show();
 
         this.story.$.mainMenu.show();
-        this.story.scene(this.background);
         this.story.chans.music.play(this.music);
-
-        this.story.$.textbox.hide();
     }
 
     hide(): void {
         super.hide();
 
         this.story.$.mainMenu.hide();
-        this.story.$.scene.empty();
-        this.story.$.textbox.show();
     }
 
-    onClick(story: Story, event: any) {
-        const btn = $(event.target).closest("button");
-
-        if (btn.length !== 0) {
-            switch (btn.attr('id')) {
-                case 'start-btn':
-                    story.views.game.start();
-                    break;
-
-                case 'quit-btn':
-                    story.views.confirm.confirmQuit();
-                    break;
-            }
-        }
+    onLeftClick(event: any): void {
+        actionBtn(event, {
+            "start": () => {
+                this.hideCurrentSubMenu();
+                this.story.views.game.start();
+            },
+            "load": () => this.showLoad(),
+            "prefs": () => {},
+            "help": () => this.showHelp(),
+            "quit": () => {
+                this.hideCurrentSubMenu();
+                this.story.views.confirm.confirmQuit();
+            },
+        });
     }
 
-    onKeyup(story: Story, event: any): void {
-        switch (event.which) {
-            case 38: // up arrow
-                break;
+    onMiddleClick(event: any): void {}
 
-            case 40: // down arrow
-                break;
+    onRightClick(event: any): void {}
 
-            case 37: // left arrow
-                break;
-
-            case 39: // right arrow
-                break;
-
-            case 13: // enter
-                break;
-
-            case 27: // escape
+    onKeyup(event: any): void {
+        actionKey(event, {
+            38: () => {}, // up arrow
+            40: () => {}, // down arrow
+            37: () => {}, // left arrow
+            39: () => {}, // right arrow
+            13: () => {}, // enter
+            27: () => { // escape
                 event.preventDefault();
-                story.views.confirm.confirmQuit();
-                break;
-        }
+                if (this.subMenuShown) {
+                    this.hideCurrentSubMenu();
+                } else {
+                    this.story.views.confirm.confirmQuit();
+                }
+            },
+        });
     }
 
-    onWheel(story: Story, event: any): void {}
+    onWheel(event: any): void {}
+
+    protected hideCurrentSubMenu(): void {
+        super.hideCurrentSubMenu();
+        this.showOverlay(this.overlay);
+    }
+
+    protected showSubmenu(btnName: string, ...content: JQuery<HTMLElement>[]): void {
+        super.showSubmenu(btnName, ...content);
+        this.showOverlay(this.gameMenuOverlay);
+    }
 }

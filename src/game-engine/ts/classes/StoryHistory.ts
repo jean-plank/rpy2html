@@ -5,7 +5,7 @@ import { Story } from './Story';
 
 
 export class StoryHistory {
-    private history: Array<Array<Node>>;
+    private history: Node[][];
 
     /**
      * @property {number} iCurrentBlock Index of the block being displayed.
@@ -19,7 +19,7 @@ export class StoryHistory {
         this.iCurrentBlock = -1;
     }
 
-    addBlock(block: Array<Node>): void {
+    addBlock(block: Node[]): void {
         this.history = _(this.history).take(this.iCurrentBlock + 1)
                                       .push(block)
                                       .value();
@@ -28,7 +28,7 @@ export class StoryHistory {
 
     nextBlock(): void {
         const newI: number = this.iCurrentBlock + 1
-        const block: Array<Node> = this.history[newI];
+        const block: Node[] = this.history[newI];
 
         if (block != undefined) {
             _.forEach(block, (node: Node) => node.execute());
@@ -45,7 +45,7 @@ export class StoryHistory {
             const newI: number = this.iCurrentBlock - 1;
 
             for (let i = 0; i <= newI; i++) {
-                const block: Array<Node> = this.history[i];
+                const block: Node[] = this.history[i];
 
                 _.forEach(block, (node: Node) => node.execute());
             }

@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 
 
 export class Image {
-    private file: string;
+    file: string;
     private $img: JQuery<HTMLImageElement>;
 
     constructor (file: string) {

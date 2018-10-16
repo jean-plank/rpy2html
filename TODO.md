@@ -1,5 +1,7 @@
 * Navigation buttons
+
 * Saves
+
 * Fade for scenes
 
 * ERROR for jp1 (en and fr):
@@ -8,3 +10,5 @@
         You should define the concerned gui attribute.
 
 * Update README.md (and what-it-does.jpg) for language support.
+
+* Change `Node | Node[]` to `Node[]`

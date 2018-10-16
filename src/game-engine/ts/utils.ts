@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
+import * as $ from "jquery";
 
 import { Story, StoryDatas } from './classes/Story';
 import { Font, Fonts } from './classes/Font';
-import { Node } from './classes/nodes';
 
 
 function getBgOrElse(urlBg: string, color?: string): string {
@@ -42,10 +42,6 @@ export function getStyle(datas: StoryDatas): string {
 
 ${fonts}
 
-#${story.$.mainMenu.attr("id")} {
-    ${getBgOrElse(datas.main_menu_overlay)}
-}
-
 #${story.$.choice.attr("id")}>button {
     ${getBgOrElse(datas.choice_btn_bg)}
 }
@@ -56,6 +52,14 @@ ${fonts}
 
 #${story.$.confirm.attr("id")} {
     ${getBgOrElse(datas.confirm_overlay)}
+}
+
+.slot {
+    ${getBgOrElse(datas.slot_bg)}
+}
+
+.slot:hover {
+    ${getBgOrElse(datas.slot_hover)}
 }
 
 .frame {
@@ -85,4 +89,84 @@ export function convertToJs(code: string): string {
             }
         }, code)
         .replace("==", "===");
+}
+
+
+type Actions = {
+    [id: string]: () => void;
+}
+
+export function actionBtn(event: any, actions: Actions): boolean {
+    const $btn: JQuery<HTMLElement> = $(event.target).closest("button");
+
+    if ($btn.length !== 0) {
+        const id: string = $btn.attr("name");
+
+        if (_.has(actions, id)) {
+            actions[id]();
+            return true;
+        }
+    }
+    return false;
+}
+
+
+export function actionKey(event: any, actions: Actions): void {
+    if (_.has(actions, event.which)) {
+        actions[event.which]();
+    }
+}
+
+
+type Save = {
+    img: string;
+    date: string;
+}
+
+function isValidSave(save: any): boolean {
+    return save === null || (  _.keys(save).length === 2
+                            && _.has(save, "img")
+                            && _.has(save, "date"));
+}
+
+const nbSlots: number = 6;
+const jpSaves: string = "jpSaves";
+
+/**
+ * Retrieves localStorage[jpSaves] and checks.
+ * @returns {Save[]} of length nbSlots containing valids Save
+ * (Save can be null).
+ * Won't return more than slots saves (even if there are more)
+ */
+export function existingSaves(): Save[] {
+    const tmp: string = localStorage.getItem(jpSaves);
+    let res: Save[];
+    if (tmp === undefined) {
+        res = _.times(nbSlots, _.constant(null));
+    } else {
+        const anySaves: any = JSON.parse(tmp);
+        if (_.isArray(anySaves)) {
+            res = _.map(<any[]>anySaves, (save) => {
+                if (isValidSave(save)) return <Save>save;
+                else return null;
+            });
+        } else {
+            res = _.times(nbSlots, _.constant(null));
+        }
+    }
+    console.log('existingSaves() =', res);
+    return res;
+}
+
+export function storeSave(save: Save, iSlot: number): void {
+    const saves: Save[] = existingSaves();
+    const res: Save[] = _.map(_.range(nbSlots), (i) => {
+        if (i === iSlot) {
+            return save;
+        } else {
+            return saves[i];
+        }
+    });
+    console.log(`storeSave(${save}, ${iSlot}) =`, res);
+    localStorage.setItem(jpSaves, JSON.stringify(res));
 }

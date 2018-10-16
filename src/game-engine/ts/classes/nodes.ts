@@ -23,7 +23,7 @@ export abstract class Node {
     abstract toString(): string;
 
     load(): void {
-        console.log(`%cloading ${this}`, 'color: #bada55');
+        // console.log(`%cloading ${this}`, 'color: #bada55');
 
         if (_.isArray(this.idNext)) {
             this.next = _.map(this.idNext, (id: number) => this.story.nodes[id]);
@@ -33,7 +33,7 @@ export abstract class Node {
     }
 
     execute(): void {
-        console.log(`%cexecuting ${this}`, 'color: blue; font-wheight: bold');
+        // console.log(`%cexecuting ${this}`, 'color: blue; font-wheight: bold');
 
         this.story.currentNode = this;
 
@@ -275,7 +275,15 @@ export class Scene extends Node {
     execute(): void {
         super.execute();
 
-        this.story.scene(this.image);
+        this.story.cleanup();
+
+        if (!this.image.isLoaded()) {
+            this.image.load();
+            console.error(`Image ${this.image} didn't preload correctly. Loaded now.`);
+        }
+
+        this.image.addTo(this.story.$.scene);
+        this.story.shownScene = this.image;
     }
 }
 

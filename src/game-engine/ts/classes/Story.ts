@@ -5,7 +5,7 @@ import * as utils from '../utils';
 import { Channel, Channels } from  './Channel';
 import { Image, Images } from  './Image';
 import { Fonts } from './Font';
-import { Sound, Sounds } from  './Sound';
+import { Sounds } from  './Sound';
 import { Chars } from  './Char';
 import { Node, Nodes, Menu } from  './nodes';
 import { StoryHistory } from './StoryHistory';
@@ -20,13 +20,18 @@ export class StoryDatas {
     name="Some Ren'Py Game";
     version="1.0";
     lang="en";
+    help: string;
     showName: boolean;
     icon: string;
     main_menu_bg: string;
     main_menu_music: string;
     main_menu_overlay: string;
+    game_menu_bg: string;
+    game_menu_overlay: string;
     choice_btn_bg: string;
     choice_btn_hover: string;
+    slot_bg: string;
+    slot_hover: string;
     textbox_bg: string;
     namebox_bg: string;
     confirm_overlay: string;
@@ -49,10 +54,15 @@ export class Story {
         namebox: JQuery<HTMLElement>;
         dialog: JQuery<HTMLElement>;
         choice: JQuery<HTMLElement>;
+        menuBg: JQuery<HTMLElement>;
+        menuOverlay: JQuery<HTMLElement>;
         mainMenu: JQuery<HTMLElement>;
+        subMainMenu: JQuery<HTMLElement>;
+        gameMenu: JQuery<HTMLElement>;
         confirm: JQuery<HTMLElement>;
     };
-    shownImgs: Array<Image>;
+    shownScene: Image;
+    shownImgs: Image[];
     chans: Channels;
 
     currentView: View;
@@ -80,11 +90,13 @@ export class Story {
             namebox: $('#namebox'),
             dialog: $('#dialog'),
             choice: $('#choice'),
+            menuBg: $("#menu-bg"),
+            menuOverlay: $("#menu-overlay"),
             mainMenu: $('#main-menu'),
+            subMainMenu: $('#main-menu .submenu').first(),
+            gameMenu: $("#game-menu"),
             confirm: $('#confirm'),
         }
-
-        this.shownImgs = [];
 
         this.chans = {
             music: new Channel(true, 0.5),
@@ -108,11 +120,14 @@ export class Story {
         this.sounds = datas.sounds;
         this.chars = datas.chars;
 
+        this.$.menuBg.hide();
+        this.$.menuOverlay.hide();
+
         this.views = {
             confirm: new Confirm(datas.lang),
             game: new Game(),
-            gameMenu: new GameMenu(),
             mainMenu: new MainMenu(datas),
+            gameMenu: new GameMenu(datas),
         }
 
         // init head
@@ -132,10 +147,18 @@ export class Story {
 
         // events
         const siht = this;
+        type Actions = { [key: number]: () => void; };
         $(document)
-            .on("click", (e) => siht.currentView.onClick(siht, e))
-            .on("keyup", (e) => siht.currentView.onKeyup(siht, e))
-            .on("wheel", (e) => siht.currentView.onWheel(siht, e))
+            .on("click", (e) => {
+                const acts: Actions = {
+                    1: () => siht.currentView.onLeftClick(e),
+                    2: () => siht.currentView.onMiddleClick(e),
+                    3: () => siht.currentView.onRightClick(e),
+                }
+                acts[e.which]();
+            })
+            .on("keyup", (e) => siht.currentView.onKeyup(e))
+            .on("wheel", (e) => siht.currentView.onWheel(e))
             .on("beforeunload", () => siht.views.confirm.confirmQuit());
     }
 
@@ -149,17 +172,7 @@ export class Story {
         this.$.choice.empty();
         this.$.scene.empty();
         this.$.charImg.empty();
+        this.shownScene = null;
         this.shownImgs = [];
-    }
-
-    scene(img: Image): void {
-        this.cleanup();
-
-        if (!img.isLoaded()) {
-            img.load();
-            console.error(`Image ${img} didn't preload correctly. Loaded now.`);
-        }
-
-        img.addTo(this.$.scene);
     }
 }
