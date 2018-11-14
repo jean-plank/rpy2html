@@ -2,4 +2,4 @@ generated-json
 dist
 .~lock.*
 *.odp
-.deploy.sh
+deploy.sh
