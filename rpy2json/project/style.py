@@ -124,9 +124,9 @@ def new_style(gui, config, fonts_usages, Borders):
 
 
 def guibtn_borders(gui, Borders):
-    left = gui.button_borders.left + 58
+    left = gui.button_borders.left + 39
     top = gui.button_borders.top + 6
-    right = gui.button_borders.right + 145
+    right = gui.button_borders.right + 39
     bottom = gui.button_borders.bottom + 6
     return Borders(left, top, right, bottom)
 
@@ -200,7 +200,7 @@ def old_style(gui, config, fonts_usages, Borders):
 
     # gui button
     guibtn_fsize = fontsize(HEIGHT, WIDTH, 32)
-    res["guibtn_padding"] = padding(Borders(64, 12, 151, 12), mmenuitems_width)
+    res["guibtn_padding"] = padding(Borders(45, 12, 45, 12), mmenuitems_width)
     res["guibtn_color_hover"] = "#66c1e0" # "#b99d83"
     res["guibtn_color"] = "#888888" #b99d83"
     res["guibtn_ffamily"] = fonts_usages["guibtn"]
@@ -208,7 +208,7 @@ def old_style(gui, config, fonts_usages, Borders):
     res["guibtn_fsize_h"] = guibtn_fsize["h"]
     res["guibtn_width"] = "auto"
     res["guibtn_height"] = "auto"
-    res["guibtn_txtalign"] = "center"
+    res["guibtn_txtalign"] = "left"
 
     # choice
     res["choice_height"] = percent(HEIGHT - textbox_height, HEIGHT)

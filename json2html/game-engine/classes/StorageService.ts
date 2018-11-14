@@ -75,7 +75,6 @@ export default class StorageService {
     }
 
     storeSave(newSave: Save, iSlot: number) {
-        console.log('storing', newSave, '\non slot', iSlot);
         this.setSave(iSlot, newSave);
         localStorage.setItem(this.storageKey, JSON.stringify(this.saves));
     }

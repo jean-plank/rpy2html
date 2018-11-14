@@ -75,7 +75,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 .menu-items {
     width: ${style.mmenuitems_width};${
         newStyle ? '' : `
-    background-color: rgba(0, 0, 0, 0.5);`}
+    background-color: rgba(0, 0, 0, 0.75);`}
 }
 
 .submenu {

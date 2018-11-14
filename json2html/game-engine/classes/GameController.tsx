@@ -103,7 +103,7 @@ export default class GameController implements IGameController, IKeyboardHandler
     private execNext(node: Node) {
         const nexts = node.nexts();
 
-        if (nexts.length === 0) this.app.showMainMenu();
+        if (nexts.length === 0) this.app.showMainMenu()();
         else {
             let next: Node | null = null;
 

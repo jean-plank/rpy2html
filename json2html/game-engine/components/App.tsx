@@ -63,7 +63,6 @@ export default class App extends React.Component<IProps, IState> {
             ? translations[props.datas.lang]
             : translations.en;
 
-
         if (_.has(this.props.datas.sounds, 'main_menu_music')) {
             this.mainMenuMusic = this.props.datas.sounds.main_menu_music;
             (this.mainMenuMusic as Sound).load();
@@ -71,7 +70,7 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        this.showMainMenu();
+        this.showMainMenu()();
     }
 
     render() {
@@ -103,7 +102,7 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     // showing views
-    showMainMenu() {
+    showMainMenu = () => () => {
         _.forEach(this.channels, (chan: Channel) => { chan.stop(); });
 
         if (this.mainMenuMusic !== null)
@@ -139,7 +138,7 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     // confirm
-    confirm(msg: string, buttons: IButton[], escapeAction?: () => void) {
+    private confirm(msg: string, buttons: IButton[], escapeAction?: () => void) {
         this.setState({
             confirm: <Confirm ref={this.setConfirmKbrdHndlr()}
                               app={this}
@@ -176,7 +175,7 @@ export default class App extends React.Component<IProps, IState> {
 
     confirmMMenu(unselectBtn: () => void) {
         this.confirmYesNo(this.lang.confirm.unsaved,
-                          this.showMainMenu,
+                          this.showMainMenu(),
                           unselectBtn);
     }
 

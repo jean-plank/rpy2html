@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import '../styles/MenuButton.css';
+
 
 export interface IButton {
     text: string;
