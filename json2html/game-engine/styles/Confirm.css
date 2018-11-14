@@ -1,0 +1,21 @@
+.Confirm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Confirm>.frame {
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.Confirm .msg {
+    text-align: center;
+}
+
+.Confirm .items {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1.67em;
+}

@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+from os import path
+from subprocess import call
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+
+DEFAULT_OUTPUT = path.normpath(path.join(path.dirname(__file__), "../../dist"))
+
+def get_args():
+    parser = ArgumentParser(
+        description="Takes a json generated from a Ren'Py game and bundles it to a html file.",
+        formatter_class=ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument(
+        "json_file",
+        metavar="<json_file>",
+        help="path to the json file")
+
+    parser.add_argument(
+        "-o",
+        nargs=1,
+        metavar="<output_dir=%s>" % DEFAULT_OUTPUT,
+        default=[DEFAULT_OUTPUT],
+        help="path to output folder",
+        dest="output_dir")
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = get_args()
+
+    json2html = path.join(path.dirname(__file__), "..")
+    abs_output = path.abspath(args.output_dir[0])
+    abs_json = path.abspath(args.json_file)
+
+    code = call(["npm", "run", "build", "--prefix", json2html, "--", "--output-path", abs_output, "--define", "__INPUT_JSON=\"%s\"" % abs_json])
+
+    exit(code)

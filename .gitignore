@@ -1,7 +1,4 @@
-deploy.sh
-node_modules
+generated-json
 dist
-examples
 .~lock.*
 *.odp
-src/converted
