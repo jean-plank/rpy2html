@@ -23,15 +23,21 @@ init python:
 
     # correct sound files names
     def correct_sound(sounds, key, sound):
-        correct = path.join(GAME_BASE_DIR, sound)
-        if path.isfile(correct):
-            sounds[key] = correct
+        if sound != None:
+            correct = path.join(GAME_BASE_DIR, sound)
+            if path.isfile(correct):
+                sounds[key] = correct
+                return
+            else:
+                var_name = correct
         else:
-            del sounds[key]
-            print('[WARNING] couldn\'t import %s' % var_name)
+            var_name = key
+        print('[WARNING] couldn\'t import %s' % var_name)
 
+    sounds = {}
     for key, value in res['sounds'].iteritems():
-        correct_sound(res['sounds'], key, value)
+        correct_sound(sounds, key, value)
+    res['sounds'] = sounds
 
     # add images
     res['images'] = parse_images(GAME_BASE_DIR, renpy.game.script.namemap, renpy.ast.Image, renpy.python.py_eval_bytecode, renpy.display.motion.ATLTransform, config, gui, style)
