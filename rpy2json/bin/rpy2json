@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from sys import exit
-from os import path, remove, listdir
+from os import path, remove, listdir, makedirs
 from shutil import copy2
 from subprocess import call
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     args_rpy = 'args.rpy' # how the temp `define game_lang` file should be
                           # named in game folder
 
-    # the paths below are relative to rpy2json_base
+    # to_be_copied, to_be_removed
     to_be_copied = listdir(rpy2json_base)
 
     to_be_removed = [args_rpy, args_rpy+'c']
@@ -72,6 +72,11 @@ if __name__ == '__main__':
     with open(path.join(game, args_rpy), 'w') as f:
         f.write('define output_file = "%s"\n' % args.output_file[0])
         f.write('define game_lang = "%s"\n' % args.game_lang[0])
+
+    # create output dir if it doesn't exists
+    output_dir = path.dirname(args.output_file[0])
+    if not path.exists(output_dir):
+        makedirs(output_dir)
 
     # compilation
     cmd = [args.renpy, args.game_base, 'compile']
