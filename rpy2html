@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+
+from os import path
+from subprocess import call
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+
+DEFAULT_LANG = "en"
+DEFAULT_OUTPUT = path.normpath(path.join(path.dirname(__file__), "dist"))
+JSON = path.join(path.dirname(__file__), "generated-json/game.json")
+
+def get_args():
+    parser = ArgumentParser(
+        description="Takes a Ren'Py game and bundles it to a html file.",
+        formatter_class=ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument(
+        "renpy",
+        metavar="<renpy executable>",
+        help="path to renpy.sh executable")
+
+    parser.add_argument(
+        "game_base",
+        metavar="<renpy game folder>",
+        help="path to the renpy game folder")
+
+    parser.add_argument(
+        "--lang",
+        nargs=1,
+        metavar="<game_lang=%s>" % DEFAULT_LANG,
+        default=[DEFAULT_LANG],
+        help="output game language",
+        dest="game_lang")
+
+    parser.add_argument(
+        "-o",
+        nargs=1,
+        metavar="<output_dir=%s>" % DEFAULT_OUTPUT,
+        default=[DEFAULT_OUTPUT],
+        help="path to output folder",
+        dest="output_dir")
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = get_args()
+
+    rpy2json = path.join(path.dirname(__file__), "rpy2json/bin/rpy2json")
+    json2html = path.join(path.dirname(__file__), "json2html/bin/json2html")
+
+    code = call([rpy2json, args.renpy, args.game_base, "--lang", args.game_lang[0], "-o", JSON])
+
+    if code != 0:
+        exit(code)
+
+    code = call([json2html, JSON, "-o", args.output_dir[0]])
+
+    exit(code)

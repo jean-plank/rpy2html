@@ -1,0 +1,38 @@
+.Memory {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.Memory>.header {
+    margin: 0 2em;
+    padding: 1em 1em;
+    border-bottom: 1px solid;
+}
+
+.Memory>.games {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.Memory>.games>div {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.Memory .MenuButton {
+    padding: 0em !important;
+}
+
+.Memory>.footer {
+    border-top: 1px solid;
+    margin: 0 2em;
+    padding: 0 1em;
+}
+
+.Memory>.footer>.MemoryGame {
+    padding: 0;
+}

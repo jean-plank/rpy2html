@@ -1,0 +1,45 @@
+{
+  "name": "json2html",
+  "version": "1.0.0",
+  "description": "Web visual novel game engine using a json.",
+  "scripts": {
+    "start": "webpack-dev-server --config webpack.dev.js --hot --define __INPUT_JSON='\"../../generated-json/game.json\"'",
+    "build": "webpack --config webpack.prod.js",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grimalkin8675/rpy2html.git"
+  },
+  "author": "Grimalkin8675",
+  "license": "MIT",
+  "dependencies": {
+    "@types/lodash": "^4.14.116",
+    "@types/node": "^10.12.0",
+    "@types/react": "^16.4.17",
+    "@types/react-dom": "^16.0.9",
+    "ajv": "^6.5.4",
+    "awesome-typescript-loader": "^5.2.1",
+    "copy-webpack-plugin": "^4.6.0",
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "lodash": "^4.17.10",
+    "markdown-loader": "^4.0.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "source-map-loader": "^0.2.4",
+    "style-loader": "^0.23.1",
+    "typescript": "^3.1.3",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-merge": "^4.1.4"
+  },
+  "devDependencies": {
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.16.0",
+    "tslint-react": "^3.6.0",
+    "webpack-dev-server": "^3.1.9"
+  }
+}

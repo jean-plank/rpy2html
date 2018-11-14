@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+from sys import exit
+from os import path, remove, listdir
+from shutil import copy2
+from subprocess import call
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
+
+DEFAULT_LANG = 'en'
+DEFAULT_OUTPUT = path.normpath(path.join(path.dirname(__file__), '../../generated-json/game.json'))
+
+def get_args():
+    parser = ArgumentParser(
+        description='Takes a Ren\'Py game and generates a json.',
+        formatter_class=ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument(
+        'renpy',
+        metavar='<renpy executable>',
+        help='path to renpy.sh executable')
+
+    parser.add_argument(
+        'game_base',
+        metavar='<renpy game folder>',
+        help='path to the renpy game folder')
+
+    parser.add_argument(
+        '--lang',
+        nargs=1,
+        metavar='<game_lang=%s>' % DEFAULT_LANG,
+        default=[DEFAULT_LANG],
+        help='output game language',
+        dest='game_lang')
+
+    parser.add_argument(
+        '-o',
+        nargs=1,
+        metavar='<output_file=%s>' % DEFAULT_OUTPUT,
+        default=[DEFAULT_OUTPUT],
+        help='path to output file',
+        dest='output_file')
+
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = get_args()
+
+    game = path.join(args.game_base, 'game')
+    rpy2json_base = path.join(path.dirname(__file__), '../project')
+    args_rpy = 'args.rpy' # how the temp `define game_lang` file should be
+                          # named in game folder
+
+    # the paths below are relative to rpy2json_base
+    to_be_copied = listdir(rpy2json_base)
+
+    to_be_removed = [args_rpy, args_rpy+'c']
+    for filename in to_be_copied:
+        to_be_removed.append(filename)
+        if filename.endswith('.rpy'):
+            to_be_removed.append(filename+'c')
+
+    # initial copy
+    def copy2_game(fname):
+        f = path.join(rpy2json_base, fname)
+        if path.isfile(f):
+            copy2(f, game)
+
+    [copy2_game(f) for f in to_be_copied]
+
+    with open(path.join(game, args_rpy), 'w') as f:
+        f.write('define output_file = "%s"\n' % args.output_file[0])
+        f.write('define game_lang = "%s"\n' % args.game_lang[0])
+
+    # compilation
+    cmd = [args.renpy, args.game_base, 'compile']
+    print
+    print('> %s' % ' '.join(cmd))
+    print
+    code = call(cmd)
+
+    # cleanup anyway
+    def remove_from_game(fname):
+        f = path.join(game, fname)
+        if path.isfile(f):
+            remove(f)
+
+    [remove_from_game(f) for f in to_be_removed]
+
+    exit(code)
