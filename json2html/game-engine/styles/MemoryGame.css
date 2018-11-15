@@ -5,17 +5,12 @@
     align-items: center;
 }
 
-.MemoryGame:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.25);
-}
-
 .MemoryGame>div {
     display: flex;
     padding: 0.67em 0;
 }
 
 .MemoryGame>.key {
-    /* width: 33%; */
     flex-grow: 1;
 }
 

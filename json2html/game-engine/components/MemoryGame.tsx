@@ -31,7 +31,7 @@ export default class MemoryGame extends React.Component<IProps> {
                 <div className='bytes'>{strBytes}</div>
                 <div className='btn'>
                     <MenuButton
-                        text={'× ' + strDel}
+                        text={'X ' + strDel}
                         action={this.props.deleteStorage} />
                 </div>
             </div>

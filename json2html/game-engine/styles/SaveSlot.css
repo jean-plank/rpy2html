@@ -11,4 +11,5 @@
 
 .SaveSlot>.Game {
     position: relative;
+    max-width: 100%;
 }

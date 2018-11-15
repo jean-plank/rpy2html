@@ -196,7 +196,8 @@ def old_style(gui, config, fonts_usages, Borders):
     res["mmenuitems_width"] = percent(mmenuitems_width, WIDTH)
 
     # submenu
-    res["submenu_width"] = percent(WIDTH - mmenuitems_width, WIDTH)
+    submenu_width = WIDTH - mmenuitems_width
+    res["submenu_width"] = percent(submenu_width, WIDTH)
 
     # gui button
     guibtn_fsize = fontsize(HEIGHT, WIDTH, 32)
@@ -227,24 +228,21 @@ def old_style(gui, config, fonts_usages, Borders):
     res["choicebtn_width"] = "auto"
 
     # save slots
-    slot_button_width = 312 # 414
-    slot_button_height = 233 # 309
-    slot_button_borders = Borders(15, 15, 15, 15)
+    slot_button_width = 0.9 * submenu_width / 3.0 # 312 # 414
+    slot_button_height = 233.0 * slot_button_width / 312.0 # 233 # 309
     slot_fsize = fontsize(HEIGHT, WIDTH, 21)
-    thumbnail_width = 384.0
-    thumbnail_height = 216.0
     res["slot_width"] = percent(slot_button_width, WIDTH - mmenuitems_width)
     res["slot_height"] = percent(slot_button_height, HEIGHT)
-    res["slot_padding"] = padding(slot_button_borders, WIDTH - mmenuitems_width)
+    res["slot_padding"] = padding(Borders(15, 15, 15, 15), WIDTH - mmenuitems_width)
     res["slot_fsize_v"] = slot_fsize["v"]
     res["slot_fsize_h"] = slot_fsize["h"]
     res["slot_txtalign"] = "center"
     res["slot_color"] = "#aaaaaa"
-    res["thumb_width"] = percent(thumbnail_width, slot_button_width)
-    res["thumb_height"] = percent(thumbnail_height, slot_button_height)
-    res["thumb_margin_top"] = percent(slot_button_borders.top, HEIGHT - thumbnail_height)
-    res["thumb_width_scale"] = thumbnail_width / WIDTH
-    res["thumb_height_scale"] = thumbnail_height / HEIGHT
+    res["thumb_width"] = "100%"
+    res["thumb_height"] = "100%"
+    res["thumb_margin_top"] = "0"
+    res["thumb_width_scale"] = slot_button_width / WIDTH
+    res["thumb_height_scale"] = slot_button_height / HEIGHT
 
     # confirm frame
     res["confirmframe_padding"] = padding(Borders(60, 60, 60, 60), WIDTH)

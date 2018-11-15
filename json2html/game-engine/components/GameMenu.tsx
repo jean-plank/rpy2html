@@ -81,7 +81,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         const keyEvents: IObj<(e: React.KeyboardEvent) => void> = {
             Escape: (evt: React.KeyboardEvent) => {
                 evt.stopPropagation();
-                this.hide();
+                this.hide()();
             },
         };
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);

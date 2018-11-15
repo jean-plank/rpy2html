@@ -20,7 +20,8 @@ export default class StorageService {
     private constructor (app: App) {
         StorageService.instance = this;
 
-        this.storageKey = StorageService.prefix + app.props.datas.gameName;
+        this.storageKey = StorageService.prefix + app.props.datas.gameName
+                                                + ` (${app.props.datas.lang})`;
 
         /**
          * Set this.saves from localStorage[StorageService.storageKey]
