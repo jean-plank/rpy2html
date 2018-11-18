@@ -37,11 +37,11 @@ export default class Image {
         }
     }
 
-    getElt(): HTMLImageElement {
+    getElt(): Node {
         if (!this.isLoaded()) {
             this.load(); // ensures that this.elt isn't null
             console.warn(`${this.toString()} didn't preload correctly. Loaded now.`);
         }
-        return (this.elt as HTMLImageElement);
+        return (this.elt as HTMLImageElement).cloneNode();
     }
 }

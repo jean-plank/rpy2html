@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import IObj from './IObj';
 import IKeyboardHandler from './IKeyboardHandler';
 import IGameController from './IGameController';
+import { IGameProps } from './GameProps';
 import IAppDatas from './IAppDatas';
 import StoryHistory from './StoryHistory';
 import Image from './Image';
@@ -21,7 +22,7 @@ import Menu from './nodes/Menu';
 // components
 import App from '../components/App';
 import Game from '../components/Game';
-import { IGameProps } from './GameProps';
+import ArmlessWankerMenu from '../components/ArlmessWankerMenu';
 
 
 export default class GameController implements IGameController, IKeyboardHandler {
@@ -117,9 +118,15 @@ export default class GameController implements IGameController, IKeyboardHandler
     update<K extends keyof IGameProps>(props?: Pick<IGameProps, K>) {
         _.forEach(props, (value, key: K) => { this.gameProps[key] = value; });
 
-        this.app.setState({ view: <Game ref={() => { this.setHandler(this); }}
-                                        controller={this}
-                                        game={this.gameProps} /> });
+        const menu = <ArmlessWankerMenu app={this.app} />;
+
+        this.app.setState({
+            view:
+                <Game ref={() => { this.setHandler(this); }}
+                      controller={this}
+                      game={this.gameProps}
+                      armlessWankerMenu={menu}/>
+        });
     }
 
     // interface for Nodes
@@ -153,11 +160,11 @@ export default class GameController implements IGameController, IKeyboardHandler
                       textboxText: what });
     }
 
-    menu(displayText: string, theChoices: Choice[]) {
-        if (displayText === '') this.update({ textboxHide: true,
+    menu(who: Char | null, what: string, theChoices: Choice[]) {
+        if (what === '') this.update({ textboxHide: true,
                                               choices: theChoices });
-        else this.update({ textboxChar: null,
-                           textboxText: displayText,
+        else this.update({ textboxChar: who,
+                           textboxText: what,
                            choices: theChoices });
     }
 

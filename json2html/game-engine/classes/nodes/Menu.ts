@@ -1,23 +1,16 @@
 import * as _ from 'lodash';
 
-import Node from './Node';
 import MenuItem from './MenuItem';
 import GameController from '../GameController';
 import Choice from '../Choice';
+import NodeWithChar from './NodeWithChar';
 
 
-export default class Menu extends Node {
+export default class Menu extends NodeWithChar {
     protected _nexts: MenuItem[] | null;
 
-    private displayTxt: string;
-
-    constructor (displayTxt: string, idNext?: number[] | null) {
-        super(idNext, true);
-        this.displayTxt = displayTxt;
-    }
-
     toString(): string {
-        const args = [`"${this.displayTxt}"`]
+        const args = [`${this.who?`"${this.who.name}", `:''}"${this.what}"`]
             .concat(_.map(this._nexts, (next: MenuItem) => `"${next.text}"`))
             .join(', ');
 
@@ -38,7 +31,7 @@ export default class Menu extends Node {
                 )
             );
 
-        (this.game as GameController).menu(this.displayTxt, choices);
+        (this.game as GameController).menu(this.who, this.what, choices);
     }
 
     nexts(): MenuItem[] {

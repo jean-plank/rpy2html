@@ -19,7 +19,11 @@ def parse(renpy_nodes, renpy_Define, py_eval_bytecode, renpy_ADVCharacter):
             char = py_eval_bytecode(value.code.bytecode)
 
             # only if it's defining an ADVCharacter
-            if value.store == "store" and isinstance(char, renpy_ADVCharacter) and value.varname != "_narrator":
+            if (   value.store == "store"
+               and isinstance(char, renpy_ADVCharacter)
+               and value.varname != "_narrator"
+               and value.varname != "centered"
+               and value.varname != "vcentered"):
                 color = char.who_args["color"] if "color" in char.who_args else None
 
                 res[value.varname] = {

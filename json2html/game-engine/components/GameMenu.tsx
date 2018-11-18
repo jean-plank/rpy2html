@@ -12,21 +12,24 @@ import IObj from '../classes/IObj';
 import Save from '../classes/Save';
 import IKeyboardHandler from '../classes/IKeyboardHandler';
 import StorageService from '../classes/StorageService';
+import History from './History';
 
 
 interface IProps {
     app: App;
     lang: string;
     help: string;
+    selectedBtn?: GameMenuBtn;
 }
 
 interface IState {
-    submenu: JSX.Element | null;
-    selectedBtn: Btn;
+    // submenu: JSX.Element | null;
+    selectedBtn: GameMenuBtn;
 }
 
-enum Btn {
+export enum GameMenuBtn {
     None,
+    History,
     Save,
     Load,
     MMenu,
@@ -34,18 +37,19 @@ enum Btn {
 }
 
 export default class GameMenu extends React.Component<IProps, IState> implements IKeyboardHandler {
-    state: IState = {
-        submenu: null,
-        selectedBtn: Btn.None,
-    };
-
     private storage: StorageService;
 
     private constructor (props: IProps) {
         super(props);
 
-        this.storage =
-            StorageService.getInstance(props.app);
+        this.state = {
+            // submenu: null,
+            selectedBtn:
+                props.selectedBtn !== undefined ? props.selectedBtn
+                                                : GameMenuBtn.None,
+        };
+
+        this.storage = StorageService.getInstance(props.app);
     }
 
     render() {
@@ -56,23 +60,28 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                     <MenuButton text={this.props.app.lang.menu.resume}
                                 action={this.hide()} />
 
+                    <MenuButton text={this.props.app.lang.menu.history}
+                                action={this.selectBtn(GameMenuBtn.History)}
+                                selected={this.isSelected(GameMenuBtn.History)}
+                            />
+
                     <MenuButton text={this.props.app.lang.menu.save}
-                                action={this.showSave()}
-                                selected={this.state.selectedBtn===Btn.Save} />
+                                action={this.selectBtn(GameMenuBtn.Save)}
+                                selected={this.isSelected(GameMenuBtn.Save)} />
 
                     <MenuButton text={this.props.app.lang.menu.load}
-                                action={this.showLoad()}
-                                selected={this.state.selectedBtn===Btn.Load} />
+                                action={this.selectBtn(GameMenuBtn.Load)}
+                                selected={this.isSelected(GameMenuBtn.Load)} />
 
                     <MenuButton text={this.props.app.lang.menu.mmenu}
                                 action={this.confirmMMenu()}
-                                selected={this.state.selectedBtn===Btn.MMenu} />
+                                selected={this.isSelected(GameMenuBtn.MMenu)} />
 
                     <MenuButton text={this.props.app.lang.menu.help}
-                                action={this.showHelp()}
-                                selected={this.state.selectedBtn===Btn.Help} />
+                                action={this.selectBtn(GameMenuBtn.Help)}
+                                selected={this.isSelected(GameMenuBtn.Help)} />
                 </div>
-                <div className='submenu'>{this.state.submenu}</div>
+                <div className='submenu'>{this.getSubmenu()}</div>
             </div>
         );
     }
@@ -87,11 +96,43 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
     }
 
+    private isSelected(btn: GameMenuBtn): boolean {
+        return this.state.selectedBtn === btn;
+    }
+
+    private getSubmenu(): JSX.Element | null {
+        if (this.state.selectedBtn === GameMenuBtn.History)
+            return this.getHistory();
+        if (this.state.selectedBtn === GameMenuBtn.Save) return this.getSave();
+        if (this.state.selectedBtn === GameMenuBtn.Load) return this.getLoad();
+        if (this.state.selectedBtn === GameMenuBtn.Help) return this.getHelp();
+        return null;
+    }
+
     private hide = () => () => {
         this.props.app.hideGameMenu();
     }
 
-    private showSave = () => () => {
+    private selectBtn = (btn: GameMenuBtn) => () => {
+        this.setState({ selectedBtn: btn });
+    }
+
+    private confirmMMenu = () => () => {
+        this.selectBtn(GameMenuBtn.MMenu)();
+        this.props.app.confirmMMenu(this.unselectBtn());
+    }
+
+    private unselectBtn = () => () => {
+        this.setState({ selectedBtn: GameMenuBtn.None });
+    }
+
+    private getHistory(): JSX.Element {
+        return <History nodes={
+                            this.props.app.gameController.history.getNodes()
+                        } />;
+    }
+
+    private getSave(): JSX.Element {
         const save = (iSlot: number) => {
             const props = _.clone(this.props.app.gameController.gameProps);
             const date: string =
@@ -105,11 +146,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
             const nodes = this.props.app.gameController.history.getNodes();
 
             this.storage.storeSave(Save.fromNodes(props, date, nodes), iSlot);
-            this.setState({
-                submenu: <Saves app={this.props.app}
-                                action={save}
-                                saves={this.storage.getSaves()} />
-            });
+            this.forceUpdate();
         };
 
         const saveWithConfirm = (iSlot: number, existingSave: Save | null) => {
@@ -117,13 +154,12 @@ export default class GameMenu extends React.Component<IProps, IState> implements
             else this.props.app.confirmOverride(() => { save(iSlot); });
         };
 
-        this.setState({ submenu: <Saves app={this.props.app}
-                                        action={saveWithConfirm}
-                                        saves={this.storage.getSaves()} />,
-                        selectedBtn: Btn.Save, });
+        return <Saves app={this.props.app}
+                      action={saveWithConfirm}
+                      saves={this.storage.getSaves()} />;
     }
 
-    private showLoad = () => () => {
+    private getLoad(): JSX.Element {
         const load = (_iSlot: number, save: Save | null) => {
             if (save === null) return;
 
@@ -135,25 +171,12 @@ export default class GameMenu extends React.Component<IProps, IState> implements
             );
         };
 
-        this.setState({ submenu: <Saves app={this.props.app}
-                                        action={load}
-                                        saves={this.storage.getSaves()} />,
-                        selectedBtn: Btn.Load, });
+        return <Saves app={this.props.app}
+                      action={load}
+                      saves={this.storage.getSaves()} />;
     }
 
-    private confirmMMenu = () => () => {
-        this.setState({ submenu: null,
-                        selectedBtn: Btn.MMenu, });
-        this.props.app.confirmMMenu(this.unselectBtn());
-    }
-
-    private showHelp = () => () => {
-        this.setState({ submenu: <Help html={this.props.help} />,
-                        selectedBtn: Btn.Help, });
-    }
-
-    private unselectBtn = () => () => {
-        this.setState({ submenu: null,
-                        selectedBtn: Btn.None, });
+    private getHelp(): JSX.Element {
+        return <Help html={this.props.help} />;
     }
 }

@@ -69,13 +69,13 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 }
 
 .game-menu-overlay {
-    ${getBgOrElse(images, 'game_menu_overlay', 'rgba(0, 0, 0, 0.75)')}
+    ${getBgOrElse(images, 'game_menu_overlay', 'rgba(19, 24, 25, 0.75)')}
 }
 
 .menu-items {
     width: ${style.mmenuitems_width};${
         newStyle ? '' : `
-    background-color: rgba(0, 0, 0, 0.75);`}
+    background-color: rgba(19, 24, 25, 0.75);`}
 }
 
 .submenu {
@@ -85,6 +85,10 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 .MenuButton, .submenu {
     font-family: ${style.guibtn_ffamily};
     font-size: ${style.guibtn_fsize_h}vh;
+}
+
+.ArmlessWankerMenu>.MenuButton {
+    font-size: ${style.quickbtn_fsize_h}vh;
 }
 
 .Memory>.about {
@@ -110,7 +114,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     color: ${style.guibtn_color_hover};
 }
 
-.MenuButton:disabled .Choices>button:disabled {
+.MenuButton:disabled, .Choices>button:disabled {
     color: ${style.disabledbtn_color};
 }
 
@@ -167,7 +171,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 }
 
 .Confirm {
-    ${getBgOrElse(images, 'confirm_overlay', 'rgba(0, 0, 0, 0.25)')}
+    ${getBgOrElse(images, 'confirm_overlay', 'rgba(19, 24, 25, 0.25)')}
 }
 
 .Confirm>.frame {
@@ -217,6 +221,10 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 
     .MenuButton, .submenu {
         font-size: ${style.guibtn_fsize_v}vw;
+    }
+
+    .ArmlessWankerMenu>.MenuButton {
+        font-size: ${style.quickbtn_fsize_v}vw;
     }
 
     .SaveSlot {

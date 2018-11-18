@@ -7,14 +7,17 @@ export interface IButton {
     text: string;
     action?: (e: React.MouseEvent) => void;
     selected?: boolean;
+    disabled?: boolean;
 }
 
 export default class MenuButton extends React.Component<IButton> {
     render() {
-        const classes = `MenuButton${this.props.selected?' selected':''}`;
+        const selected = this.props.selected ? 'selected' : '';
 
         return (
-            <button className={classes} onClick={this.props.action}>
+            <button className={`MenuButton ${selected}`}
+                    onClick={this.props.action}
+                    disabled={this.props.disabled}>
                 {this.props.text}
             </button>
         );

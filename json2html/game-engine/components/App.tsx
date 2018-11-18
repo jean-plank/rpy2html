@@ -17,7 +17,7 @@ import Channel from '../classes/Channel';
 
 // components
 import MainMenu from './MainMenu';
-import GameMenu from './GameMenu';
+import GameMenu, { GameMenuBtn } from './GameMenu';
 import Confirm from './Confirm';
 import { IButton } from './MenuButton';
 
@@ -116,14 +116,15 @@ export default class App extends React.Component<IProps, IState> {
         });
     }
 
-    showGameMenu() {
+    showGameMenu(gameMenuBtn?: GameMenuBtn) {
         _.forEach(this.channels, (chan: Channel) => { chan.pause(); });
 
         this.setState({
             view: <GameMenu ref={this.setViewKbrdHndlr()}
                             app={this}
                             lang={this.props.datas.lang}
-                            help={this.props.datas.help} />
+                            help={this.props.datas.help}
+                            selectedBtn={gameMenuBtn} />
         });
     }
 

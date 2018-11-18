@@ -1,0 +1,9 @@
+.ArmlessWankerMenu {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.2em
+}
+
+.ArmlessWankerMenu>.MenuButton {
+    margin: 0 1em;
+}

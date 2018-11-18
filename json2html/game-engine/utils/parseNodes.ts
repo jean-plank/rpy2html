@@ -94,6 +94,7 @@ const parseIfBlock = (args: any[]): IfBlock => {
 };
 
 const parseMenu = (args: any[]): Menu => {
+    // TODO: correct menu with caption parsing
     if (args.length <= 2) {
         let displayTxt: string | undefined;
         let idNext: number[] | null | undefined;
@@ -102,7 +103,7 @@ const parseMenu = (args: any[]): Menu => {
         if (isValidIdNext(args[1])) idNext = args[1];
 
         if (displayTxt !== undefined) {
-            return new Menu(displayTxt, idNext);
+            return new Menu(null, displayTxt, idNext);
         }
     }
     throw unknownArgsError("Menu", args);

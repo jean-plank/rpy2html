@@ -14,7 +14,6 @@ export default abstract class NodeWithImg extends Node {
 
     constructor (imgName: string, idNext?: number[] | null) {
         super(idNext);
-
         this.imgName = imgName;
     }
 

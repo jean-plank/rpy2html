@@ -15,6 +15,7 @@ module.exports = merge(common, {
         port: 3000,
         contentBase: common.output.path,
         inline: true, // iframe or inline script
+        host: '0.0.0.0',
     },
 
     // When importing a module whose path matches one of the following, just

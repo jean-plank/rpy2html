@@ -49,6 +49,8 @@
     "guibtn_width",
     "guibtn_height",
     "guibtn_txtalign",
+    "quickbtn_fsize_v",
+    "quickbtn_fsize_h",
 
     "choice_height",
     "choice_yalign",
@@ -128,6 +130,8 @@
     "guibtn_width": { "type": "string" },
     "guibtn_height": { "type": "string" },
     "guibtn_txtalign": { "type": "string" },
+    "quickbtn_fsize_v": { "type": "number" },
+    "quickbtn_fsize_h": { "type": "number" },
 
     "choice_height": { "type": "string" },
     "choice_yalign": { "type": "string" },

@@ -49,8 +49,12 @@ export default class StoryHistory {
         }
     }
 
+    noPreviousBlock(): boolean {
+        return this.iCurrentBlock <= 0;
+    }
+
     previousBlock(): void {
-        if (this.iCurrentBlock <= 0) return;
+        if (this.noPreviousBlock()) return;
 
         this.game.cleanup();
 

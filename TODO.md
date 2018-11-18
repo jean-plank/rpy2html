@@ -1,3 +1,7 @@
-* Navigation buttons
-
 * Fade for scenes
+
+* Submenu title
+
+* Quick save/load
+
+* Fix: menu with caption

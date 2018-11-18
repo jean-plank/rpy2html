@@ -17,6 +17,7 @@ import Choices from './Choices';
 interface IProps {
     controller: IGameController;
     game: IGameProps;
+    armlessWankerMenu?: JSX.Element;
 }
 
 export default class Game extends React.Component<IProps> {
@@ -31,6 +32,7 @@ export default class Game extends React.Component<IProps> {
                          char={this.props.game.textboxChar}
                          text={this.props.game.textboxText} />
                 <Choices choices={this.props.game.choices} />
+                {this.props.armlessWankerMenu}
             </div>
         );
     }

@@ -3,16 +3,21 @@ import IObj from '../classes/IObj';
 
 export interface ILanguage {
     menu: {
+        pause: string;
         // main menu buttons
         start: string;
-        resume: string;
-        save: string;
         load: string;
         prefs: string;
         memory: string;
-        mmenu: string;
         help: string;
         quit: string;
+        // game menu buttons
+        resume: string;
+        history: string;
+        save: string;
+        mmenu: string;
+        // quick menu buttons
+        back: string;
     };
     confirm: {
         // diverse confirm translations
@@ -39,15 +44,18 @@ export interface ILanguage {
 const translations: IObj<ILanguage> = {
     en: {
         menu: {
+            pause: 'Pause',
             start: 'Start',
-            resume: 'Resume',
-            save: 'Save',
             load: 'Load',
             prefs: 'Preferences',
             memory: 'Memory',
-            mmenu: 'Main Menu',
             help: 'Help',
             quit: 'Quit',
+            resume: 'Resume',
+            history: 'History',
+            save: 'Save',
+            mmenu: 'Main Menu',
+            back: 'Back',
         },
         confirm: {
             audio: 'Be aware that this page is playing audio.',
@@ -70,15 +78,18 @@ const translations: IObj<ILanguage> = {
     },
     fr: {
         menu: {
+            pause: 'Pause',
             start: 'Commencer',
-            resume: 'Continuer',
-            save: 'Sauvegarder',
             load: 'Charger une partie',
             prefs: 'Préférences',
             memory: 'Mémoire',
-            mmenu: 'Menu Principal',
             help: 'Aide',
             quit: 'Quitter',
+            resume: 'Continuer',
+            history: 'Historique',
+            save: 'Sauvegarder',
+            mmenu: 'Menu Principal',
+            back: 'Retour',
         },
         confirm: {
             audio: 'Attention ! Cette page joue du son...',

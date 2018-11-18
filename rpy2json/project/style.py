@@ -73,6 +73,7 @@ def new_style(gui, config, fonts_usages, Borders):
 
     # gui button
     guibtn_fsize = fontsize(HEIGHT, WIDTH, gui.button_text_size)
+    quickbtn_fsize = fontsize(HEIGHT, WIDTH, gui.quick_button_text_size)
     res["guibtn_padding"] = padding(guibtn_borders(gui, Borders), mmenuitems_width)
     res["guibtn_color_hover"] = gui.button_text_hover_color
     res["guibtn_color"] = gui.button_text_idle_color
@@ -82,6 +83,8 @@ def new_style(gui, config, fonts_usages, Borders):
     res["guibtn_width"] = get_or_else(percent(gui.button_width, mmenuitems_width), "auto")
     res["guibtn_height"] = get_or_else(percent(gui.button_height, HEIGHT), "auto")
     res["guibtn_txtalign"] = textalign(gui.button_text_xalign)
+    res["quickbtn_fsize_v"] = quickbtn_fsize["v"]
+    res["quickbtn_fsize_h"] = quickbtn_fsize["h"]
 
     # choice
     res["choice_height"] = percent(HEIGHT - gui.textbox_height, HEIGHT)
@@ -201,6 +204,7 @@ def old_style(gui, config, fonts_usages, Borders):
 
     # gui button
     guibtn_fsize = fontsize(HEIGHT, WIDTH, 32)
+    quickbtn_fsize = fontsize(HEIGHT, WIDTH, 21)
     res["guibtn_padding"] = padding(Borders(45, 12, 45, 12), mmenuitems_width)
     res["guibtn_color_hover"] = "#66c1e0" # "#b99d83"
     res["guibtn_color"] = "#888888" #b99d83"
@@ -210,6 +214,8 @@ def old_style(gui, config, fonts_usages, Borders):
     res["guibtn_width"] = "auto"
     res["guibtn_height"] = "auto"
     res["guibtn_txtalign"] = "left"
+    res["quickbtn_fsize_v"] = quickbtn_fsize["v"]
+    res["quickbtn_fsize_h"] = quickbtn_fsize["h"]
 
     # choice
     res["choice_height"] = percent(HEIGHT - textbox_height, HEIGHT)

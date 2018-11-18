@@ -78,6 +78,8 @@ export interface IStyle {
     guibtn_width: string;
     guibtn_height: string;
     guibtn_txtalign: string;
+    quickbtn_fsize_v: string;
+    quickbtn_fsize_h: string;
 
     choice_height: string;
     choice_yalign: string;
