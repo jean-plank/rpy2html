@@ -1,0 +1,167 @@
+{
+  "$id": "style",
+  "type": "object",
+  "required": [
+    "selected_color",
+    "disabledbtn_color",
+    "accent_color",
+
+    "game_width",
+    "game_height",
+
+    "textbox_height",
+    "textbox_yalign",
+
+    "namebox_bgtile",
+    "namebox_padding",
+    "namebox_ffamily",
+    "namebox_fsize_v",
+    "namebox_fsize_h",
+    "namebox_width",
+    "namebox_height",
+    "namebox_left",
+    "namebox_top",
+    "namebox_txtalign",
+
+    "dialog_color",
+    "dialog_ffamily",
+    "dialog_fsize_v",
+    "dialog_fsize_h",
+    "dialog_left",
+    "dialog_top",
+    "dialog_txtalign",
+    "dialog_width",
+
+    "mmenu_ffamily",
+    "mmenu_fsize_v",
+    "mmenu_fsize_h",
+
+    "mmenuitems_width",
+
+    "submenu_width",
+
+    "guibtn_padding",
+    "guibtn_color_hover",
+    "guibtn_color",
+    "guibtn_ffamily",
+    "guibtn_fsize_v",
+    "guibtn_fsize_h",
+    "guibtn_width",
+    "guibtn_height",
+    "guibtn_txtalign",
+    "quickbtn_fsize_v",
+    "quickbtn_fsize_h",
+
+    "choice_height",
+    "choice_yalign",
+
+    "choicebtn_bgtile",
+    "choicebtn_padding",
+    "choicebtn_color_hover",
+    "choicebtn_color",
+    "choicebtn_ffamily",
+    "choicebtn_fsize_v",
+    "choicebtn_fsize_h",
+    "choicebtn_txtalign",
+    "choicebtn_width",
+
+    "slot_width",
+    "slot_height",
+    "slot_padding",
+    "slot_fsize_v",
+    "slot_fsize_h",
+    "slot_txtalign",
+    "slot_color",
+    "thumb_width",
+    "thumb_height",
+    "thumb_margin_top",
+    "thumb_width_scale",
+    "thumb_height_scale",
+
+    "confirmframe_padding",
+
+    "interface_text_color"
+  ],
+  "properties": {
+    "selected_color": { "type": "string" },
+    "disabledbtn_color": { "type": "string" },
+    "accent_color": { "type": "string" },
+
+    "game_width": { "type": "number" },
+    "game_height": { "type": "number" },
+
+    "textbox_height": { "type": "string" },
+    "textbox_yalign": { "type": "string" },
+
+    "namebox_bgtile": { "type": "string" },
+    "namebox_padding": { "type": "string" },
+    "namebox_ffamily": { "type": "string" },
+    "namebox_fsize_v": { "type": "number" },
+    "namebox_fsize_h": { "type": "number" },
+    "namebox_width": { "type": "string" },
+    "namebox_height": { "type": "string" },
+    "namebox_left": { "type": "string" },
+    "namebox_top": { "type": "string" },
+    "namebox_txtalign": { "type": "string" },
+
+    "dialog_color": { "type": "string" },
+    "dialog_ffamily": { "type": "string" },
+    "dialog_fsize_v": { "type": "number" },
+    "dialog_fsize_h": { "type": "number" },
+    "dialog_left": { "type": "string" },
+    "dialog_top": { "type": "string" },
+    "dialog_txtalign": { "type": "string" },
+    "dialog_width": { "type": "string" },
+
+    "mmenu_ffamily": { "type": "string" },
+    "mmenu_fsize_v": { "type": "number" },
+    "mmenu_fsize_h": { "type": "number" },
+
+    "mmenuitems_width": { "type": "string" },
+
+    "submenu_width": { "type": "string" },
+
+    "guibtn_padding": { "type": "string" },
+    "guibtn_color_hover": { "type": "string" },
+    "guibtn_color": { "type": "string" },
+    "guibtn_ffamily": { "type": "string" },
+    "guibtn_fsize_v": { "type": "number" },
+    "guibtn_fsize_h": { "type": "number" },
+    "guibtn_width": { "type": "string" },
+    "guibtn_height": { "type": "string" },
+    "guibtn_txtalign": { "type": "string" },
+    "quickbtn_fsize_v": { "type": "number" },
+    "quickbtn_fsize_h": { "type": "number" },
+
+    "choice_height": { "type": "string" },
+    "choice_yalign": { "type": "string" },
+
+    "choicebtn_bgtile": { "type": "string" },
+    "choicebtn_padding": { "type": "string" },
+    "choicebtn_color_hover": { "type": "string" },
+    "choicebtn_color": { "type": "string" },
+    "choicebtn_ffamily": { "type": "string" },
+    "choicebtn_fsize_v": { "type": "number" },
+    "choicebtn_fsize_h": { "type": "number" },
+    "choicebtn_txtalign": { "type": "string" },
+    "choicebtn_width": { "type": "string" },
+
+    "slot_width": { "type": "string" },
+    "slot_height": { "type": "string" },
+    "slot_padding": { "type": "string" },
+    "slot_fsize_v": { "type": "number" },
+    "slot_fsize_h": { "type": "number" },
+    "slot_txtalign": { "type": "string" },
+    "slot_color": { "type": "string" },
+    "thumb_width": { "type": "string" },
+    "thumb_height": { "type": "string" },
+    "thumb_margin_top": { "type": "string" },
+    "thumb_width_scale": { "type": "number" },
+    "thumb_height_scale": { "type": "number" },
+
+    "confirmframe_padding": { "type": "string" },
+
+    "interface_text_color": { "type": "string" }
+  },
+  "additionalProperties": false
+}

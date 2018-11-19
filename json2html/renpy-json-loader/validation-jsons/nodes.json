@@ -1,0 +1,153 @@
+{
+  "$id": "nodes",
+  "type": "object",
+  "patternProperties": {
+    ".*": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Hide" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "If" },
+            "arguments": {
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "IfBlock" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Menu" },
+            "arguments":{
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "MenuItem" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Play" },
+            "arguments": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 3
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "PyExpr" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Say" },
+            "arguments": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 3
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Scene" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Show" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "Stop" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

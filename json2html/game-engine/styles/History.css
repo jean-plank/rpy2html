@@ -1,0 +1,27 @@
+.History {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.History>.HistoryLine {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 1em 0;
+}
+
+.History>.HistoryLine>div {
+    padding: 0 0.5em;
+}
+
+.History>.HistoryLine>.who {
+    width: 20%;
+    color: #0099cc;
+    text-align: right;
+}
+
+.History>.HistoryLine>.what {
+    width: 80%;
+}

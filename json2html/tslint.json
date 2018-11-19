@@ -1,0 +1,27 @@
+{
+    "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+    "linterOptions": {
+        "exclude": [
+            "node_modules/**/*",
+            "game-engine/utils/registerServiceWorker.ts"
+        ]
+    },
+    "rules": {
+        "object-literal-sort-keys": false,
+        "ordered-imports": false,
+        "no-console": false,
+        "only-arrow-functions": true,
+        "strict-type-predicates": true,
+        "triple-equals": true,
+        "no-void-expression": true,
+        "curly": false,
+        "no-var-requires": false,
+        "member-access": [true, "no-public"],
+        "no-empty": [true, "allow-empty-catch", "allow-empty-functions"],
+        "semicolon": [true, "always"],
+        "member-ordering": false,
+        "no-eval": false,
+        "match-default-export-name": true,
+        "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
+    }
+}
