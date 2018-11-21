@@ -1,3 +1,5 @@
+* Add video support
+
 * Fade for scenes
 
 * Submenu title

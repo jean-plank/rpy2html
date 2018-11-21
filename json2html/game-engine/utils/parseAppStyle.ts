@@ -148,7 +148,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 }
 
 .SaveSlot {
-    ${getBgOrElse(images, 'slot_bg', '#003d51')}
+    ${getBgOrElse(images, 'slot_bg')}
     color: ${style.slot_color};
     width: ${style.slot_width};
     height: ${style.slot_height};
@@ -158,7 +158,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 }
 
 .SaveSlot:hover {
-    ${getBgOrElse(images, 'slot_hover', '#005b7a')}
+    ${getBgOrElse(images, 'slot_hover')}
 }
 
 .SaveSlot>* {
@@ -168,6 +168,17 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
 .SaveSlot>.Game, .SaveSlot>.empty-slot {
     height: calc(${style.thumb_height} + 1px);
     margin-top: ${style.thumb_margin_top};
+}${
+    !_.has(images, 'slot_bg')
+        ? `
+.SaveSlot>.empty-slot {
+    background-color: #003d51;
+}
+
+.SaveSlot:hover>.empty-slot {
+    background-color: #005b7a;
+}`
+        : ''
 }
 
 .Confirm {
