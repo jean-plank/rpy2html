@@ -63,10 +63,12 @@ export default class App extends React.Component<IProps, IState> {
             ? translations[props.datas.lang]
             : translations.en;
 
-        if (_.has(this.props.datas.sounds, 'main_menu_music')) {
-            this.mainMenuMusic = this.props.datas.sounds.main_menu_music;
+        if (_.has(props.datas.sounds, 'main_menu_music')) {
+            this.mainMenuMusic = props.datas.sounds.main_menu_music;
             (this.mainMenuMusic as Sound).load();
         }
+
+        document.title = props.datas.gameName;
     }
 
     componentDidMount() {
