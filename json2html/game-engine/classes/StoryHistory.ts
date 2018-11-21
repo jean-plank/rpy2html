@@ -21,7 +21,7 @@ export default class StoryHistory {
     }
 
     getNodes(): Node[] {
-        return _.flatten(this.blocks);
+        return _.flatten(_.take(this.blocks, this.iCurrentBlock + 1));
     }
 
     addNode(node: Node) {
