@@ -16,5 +16,6 @@ def guiattr(gui, gui_attr, default):
     else:
         return default
 
+
 def replace_bools(s):
     return s.replace('True', 'true').replace('False', 'false')
