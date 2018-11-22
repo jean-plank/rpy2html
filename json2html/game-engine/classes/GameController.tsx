@@ -24,7 +24,7 @@ import Menu from './nodes/Menu';
 // components
 import App from '../components/App';
 import Game from '../components/Game';
-import ArmlessWankerMenu from '../components/ArlmessWankerMenu';
+import ArmlessWankerMenu from '../components/ArmlessWankerMenu';
 
 
 export default class GameController implements IGameController, IKeyboardHandler {
