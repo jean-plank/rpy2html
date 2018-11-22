@@ -16,8 +16,10 @@ export interface ILanguage {
         history: string;
         save: string;
         mmenu: string;
-        // quick menu buttons
+        // armless wanker menu
         back: string;
+        qSave: string;
+        qLoad: string;
     };
     confirm: {
         // diverse confirm translations
@@ -56,6 +58,8 @@ const translations: IObj<ILanguage> = {
             save: 'Save',
             mmenu: 'Main Menu',
             back: 'Back',
+            qSave: 'Quick save',
+            qLoad: 'Quick load',
         },
         confirm: {
             audio: 'Be aware that this page is playing audio.',
@@ -67,9 +71,9 @@ const translations: IObj<ILanguage> = {
             no: 'No',
         },
         memory: {
-            about: 'Jean Plank games are saved on local browser storage.<br>They are only avaible on this computer.',
+            about: 'Jean Plank games are saved on local browser storage. They are only avaible on this computer.',
             delete: 'delete',
-            deleteAll: 'deleteAll',
+            deleteAll: 'delete all',
             total: 'total',
         },
         emptySlot: 'empty slot',
@@ -90,6 +94,8 @@ const translations: IObj<ILanguage> = {
             save: 'Sauvegarder',
             mmenu: 'Menu Principal',
             back: 'Retour',
+            qSave: 'Sauvegarde rapide',
+            qLoad: 'Chargement rapide',
         },
         confirm: {
             audio: 'Attention ! Cette page joue du son...',

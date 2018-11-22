@@ -39,6 +39,7 @@ export default class Game extends React.Component<IProps> {
 
     private onClick = () => (e: React.MouseEvent) => {
         if (e.button === 0) this.props.controller.execNextIfNotMenu();
+        else if (e.button === 1) this.props.controller.showGameMenu();
     }
 
     private onWheel = () => (e: React.WheelEvent) => {

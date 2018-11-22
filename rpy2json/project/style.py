@@ -149,7 +149,7 @@ def old_style(gui, config, fonts_usages, Borders):
     res = {}
 
     res["selected_color"] = "#ffffff"
-    res["disabledbtn_color"] = "#888888"
+    res["disabledbtn_color"] = "#666666"
     res["accent_color"] = "#0099cc"
 
     # game

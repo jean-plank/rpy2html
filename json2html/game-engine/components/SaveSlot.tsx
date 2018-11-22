@@ -3,6 +3,8 @@ import * as React from 'react';
 import '../styles/SaveSlot.css';
 
 import Save from '../classes/Save';
+import IGameController from '../classes/IGameController';
+
 import Game from './Game';
 
 
@@ -13,19 +15,20 @@ interface IProps {
 }
 
 export default class SaveSlot extends React.Component<IProps> {
-    render() {
-        const fakeController = {
-            execNextIfNotMenu: () => {},
-            history: {
-                previousBlock: () => {},
-                nextBlock: () => {}
-            }
-        };
+    private static fakeController: IGameController = {
+        execNextIfNotMenu: () => {},
+        history: {
+            previousBlock: () => {},
+            nextBlock: () => {}
+        },
+        showGameMenu: () => {}
+    };
 
+    render() {
         return (
             <div className='SaveSlot' onClick={this.props.action}>
                 {this.props.save !== null
-                    ? <Game controller={fakeController}
+                    ? <Game controller={SaveSlot.fakeController}
                             game={this.props.save.gameProps} />
                     : <div className='empty-slot' />}
 

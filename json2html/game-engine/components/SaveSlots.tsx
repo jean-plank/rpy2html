@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import '../styles/Saves.css';
+import '../styles/SaveSlots.css';
 
 import App from './App';
 import SaveSlot from './SaveSlot';
@@ -15,7 +15,7 @@ interface IProps {
     saves: Array<Save | null>;
 }
 
-export default class Saves extends React.Component<IProps> {
+export default class SaveSlots extends React.Component<IProps> {
     render() {
         const slots: JSX.Element[] =
             _.map(this.props.saves, (save: Save | null, i: number) => {
@@ -26,6 +26,6 @@ export default class Saves extends React.Component<IProps> {
                                  emptySlot={this.props.app.lang.emptySlot} />;
             });
 
-        return <div className='saves'>{slots}</div>;
+        return <div className='SaveSlots'>{slots}</div>;
     }
 }

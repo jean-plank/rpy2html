@@ -45,9 +45,10 @@ export default class Memory extends React.Component<IProps, IState> {
 
         return (
             <div className='Memory'>
-                <div className='header'>
-                    {this.props.app.lang.memory.about}
-                </div>
+                <div className='header'
+                     dangerouslySetInnerHTML={{
+                         __html: this.props.app.lang.memory.about
+                     }} />
                 <div className='games'>
                     <div>
                         {games.length > 0 ? games
@@ -78,6 +79,6 @@ export default class Memory extends React.Component<IProps, IState> {
 
     private deleteAll = () => () => {
         _(this.state.games).keys()
-                           .forEach(key => this.deleteStorage(key));
+                           .forEach(key => { this.deleteStorage(key)(); });
     }
 }

@@ -4,6 +4,6 @@
 
 * Submenu title
 
-* Quick save/load
-
 * Fix: menu with caption
+
+* Notification for quick save (and load ?)

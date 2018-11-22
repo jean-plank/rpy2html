@@ -9,6 +9,8 @@ import IGameController from './IGameController';
 import { IGameProps } from './GameProps';
 import IAppDatas from './IAppDatas';
 import StoryHistory from './StoryHistory';
+import StorageService from './StorageService';
+import QuickSave from './QuickSave';
 import Image from './Image';
 import Char from './Char';
 import Sound from './Sound';
@@ -40,6 +42,8 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     private nodes: IObj<Node>;
     private currentNode: Node | null = null;
+    private armlessWankerMenu: ArmlessWankerMenu | null = null;
+    private storage: StorageService;
 
     constructor (app: App, datas: IAppDatas, setHandler: (handler: IKeyboardHandler | null) => void) {
         this.app = app;
@@ -48,28 +52,33 @@ export default class GameController implements IGameController, IKeyboardHandler
         this.nodes = datas.nodes;
         _.forEach(this.nodes, (node: Node) => { node.init(this, datas); });
 
+        this.storage = StorageService.getInstance(app);
+
         if (_.has(this.nodes, '0')) this.nodes['0'].loadBlock();
         else throw EvalError('A node with id 0 is needed to start the story.');
     }
 
     onKeyUp(e: React.KeyboardEvent) {
+        e.preventDefault();
         const keyEvents: IObj<(e: React.KeyboardEvent) => void> = {
             ArrowUp: () => {},
             ArrowDown: () => {},
             ArrowLeft: () => {},
             ArrowRight: () => {},
-            Escape: (evt: React.KeyboardEvent) => {
-                evt.stopPropagation();
-                this.app.showGameMenu();
+            Escape: () => {
+                e.stopPropagation();
+                this.showGameMenu();
             },
-            ' ': this.execNextIfNotMenu,
-            Enter: this.execNextIfNotMenu,
+            ' ': () => { this.execNextIfNotMenu(); },
+            Enter: () => { this.execNextIfNotMenu(); },
             Control: () => {},
             Tab: () => {},
-            PageUp: this.history.previousBlock,
-            PageDown: this.history.nextBlock,
+            PageUp: () => { this.history.previousBlock(); },
+            PageDown: () => { this.history.nextBlock(); },
             h: () => {},
             v: () => {},
+            s: () => { this.quickSave(); },
+            l: () => { this.quickLoad(); },
         };
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
     }
@@ -77,6 +86,28 @@ export default class GameController implements IGameController, IKeyboardHandler
     start() {
         this.history = new StoryHistory(this);
         this.execThenExecNext(this.nodes[0]);
+    }
+
+    showGameMenu() {
+        this.app.showGameMenu();
+    }
+
+    quickSave() {
+        const nodes = this.history.getNodes();
+        const onSave = () => {
+            if (this.armlessWankerMenu !== null) {
+                this.armlessWankerMenu.setState({
+                    disableQuickLoad: this.storage.getQuickSave() === null
+                });
+            }
+        };
+        this.storage.storeQuickSave(QuickSave.fromNodes(nodes), onSave);
+    }
+
+    quickLoad() {
+        const qSave = this.storage.getQuickSave();
+        if (qSave !== null)
+            this.restoreSave(qSave.history);
     }
 
     execute(node: Node) {
@@ -118,7 +149,8 @@ export default class GameController implements IGameController, IKeyboardHandler
     update<K extends keyof IGameProps>(props?: Pick<IGameProps, K>) {
         _.forEach(props, (value, key: K) => { this.gameProps[key] = value; });
 
-        const menu = <ArmlessWankerMenu app={this.app} />;
+        const menu = <ArmlessWankerMenu ref={this.setWankerMenu()}
+                                        app={this.app} />;
 
         this.app.setState({
             view:
@@ -127,6 +159,14 @@ export default class GameController implements IGameController, IKeyboardHandler
                       game={this.gameProps}
                       armlessWankerMenu={menu}/>
         });
+    }
+
+    private setWankerMenu = () => (menu: ArmlessWankerMenu | null) => {
+        this.armlessWankerMenu = menu;
+        if (menu !== null)
+            menu.setState({
+                disableQuickLoad: this.storage.getQuickSave() === null
+            });
     }
 
     // interface for Nodes
