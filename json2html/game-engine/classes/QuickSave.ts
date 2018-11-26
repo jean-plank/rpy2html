@@ -21,8 +21,9 @@ export default class QuickSave implements IQuickSave {
     static fromAny(save: any): QuickSave | null {
         if (  _.keys(save).length === 1
            && _.has(save, 'history') && _.isArray(save.history)
-                                     && _.every(save.history, _.isString))
+                                     && _.every(save.history, _.isString)) {
             return new QuickSave(save.history);
+        }
         return null;
     }
 }

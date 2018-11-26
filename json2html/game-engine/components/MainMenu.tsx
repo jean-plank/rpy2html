@@ -67,7 +67,8 @@ export default class MainMenu extends React.Component<IProps, IState> implements
 
                     <MenuButton text={this.props.app.lang.menu.memory}
                                 action={this.showMemory()}
-                                selected={this.state.selectedBtn===Btn.Memory} />
+                                selected={
+                                    this.state.selectedBtn===Btn.Memory} />
 
                     <MenuButton text={this.props.app.lang.menu.help}
                                 action={this.showHelp()}

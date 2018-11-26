@@ -259,11 +259,15 @@ const getFonts = (fonts: IObj<Font>): string => {
     );
 };
 
-const getBgOrElse = (images: IObj<Image>, img: string, color?: string): string => {
-    if (_.has(images, img)) return (
+const getBgOrElse = (images: IObj<Image>,
+                     img: string,
+                     color?: string): string => {
+    if (_.has(images, img)) {
+        return (
 `background-color: unset;
 background-image: url('${images[img].file}');`
-    );
+        );
+    }
     console.warn(`Background image not found: ${img}`);
     if (color !== undefined) return `background-color: ${color};`;
     return '';

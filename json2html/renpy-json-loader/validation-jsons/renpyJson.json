@@ -4,6 +4,7 @@
   "required": [
     "images",
     "sounds",
+    "videos",
     "fonts",
     "characters",
     "nodes",
@@ -19,6 +20,12 @@
       }
     },
     "sounds": {
+      "type": "object",
+      "patternProperties": {
+        ".*": { "type": "string" }
+      }
+    },
+    "videos": {
       "type": "object",
       "patternProperties": {
         ".*": { "type": "string" }

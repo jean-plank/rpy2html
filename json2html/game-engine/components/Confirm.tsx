@@ -45,8 +45,9 @@ export default class Confirm extends React.Component<IProps> implements IKeyboar
         const keyEvents: IObj<(e: React.KeyboardEvent) => void> = {
             Escape: evt => {
                 evt.stopPropagation();
-                if (this.props.escapeAction !== undefined)
+                if (this.props.escapeAction !== undefined) {
                     this.props.escapeAction();
+                }
                 this.props.app.hideConfirm();
             },
         };

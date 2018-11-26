@@ -16,7 +16,7 @@ export default class Stop extends Node {
         return `Stop("${this.chanName}")`;
     }
 
-    execute(): void {
+    execute() {
         super.execute(); // ensures that game isn't null
         (this.game as GameController).stop(this.chanName);
     }

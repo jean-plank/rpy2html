@@ -16,8 +16,9 @@ export default class Choice {
 
     static fromAny(choice: any): Choice | null {
         if (  _.keys(choice).length === 1
-           && _.has(choice, 'text') && _.isString(choice.text))
+           && _.has(choice, 'text') && _.isString(choice.text)) {
             return new Choice(choice.text, () => {});
+        }
         return null;
     }
 }

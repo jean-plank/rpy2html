@@ -71,7 +71,8 @@ const translations: IObj<ILanguage> = {
             no: 'No',
         },
         memory: {
-            about: 'Jean Plank games are saved on local browser storage. They are only avaible on this computer.',
+            about:
+                'Jean Plank games are saved on local browser storage. They are only avaible on this computer.',
             delete: 'delete',
             deleteAll: 'delete all',
             total: 'total',
@@ -101,13 +102,16 @@ const translations: IObj<ILanguage> = {
             audio: 'Attention ! Cette page joue du son...',
             audioBtn: 'OSEF ! Je veux jouer au jeu.',
             quit: 'Êtes-vous sûr de vouloir quitter ?',
-            unsaved: 'Êtes vous sûr ?<br>Toute progression non sauvegardée sera perdue.',
-            override: 'Êtes vous sûr de vouloir écraser la sauvegarde existante ?',
+            unsaved:
+                'Êtes vous sûr ?<br>Toute progression non sauvegardée sera perdue.',
+            override:
+                'Êtes vous sûr de vouloir écraser la sauvegarde existante ?',
             yes: 'Oui',
             no: 'Non',
         },
         memory: {
-            about: 'Les sauvegardes des jeux Jean Plank se trouvent dans les fichiers locaux du navigateur. Elles ne sont disponibles que sur cet ordinateur.',
+            about:
+                'Les sauvegardes des jeux Jean Plank se trouvent dans les fichiers locaux du navigateur. Elles ne sont disponibles que sur cet ordinateur.',
             delete: 'supprimer',
             deleteAll: 'tout supprimer',
             total: 'total',

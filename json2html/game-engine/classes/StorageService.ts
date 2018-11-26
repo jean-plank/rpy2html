@@ -51,8 +51,9 @@ export default class StorageService {
     }
 
     static getInstance(app: App): StorageService {
-        if (StorageService.instance === null)
+        if (StorageService.instance === null) {
             StorageService.instance = new StorageService(app);
+        }
 
         return StorageService.instance;
     }
@@ -60,8 +61,9 @@ export default class StorageService {
     private loadSaves() {
         _.forEach(this.saves.slots, (save: Save | null) => {
             if (save !== null) {
-                if (save.gameProps.sceneImg !== null)
+                if (save.gameProps.sceneImg !== null) {
                     save.gameProps.sceneImg.load();
+                }
                 _.forEach(save.gameProps.charImgs, img => { img.load(); });
             }
         });
@@ -72,8 +74,9 @@ export default class StorageService {
     }
 
     private setSave(iSlot: number, newSave: Save) {
-        if (_.inRange(iSlot, StorageService.nbSlots))
+        if (_.inRange(iSlot, StorageService.nbSlots)) {
             this.saves.slots[iSlot] = newSave;
+        }
     }
 
     private store() {
@@ -107,9 +110,10 @@ export default class StorageService {
                        .filter(key => _.startsWith(key, StorageService.prefix))
                        .forEach(key => {
                            const value = localStorage.getItem(key);
-                           if (value !== null)
-                              res[key.replace(StorageService.prefix, '')] =
-                                  byteCount(value);
+                           if (value !== null) {
+                               const k = key.replace(StorageService.prefix, '');
+                              res[k] = byteCount(value);
+                           }
                        });
         return res;
     }

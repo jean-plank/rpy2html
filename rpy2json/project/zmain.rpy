@@ -6,7 +6,7 @@ init python:
     from sys import argv
     from os import path
 
-    from nodes_sounds import parse as parse_nodes_sounds
+    from nodes_sounds_videos import parse as parse_nodes_sounds_videos
     from images import parse as parse_images
     from characters import parse as parse_characters
     from fonts import parse as parse_fonts
@@ -19,10 +19,10 @@ init python:
     RENPY_BASE_DIR = path.dirname(__file__)
 
     # nodes
-    res = parse_nodes_sounds(renpy.game.script.namemap, renpy.ast, config)
+    res = parse_nodes_sounds_videos(renpy.game.script.namemap, renpy.ast, config)
 
     # correct sound files names (it is easier to do it that uglier way)
-    def correct_sound(sounds, key, sound):
+    def correct_media(sounds, key, sound):
         if sound != None:
             correct = path.join(GAME_BASE_DIR, sound)
             if path.isfile(correct):
@@ -36,8 +36,13 @@ init python:
 
     sounds = {}
     for key, value in res['sounds'].iteritems():
-        correct_sound(sounds, key, value)
+        correct_media(sounds, key, value)
     res['sounds'] = sounds
+
+    videos = {}
+    for key, value in res['videos'].iteritems():
+        correct_media(videos, key, value)
+    res['videos'] = videos
 
     # add images and correct them
     res['images'] = parse_images(GAME_BASE_DIR,

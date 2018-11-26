@@ -14,8 +14,9 @@ export default class Char {
         if (  _.keys(char).length === 2
            && _.has(char, 'name') && _.isString(char.name)
            && _.has(char, 'color') &&
-               (_.isString(char.color) || char.color === undefined))
-             return new Char(char.name, char.color);
+               (_.isString(char.color) || char.color === undefined)) {
+            return new Char(char.name, char.color);
+        }
         return null;
     }
 }

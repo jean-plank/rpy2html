@@ -21,12 +21,14 @@ export default abstract class NodeWithImg extends Node {
         return `${this.constructor.name}("${this.imgName}")`;
     }
 
-    init(game: GameController, datas: IAppDatas): void {
+    init(game: GameController, datas: IAppDatas) {
         super.init(game, datas);
 
-        if (_.has(datas.images, this.imgName))
+        if (_.has(datas.images, this.imgName)) {
             this.image = datas.images[this.imgName];
-        else
-            console.warn(`${this.constructor.name}: invalid image name: ${this.imgName}`);
+        } else {
+            console.warn(
+                `${this.constructor.name}: invalid image name: ${this.imgName}`);
+        }
     }
 }

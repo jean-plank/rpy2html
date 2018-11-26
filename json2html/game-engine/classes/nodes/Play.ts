@@ -24,22 +24,23 @@ export default class Play extends Node {
         return `Play("${this.chanName}", "${this.sndName}")`;
     }
 
-    init(game: GameController, datas: IAppDatas): void {
+    init(game: GameController, datas: IAppDatas) {
         super.init(game, datas);
 
-        if (_.has(datas.sounds, this.sndName))
+        if (_.has(datas.sounds, this.sndName)) {
             this.sound = datas.sounds[this.sndName];
-        else console.warn(`Play: invalid sound name: ${this.sndName}`);
+        } else console.warn(`Play: invalid sound name: ${this.sndName}`);
     }
 
-    load(): void {
+    load() {
         super.load();
         if (this.sound !== null) this.sound.load();
     }
 
-    execute(): void {
+    execute() {
         super.execute(); // ensures that game isn't null
-        if (this.sound !== null)
+        if (this.sound !== null) {
             (this.game as GameController).play(this.chanName, this.sound);
+        }
     }
 }

@@ -37,7 +37,7 @@ export default class StoryHistory {
         }
     }
 
-    nextBlock(): void {
+    nextBlock() {
         const newI: number = this.iCurrentBlock + 1;
 
         if (_.inRange(newI, this.blocks.length)) {
@@ -53,7 +53,7 @@ export default class StoryHistory {
         return this.iCurrentBlock <= 0;
     }
 
-    previousBlock(): void {
+    previousBlock() {
         if (this.noPreviousBlock()) return;
 
         this.game.cleanup();

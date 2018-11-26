@@ -1,19 +1,7 @@
-import { basename } from 'path';
+import Media from './Media';
 
 
-export default class Sound {
-    private file: string;
-    private elt: HTMLAudioElement | null;
-
-    constructor (file: string) {
-        this.file = file;
-        this.elt = null;
-    }
-
-    toString(): string {
-        return `Sound("${basename(this.file)}")`;
-    }
-
+export default class Sound extends Media<HTMLAudioElement> {
     load() {
         if (!this.isLoaded()) {
             this.elt = document.createElement('audio');
@@ -22,15 +10,10 @@ export default class Sound {
         }
     }
 
-    isLoaded(): boolean {
-        return this.elt !== null;
-    }
-
     play(volume?: number): Promise<void> {
-        this.loadIfNot();
-        if (volume !== undefined)
-            (this.elt as HTMLAudioElement).volume = volume;
-        return (this.elt as HTMLAudioElement).play();
+        const elt = this.getElt();
+        if (volume !== undefined) elt.volume = volume;
+        return elt.play();
     }
 
     stop() {
@@ -47,12 +30,5 @@ export default class Sound {
     onEnded(f: () => void) {
         this.loadIfNot();
         (this.elt as HTMLAudioElement).onended = f;
-    }
-
-    private loadIfNot() {
-        if (!this.isLoaded()) {
-            this.load();
-            console.warn(`${this.toString()} didn't preload correctly. Loaded now.`);
-        }
     }
 }

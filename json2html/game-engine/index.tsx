@@ -12,6 +12,7 @@ import IAppDatas from './classes/IAppDatas';
 import Char from './classes/Char';
 import Image from './classes/Image';
 import Sound from './classes/Sound';
+import Video from './classes/Video';
 import Font from './classes/Font';
 
 import App from './components/App';
@@ -28,8 +29,9 @@ const main = (json: IRenpyJson) => {
         chars: mapColl(json.characters, (char: IRawChar) =>
             char.color === null ? new Char(char.name)
                                 : new Char(char.name, char.color)),
-        images: mapColl(json.images, (file: string) => new Image(file)),
-        sounds: mapColl(json.sounds, (file: string) => new Sound(file)),
+        images: mapColl(json.images, file => new Image(file)),
+        sounds: mapColl(json.sounds, file => new Sound(file)),
+        videos: mapColl(json.videos, file => new Video(file)),
         fonts: mapColl(json.fonts,
                         (def: IRawDefinition) => new Font(def.src, def.bold)),
         style: json.style,

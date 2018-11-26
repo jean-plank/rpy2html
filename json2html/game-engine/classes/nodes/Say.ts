@@ -10,7 +10,7 @@ export default class Say extends NodeWithChar {
         return `Say(${this.who?`"${this.who.name}", `:''}"${this.what}")`;
     }
 
-    execute(): void {
+    execute() {
         super.execute(); // ensures that game isn't null
         (this.game as GameController).say(this.who, this.what);
     }

@@ -101,8 +101,9 @@ export default class GameMenu extends React.Component<IProps, IState> implements
     }
 
     private getSubmenu(): JSX.Element | null {
-        if (this.state.selectedBtn === GameMenuBtn.History)
+        if (this.state.selectedBtn === GameMenuBtn.History) {
             return this.getHistory();
+        }
         if (this.state.selectedBtn === GameMenuBtn.Save) return this.getSave();
         if (this.state.selectedBtn === GameMenuBtn.Load) return this.getLoad();
         if (this.state.selectedBtn === GameMenuBtn.Help) return this.getHelp();

@@ -5,6 +5,7 @@ import IObj from './IObj';
 import Char from './Char';
 import Image from './Image';
 import Sound from './Sound';
+import Video from './Video';
 import Font from './Font';
 
 
@@ -17,6 +18,7 @@ export default interface IAppDatas {
     chars: IObj<Char>;
     images: IObj<Image>;
     sounds: IObj<Sound>;
+    videos: IObj<Video>;
     fonts: IObj<Font>;
     style: IStyle;
 }

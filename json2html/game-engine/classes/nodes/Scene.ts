@@ -4,14 +4,15 @@ import GameController from '../GameController';
 
 
 export default class Scene extends NodeWithImg {
-    load(): void {
+    load() {
         super.load();
         if (this.image !== null) this.image.load();
     }
 
-    execute(): void {
+    execute() {
         super.execute(); // ensures that game isn't null
-        if (this.image !== null)
+        if (this.image !== null) {
             (this.game as GameController).scene(this.image);
+        }
     }
 }

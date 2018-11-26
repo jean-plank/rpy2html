@@ -16,6 +16,7 @@ import Char from './Char';
 import Sound from './Sound';
 import Channel from './Channel';
 import Choice from './Choice';
+import Video from './Video';
 
 // nodes
 import Node from './nodes/Node';
@@ -36,6 +37,7 @@ export default class GameController implements IGameController, IKeyboardHandler
         textboxChar: null,
         textboxText: '',
         choices: [],
+        video: null,
     };
     history: StoryHistory;
     setHandler: (handler: IKeyboardHandler | null) => void = () => {};
@@ -45,7 +47,9 @@ export default class GameController implements IGameController, IKeyboardHandler
     private armlessWankerMenu: ArmlessWankerMenu | null = null;
     private storage: StorageService;
 
-    constructor (app: App, datas: IAppDatas, setHandler: (handler: IKeyboardHandler | null) => void) {
+    constructor (app: App,
+                 datas: IAppDatas,
+                 setHandler: (handler: IKeyboardHandler | null) => void) {
         this.app = app;
         this.setHandler = setHandler;
 
@@ -106,11 +110,11 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     quickLoad() {
         const qSave = this.storage.getQuickSave();
-        if (qSave !== null)
-            this.restoreSave(qSave.history);
+        if (qSave !== null) this.restoreSave(qSave.history);
     }
 
     execute(node: Node) {
+        if (this.currentNode !== null) this.currentNode.beforeNext();
         node.execute();
         this.currentNode = node;
     }
@@ -122,8 +126,9 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     execNextIfNotMenu() {
         if (  this.currentNode !== null
-           && !(this.currentNode instanceof Menu))
+           && !(this.currentNode instanceof Menu)) {
             this.execNext(this.currentNode);
+        }
     }
 
     execThenExecNext(node: Node) {
@@ -163,10 +168,11 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     private setWankerMenu = () => (menu: ArmlessWankerMenu | null) => {
         this.armlessWankerMenu = menu;
-        if (menu !== null)
+        if (menu !== null) {
             menu.setState({
                 disableQuickLoad: this.storage.getQuickSave() === null
             });
+        }
     }
 
     // interface for Nodes
@@ -174,7 +180,8 @@ export default class GameController implements IGameController, IKeyboardHandler
         _.forEach(this.app.channels, (chan: Channel) => { chan.stop(); });
         this.update({ choices: [],
                       sceneImg: null,
-                      charImgs: [] });
+                      charImgs: [],
+                      video: null });
     }
 
     scene(image: Image) {
@@ -185,8 +192,9 @@ export default class GameController implements IGameController, IKeyboardHandler
     }
 
     show(image: Image) {
-        if (this.gameProps.charImgs.indexOf(image) === -1)
+        if (this.gameProps.charImgs.indexOf(image) === -1) {
             this.update({ charImgs: _.concat(this.gameProps.charImgs, image) });
+        }
     }
 
     hide(image: Image) {
@@ -201,11 +209,18 @@ export default class GameController implements IGameController, IKeyboardHandler
     }
 
     menu(who: Char | null, what: string, theChoices: Choice[]) {
-        if (what === '') this.update({ textboxHide: true,
-                                              choices: theChoices });
-        else this.update({ textboxChar: who,
-                           textboxText: what,
-                           choices: theChoices });
+        if (what === '') {
+            this.update({
+                textboxHide: true,
+                choices: theChoices
+            });
+        } else {
+            this.update({
+                textboxChar: who,
+                textboxText: what,
+                choices: theChoices
+            });
+        }
     }
 
     afterMenu() {
@@ -214,11 +229,11 @@ export default class GameController implements IGameController, IKeyboardHandler
     }
 
     play(chanName: string, sound: Sound) {
-        if (_.has(this.app.channels, chanName))
+        if (_.has(this.app.channels, chanName)) {
             // Normal channels support playing and queueing audio, but only
             // play back one audio file at a time.
             this.app.channels[chanName].play(sound);
-        else if (chanName === "audio") {
+        } else if (chanName === "audio") {
             // The audio channel supports playing back multiple audio files at
             // one time, but does not support queueing sound or stopping
             // playback.
@@ -227,10 +242,19 @@ export default class GameController implements IGameController, IKeyboardHandler
     }
 
     stop(chanName: string) {
-        if (_.has(this.app.channels, chanName))
+        if (_.has(this.app.channels, chanName)) {
             this.app.channels[chanName].stop();
-        // else if (chanName === "audio")
-        //     // TODO
+        } else if (chanName === "audio") {
+            // TODO
+        }
+    }
+
+    cutscene(vid: Video) {
+        this.update({ video: vid });
+    }
+
+    afterCutscene() {
+        this.update({ video: null });
     }
 
     // restore save
@@ -247,9 +271,12 @@ export default class GameController implements IGameController, IKeyboardHandler
         if (realNexts.length === 1) {
             this.executeAndAddToHistory(realNexts[0]);
             this.restoreRec(_.tail(history), realNexts[0].nexts());
-        } else if (realNexts.length === 0)
-            console.error(`Error while restoring save: couldn't find node "${head}"`);
-        else
-            console.error(`Error while restoring save: find several matching nodes for "${head}":\n`, realNexts);
+        } else if (realNexts.length === 0) {
+            console.error(
+                `Error while restoring save: couldn't find node "${head}"`);
+        } else {
+            console.error(
+                `Error while restoring save: find several matching nodes for "${head}":\n`, realNexts);
+        }
     }
 }

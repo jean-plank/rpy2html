@@ -13,20 +13,24 @@ export default abstract class NodeWithChar extends Node {
 
     private whosName: string | null;
 
-    constructor (whosName: string | null, what: string, idNext?: number[] | null) {
+    constructor (whosName: string | null,
+                 what: string,
+                 idNext?: number[] | null) {
         super(idNext, true);
         this.whosName = whosName;
         this.who = null;
         this.what = what;
     }
 
-    init(game: GameController, datas: IAppDatas): void {
+    init(game: GameController, datas: IAppDatas) {
         super.init(game, datas);
 
         if (this.whosName !== null) {
-            if (_.has(datas.chars, this.whosName))
+            if (_.has(datas.chars, this.whosName)) {
                 this.who = datas.chars[this.whosName];
-            else console.warn(`Say: invalid character name: ${this.whosName}`);
+            } else {
+                console.warn(`Say: invalid character name: ${this.whosName}`);
+            }
         }
     }
 }

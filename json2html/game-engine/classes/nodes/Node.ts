@@ -33,7 +33,7 @@ export default abstract class Node {
     }
 
     load() {
-        // ensures that game and _nexts aren't  null
+        // ensures that game and _nexts aren't null
         this.throwErrorIfNotInitiated();
         if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55');
     }
@@ -41,12 +41,16 @@ export default abstract class Node {
     execute() {
         // ensures that game and _nexts aren't null
         this.throwErrorIfNotInitiated();
-        if (__DEV) console.log(`%cexecuting ${this}`,
-                               'color: blue; font-wheight: bold');
-
-        if (this.stopExecution)
+        if (__DEV) {
+            console.log(
+                `%cexecuting ${this}`, 'color: blue; font-wheight: bold');
+        }
+        if (this.stopExecution) {
             _.forEach(this._nexts, (next: Node) => { next.loadBlock(); });
+        }
     }
+
+    beforeNext() {}
 
     nexts(): Node[] {
         // ensures that game and _nexts aren't null
@@ -60,12 +64,14 @@ export default abstract class Node {
      */
     loadBlock() {
         this.load();
-        if (!this.stopExecution)
+        if (!this.stopExecution) {
             _.forEach(this._nexts, (next: Node) => { next.loadBlock(); });
+        }
     }
 
     protected throwErrorIfNotInitiated() {
-        if (this.game === null || this._nexts === null)
+        if (this.game === null || this._nexts === null) {
             throw EvalError("Node wasn't initiated.");
+        }
     }
 }

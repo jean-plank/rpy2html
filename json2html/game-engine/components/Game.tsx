@@ -12,6 +12,7 @@ import LayerScene from './LayerScene';
 import LayerChars from './LayerChars';
 import Textbox from './Textbox';
 import Choices from './Choices';
+import Cutscene from './Cutscene';
 
 
 interface IProps {
@@ -22,19 +23,29 @@ interface IProps {
 
 export default class Game extends React.Component<IProps> {
     render() {
-        return (
-            <div className='Game'
-                 onClick={this.onClick()}
-                 onWheel={this.onWheel()}>
-                <LayerScene img={this.props.game.sceneImg} />
-                <LayerChars imgs={this.props.game.charImgs} />
-                <Textbox hide={this.props.game.textboxHide}
-                         char={this.props.game.textboxChar}
-                         text={this.props.game.textboxText} />
-                <Choices choices={this.props.game.choices} />
-                {this.props.armlessWankerMenu}
-            </div>
-        );
+        if (this.props.game.video === null) {
+            return (
+                <div className='Game'
+                     onClick={this.onClick()}
+                     onWheel={this.onWheel()}>
+                    <LayerScene img={this.props.game.sceneImg} />
+                    <LayerChars imgs={this.props.game.charImgs} />
+                    <Textbox hide={this.props.game.textboxHide}
+                             char={this.props.game.textboxChar}
+                             text={this.props.game.textboxText} />
+                    <Choices choices={this.props.game.choices} />
+                    {this.props.armlessWankerMenu}
+                </div>
+            );
+        } else {
+            return (
+                <div className='Game'
+                     onClick={this.onClick()}
+                     onWheel={this.onWheel()}>
+                    <Cutscene video={this.props.game.video} />
+                </div>
+            );
+        }
     }
 
     private onClick = () => (e: React.MouseEvent) => {
