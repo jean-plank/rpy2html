@@ -111,4 +111,7 @@ export interface IStyle {
     confirmframe_padding: string;
 
     interface_text_color: string;
+
+    title_fsize_v: string;
+    title_fsize_h: string;
 }

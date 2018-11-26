@@ -48,16 +48,24 @@ export default class MainMenu extends React.Component<IProps, IState> implements
 
     constructor (props: IProps) {
         super(props);
-
-        this.storage =
-            StorageService.getInstance(props.app);
+        this.storage = StorageService.getInstance(props.app);
     }
 
     render() {
+        const submenuTitle: string = (() => {
+            switch (this.state.selectedBtn) {
+                case Btn.Load: return this.props.app.lang.menu.load;
+                case Btn.Memory: return this.props.app.lang.menu.memory;
+                case Btn.Help: return this.props.app.lang.menu.help;
+                case Btn.None: return '';
+            }
+        })();
+
         return (
-            <div className='MainMenu'>
+            <div className='menu MainMenu'>
                 <div className={this.state.overlayClassName} />
-                <div className='menu-items'>
+                <div className='submenu-title'>{submenuTitle}</div>
+                <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.start}
                                 action={this.startGame()} />
 

@@ -53,10 +53,28 @@ export default class GameMenu extends React.Component<IProps, IState> implements
     }
 
     render() {
+        const submenuTitle: string = (() => {
+            switch (this.state.selectedBtn) {
+                case GameMenuBtn.History:
+                    return this.props.app.lang.menu.history;
+                case GameMenuBtn.Save:
+                    return this.props.app.lang.menu.save;
+                case GameMenuBtn.Load:
+                    return this.props.app.lang.menu.load;
+                case GameMenuBtn.MMenu:
+                    return this.props.app.lang.menu.mmenu;
+                case GameMenuBtn.Help:
+                    return this.props.app.lang.menu.help;
+                case GameMenuBtn.None:
+                    return '';
+            }
+        })();
+
         return (
-            <div className='GameMenu'>
+            <div className='menu GameMenu'>
                 <div className='game-menu-overlay' />
-                <div className='menu-items'>
+                <div className='submenu-title'>{submenuTitle}</div>
+                <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.resume}
                                 action={this.hide()} />
 

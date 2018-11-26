@@ -80,7 +80,10 @@
 
     "confirmframe_padding",
 
-    "interface_text_color"
+    "interface_text_color",
+
+    "title_fsize_v",
+    "title_fsize_h"
   ],
   "properties": {
     "selected_color": { "type": "string" },
@@ -161,7 +164,10 @@
 
     "confirmframe_padding": { "type": "string" },
 
-    "interface_text_color": { "type": "string" }
+    "interface_text_color": { "type": "string" },
+
+    "title_fsize_v": { "type": "number" },
+    "title_fsize_h": { "type": "number" }
   },
   "additionalProperties": false
 }
