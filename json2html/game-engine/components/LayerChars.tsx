@@ -12,10 +12,11 @@ interface IProps {
 
 export default class LayerChars extends React.Component<IProps> {
     render() {
-        return <div className='LayerChars' ref={this.setImages} />;
+        return <div className='LayerChars' ref={this.setImages()} />;
     }
 
-    private setImages = (div: HTMLElement | null) => {
+    // keep this method partial (or it won't work)
+    private setImages = () => (div: HTMLElement | null) => {
         if (div !== null) {
             div.innerHTML = '';
             _.forEach(this.props.imgs, img => {

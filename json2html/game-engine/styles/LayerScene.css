@@ -7,4 +7,5 @@
     position: absolute;
     top: 0;
     left: 0;
+    animation: fade-in 1s forwards;
 }
