@@ -12,14 +12,14 @@ interface IProps {
 
 export default class LayerChars extends React.Component<IProps> {
     render() {
-        return <div className='LayerChars' ref={this.setImages()} />;
+        return <div className='LayerChars' ref={this.setImages} />;
     }
 
-    private setImages = () => (div: HTMLElement | null) => {
+    private setImages = (div: HTMLElement | null) => {
         if (div !== null) {
             div.innerHTML = '';
             _.forEach(this.props.imgs, img => {
-                div.append(img.getElt().cloneNode());
+                div.appendChild(img.getElt().cloneNode());
             });
         }
     }

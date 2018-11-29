@@ -20,6 +20,7 @@ export interface ILanguage {
         back: string;
         qSave: string;
         qLoad: string;
+        saved: string;
     };
     confirm: {
         // diverse confirm translations
@@ -60,6 +61,7 @@ const translations: IObj<ILanguage> = {
             back: 'Back',
             qSave: 'Quick save',
             qLoad: 'Quick load',
+            saved: 'Saved!',
         },
         confirm: {
             audio: 'Be aware that this page is playing audio.',
@@ -97,6 +99,7 @@ const translations: IObj<ILanguage> = {
             back: 'Retour',
             qSave: 'Sauvegarde rapide',
             qLoad: 'Chargement rapide',
+            saved: 'Sauvegardé !',
         },
         confirm: {
             audio: 'Attention ! Cette page joue du son...',

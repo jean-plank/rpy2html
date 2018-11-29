@@ -11,12 +11,12 @@ interface IProps {
 
 export default class LayerScene extends React.Component<IProps> {
     render() {
-        return <div className='LayerScene' ref={this.setImage()} />;
+        return <div className='LayerScene' ref={this.setImage} />;
     }
 
-    private setImage = () => (div: HTMLDivElement | null) => {
+    private setImage = (div: HTMLDivElement | null) => {
         if (div !== null && this.props.img !== null) {
-            div.append(this.props.img.getElt().cloneNode());
+            div.appendChild(this.props.img.getElt().cloneNode());
         }
     }
 }

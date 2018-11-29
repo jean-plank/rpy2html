@@ -7,10 +7,12 @@ import Font from '../classes/Font';
 import Image from '../classes/Image';
 
 
-export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string => {
+export default (style: IStyle,
+                fonts: IObj<Font>,
+                images: IObj<Image>): HTMLStyleElement => {
     const newStyle = _.has(images, 'main_menu_overlay');
-
-    return (
+    const res = document.createElement('style');
+    res.innerHTML = (
 `${getFonts(fonts)}
 
 .App>* {
@@ -86,7 +88,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     width: ${style.submenu_width};
 }
 
-.MenuButton, .menu .submenu {
+.Notification, .MenuButton, .menu .submenu {
     font-family: ${style.guibtn_ffamily};
     font-size: ${style.guibtn_fsize_h}vh;
 }
@@ -238,7 +240,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
         font-size: ${style.title_fsize_v}vw;
     }
 
-    .MenuButton, .menu .submenu {
+    .Notification, .MenuButton, .menu .submenu {
         font-size: ${style.guibtn_fsize_v}vw;
     }
 
@@ -251,6 +253,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     }
 }`
     );
+    return res;
 };
 
 const getFonts = (fonts: IObj<Font>): string => {

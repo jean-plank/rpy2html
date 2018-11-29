@@ -67,19 +67,19 @@ export default class MainMenu extends React.Component<IProps, IState> implements
                 <div className='submenu-title'>{submenuTitle}</div>
                 <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.start}
-                                action={this.startGame()} />
+                                action={this.startGame} />
 
                     <MenuButton text={this.props.app.lang.menu.load}
-                                action={this.showLoad()}
+                                action={this.showLoad}
                                 selected={this.state.selectedBtn===Btn.Load} />
 
                     <MenuButton text={this.props.app.lang.menu.memory}
-                                action={this.showMemory()}
+                                action={this.showMemory}
                                 selected={
                                     this.state.selectedBtn===Btn.Memory} />
 
                     <MenuButton text={this.props.app.lang.menu.help}
-                                action={this.showHelp()}
+                                action={this.showHelp}
                                 selected={this.state.selectedBtn===Btn.Help} />
                 </div>
                 <div className='submenu'>{this.state.submenu}</div>
@@ -101,11 +101,11 @@ export default class MainMenu extends React.Component<IProps, IState> implements
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
     }
 
-    private startGame = () => () => {
+    private startGame = () => {
         this.props.app.startGame();
     }
 
-    private showLoad = () => () => {
+    private showLoad = () => {
         const load = (_iSlot: number, save: Save | null) => {
             if (save === null) return;
             this.props.app.gameController.restoreSave(save.history);
@@ -118,13 +118,13 @@ export default class MainMenu extends React.Component<IProps, IState> implements
                         selectedBtn: Btn.Load, });
     }
 
-    private showMemory = () => () => {
+    private showMemory = () => {
         this.setState({ overlayClassName: MainMenu.gameMenuOverlay,
                         submenu: <Memory app={this.props.app} />,
                         selectedBtn: Btn.Memory });
     }
 
-    private showHelp = () => () => {
+    private showHelp = () => {
         this.setState({ overlayClassName: MainMenu.gameMenuOverlay,
                         submenu: <Help html={this.props.help} />,
                         selectedBtn: Btn.Help, });

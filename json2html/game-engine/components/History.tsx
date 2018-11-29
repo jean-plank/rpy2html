@@ -25,11 +25,11 @@ export default class History extends React.Component<IProps> {
             }
         });
 
-        return <div ref={this.scrollToBottom()}
+        return <div ref={this.scrollToBottom}
                     className='History'>{says}</div>;
     }
 
-    private scrollToBottom = () => (elt: HTMLDivElement | null) => {
+    private scrollToBottom = (elt: HTMLDivElement | null) => {
         if (elt !== null) elt.scrollTop = elt.scrollHeight - elt.clientHeight;
     }
 }

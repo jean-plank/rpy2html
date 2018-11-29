@@ -98,14 +98,13 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     quickSave() {
         const nodes = this.history.getNodes();
-        const onSave = () => {
-            if (this.armlessWankerMenu !== null) {
-                this.armlessWankerMenu.setState({
-                    disableQuickLoad: this.storage.getQuickSave() === null
-                });
-            }
-        };
-        this.storage.storeQuickSave(QuickSave.fromNodes(nodes), onSave);
+        this.storage.storeQuickSave(QuickSave.fromNodes(nodes));
+        if (this.armlessWankerMenu !== null) {
+            this.armlessWankerMenu.setState({
+                disableQuickLoad: this.storage.getQuickSave() === null
+            });
+        }
+        this.app.notify(this.app.lang.menu.saved);
     }
 
     quickLoad() {
@@ -140,7 +139,7 @@ export default class GameController implements IGameController, IKeyboardHandler
     private execNext(node: Node) {
         const nexts = node.nexts();
 
-        if (nexts.length === 0) this.app.showMainMenu()();
+        if (nexts.length === 0) this.app.showMainMenu();
         else {
             let next: Node | null = null;
 
@@ -154,7 +153,7 @@ export default class GameController implements IGameController, IKeyboardHandler
     update<K extends keyof IGameProps>(props?: Pick<IGameProps, K>) {
         _.forEach(props, (value, key: K) => { this.gameProps[key] = value; });
 
-        const menu = <ArmlessWankerMenu ref={this.setWankerMenu()}
+        const menu = <ArmlessWankerMenu ref={this.setWankerMenu}
                                         app={this.app} />;
 
         this.app.setState({
@@ -166,7 +165,7 @@ export default class GameController implements IGameController, IKeyboardHandler
         });
     }
 
-    private setWankerMenu = () => (menu: ArmlessWankerMenu | null) => {
+    private setWankerMenu = (menu: ArmlessWankerMenu | null) => {
         this.armlessWankerMenu = menu;
         if (menu !== null) {
             menu.setState({

@@ -76,7 +76,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                 <div className='submenu-title'>{submenuTitle}</div>
                 <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.resume}
-                                action={this.hide()} />
+                                action={this.hide} />
 
                     <MenuButton text={this.props.app.lang.menu.history}
                                 action={this.selectBtn(GameMenuBtn.History)}
@@ -92,7 +92,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                                 selected={this.isSelected(GameMenuBtn.Load)} />
 
                     <MenuButton text={this.props.app.lang.menu.mmenu}
-                                action={this.confirmMMenu()}
+                                action={this.confirmMMenu}
                                 selected={this.isSelected(GameMenuBtn.MMenu)} />
 
                     <MenuButton text={this.props.app.lang.menu.help}
@@ -108,7 +108,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         const keyEvents: IObj<(e: React.KeyboardEvent) => void> = {
             Escape: (evt: React.KeyboardEvent) => {
                 evt.stopPropagation();
-                this.hide()();
+                this.hide();
             },
         };
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
@@ -128,7 +128,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         return null;
     }
 
-    private hide = () => () => {
+    private hide = () => {
         this.props.app.hideGameMenu();
     }
 
@@ -136,12 +136,12 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         this.setState({ selectedBtn: btn });
     }
 
-    private confirmMMenu = () => () => {
+    private confirmMMenu = () => {
         this.selectBtn(GameMenuBtn.MMenu)();
-        this.props.app.confirmMMenu(this.unselectBtn());
+        this.props.app.confirmMMenu(this.unselectBtn);
     }
 
-    private unselectBtn = () => () => {
+    private unselectBtn = () => {
         this.setState({ selectedBtn: GameMenuBtn.None });
     }
 

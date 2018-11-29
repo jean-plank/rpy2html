@@ -26,8 +26,8 @@ export default class Game extends React.Component<IProps> {
         if (this.props.game.video === null) {
             return (
                 <div className='Game'
-                     onClick={this.onClick()}
-                     onWheel={this.onWheel()}>
+                     onClick={this.onClick}
+                     onWheel={this.onWheel}>
                     <LayerScene img={this.props.game.sceneImg} />
                     <LayerChars imgs={this.props.game.charImgs} />
                     <Textbox hide={this.props.game.textboxHide}
@@ -40,20 +40,20 @@ export default class Game extends React.Component<IProps> {
         } else {
             return (
                 <div className='Game'
-                     onClick={this.onClick()}
-                     onWheel={this.onWheel()}>
+                     onClick={this.onClick}
+                     onWheel={this.onWheel}>
                     <Cutscene video={this.props.game.video} />
                 </div>
             );
         }
     }
 
-    private onClick = () => (e: React.MouseEvent) => {
+    private onClick = (e: React.MouseEvent) => {
         if (e.button === 0) this.props.controller.execNextIfNotMenu();
         else if (e.button === 1) this.props.controller.showGameMenu();
     }
 
-    private onWheel = () => (e: React.WheelEvent) => {
+    private onWheel = (e: React.WheelEvent) => {
         if (e.deltaY < 0) this.props.controller.history.previousBlock();
         else if (e.deltaY > 0) this.props.controller.history.nextBlock();
     }

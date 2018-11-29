@@ -96,10 +96,9 @@ export default class StorageService {
         return this.saves.quickSave;
     }
 
-    storeQuickSave(quickSave: QuickSave, onSave: () => void) {
+    storeQuickSave(quickSave: QuickSave) {
         this.saves.quickSave = quickSave;
         this.store();
-        onSave();
     }
 
     // for Memory submenu

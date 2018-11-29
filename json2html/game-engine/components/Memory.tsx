@@ -66,7 +66,7 @@ export default class Memory extends React.Component<IProps, IState> {
                 <MemoryGame app={this.props.app}
                             storageKey={this.props.app.lang.memory.total}
                             bytes={total}
-                            deleteStorage={this.deleteAll()}
+                            deleteStorage={this.deleteAll}
                             deleteAll={true} />
             </div>
         );
@@ -77,7 +77,7 @@ export default class Memory extends React.Component<IProps, IState> {
         this.setState({ games: this.storage.allJPGamesStorages() });
     }
 
-    private deleteAll = () => () => {
+    private deleteAll = () => {
         _(this.state.games).keys()
                            .forEach(key => { this.deleteStorage(key)(); });
     }
