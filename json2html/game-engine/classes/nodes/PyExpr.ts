@@ -17,7 +17,7 @@ export default class PyExpr extends Node {
         return `PyExpr("${this.code}")`;
     }
 
-    execute(): void {
+    execute() {
         super.execute();
 
         try {

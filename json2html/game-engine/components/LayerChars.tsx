@@ -18,7 +18,9 @@ export default class LayerChars extends React.Component<IProps> {
     private setImages = () => (div: HTMLElement | null) => {
         if (div !== null) {
             div.innerHTML = '';
-            _.forEach(this.props.imgs, img => { div.append(img.getElt()); });
+            _.forEach(this.props.imgs, img => {
+                div.append(img.getElt().cloneNode());
+            });
         }
     }
 }

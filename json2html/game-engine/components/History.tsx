@@ -18,10 +18,11 @@ export default class History extends React.Component<IProps> {
         const says: JSX.Element[] = [];
 
         _.forEach(this.props.nodes, (node, i) => {
-            if (node instanceof NodeWithChar)
+            if (node instanceof NodeWithChar) {
                 says.push(<HistoryLine key={i}
                                        char={node.who}
                                        text={node.what} />);
+            }
         });
 
         return <div ref={this.scrollToBottom()}

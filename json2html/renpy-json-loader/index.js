@@ -39,6 +39,7 @@ async function loadAllFiles(webpack, content, callback) {
         content.help = await loadHelp(webpack, content.lang);
         content.images = await loadFiles(webpack, content.images);
         content.sounds = await loadFiles(webpack, content.sounds);
+        content.videos = await loadFiles(webpack, content.videos);
         content.fonts = await loadFiles(
             webpack,
             content.fonts,
@@ -56,18 +57,23 @@ async function loadAllFiles(webpack, content, callback) {
 
 
 /**
- * @param {A => string}                     getPath In case file isn't
+ * @param {A => string}                     getPath    In case file isn't
  * directly the path.
  * @param {(file: A, newPath: string) => A} changePath In case file isn't
  * directly the path.
  */
 function loadFiles(webpack, files, getPath=f=>f, changePath=(_file, newPath) => newPath) {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
         const res = {};
         for (const key in files) {
-            if (files.hasOwnProperty(key))
-                res[key] =
-                    await loadFile(webpack, files[key], getPath, changePath);
+            if (files.hasOwnProperty(key)) {
+                try {
+                    res[key] = await
+                        loadFile(webpack, files[key], getPath, changePath);
+                } catch (e) {
+                    return reject(e);
+                }
+            }
         }
         resolve(res);
     });
@@ -83,10 +89,12 @@ function loadFile(webpack, file, getPath, changePath) {
                 for (const res in module.buildInfo.assets) {
                     return resolve(changePath(file, res));
                 }
-                reject(EvalError(`Loading file: didn't find output file: "${
-                    file
-                }"`));
-            }));
+                reject(EvalError(
+                    `Loading file: didn't find output file: "${file}"`
+                ));
+            }
+        )
+    );
 }
 
 

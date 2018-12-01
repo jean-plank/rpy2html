@@ -10,7 +10,7 @@ import StorageService from '../classes/StorageService';
 
 import App from './App';
 import MenuButton from './MenuButton';
-import Saves from './Saves';
+import SaveSlots from './SaveSlots';
 import Memory from './Memory';
 import Help from './Help';
 
@@ -67,7 +67,8 @@ export default class MainMenu extends React.Component<IProps, IState> implements
 
                     <MenuButton text={this.props.app.lang.menu.memory}
                                 action={this.showMemory()}
-                                selected={this.state.selectedBtn===Btn.Memory} />
+                                selected={
+                                    this.state.selectedBtn===Btn.Memory} />
 
                     <MenuButton text={this.props.app.lang.menu.help}
                                 action={this.showHelp()}
@@ -103,9 +104,9 @@ export default class MainMenu extends React.Component<IProps, IState> implements
         };
 
         this.setState({ overlayClassName: MainMenu.gameMenuOverlay,
-                        submenu: <Saves app={this.props.app}
-                                        action={load}
-                                        saves={this.storage.getSaves()} />,
+                        submenu: <SaveSlots app={this.props.app}
+                                            action={load}
+                                            saves={this.storage.getSaves()} />,
                         selectedBtn: Btn.Load, });
     }
 

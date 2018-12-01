@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import Node from './Node';
 import { convertToJs } from '../../utils/utils';
-import GameController from '../GameController';
 
 
 export default class MenuItem extends Node {
@@ -18,10 +17,5 @@ export default class MenuItem extends Node {
 
     toString(): string {
         return `MenuItem("${this.text}")`;
-    }
-
-    execute(): void {
-        super.execute(); // ensures that game isn't null
-        (this.game as GameController).afterMenu();
     }
 }

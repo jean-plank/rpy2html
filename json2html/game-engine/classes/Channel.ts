@@ -59,10 +59,11 @@ export default class Channel {
 
     //
     resume() {
-        if (this.currentlyPlaying !== null)
+        if (this.currentlyPlaying !== null) {
             this.currentlyPlaying
                 .play()
                 .catch(() => { this.app.confirmAudio(this.resume); });
+        }
     }
 
     private onEnded(): () => void {

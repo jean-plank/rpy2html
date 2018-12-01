@@ -27,7 +27,8 @@ def parse(renpy_nodes, renpy_ast, config):
     """
     res = {
         'nodes': {},
-        'sounds': {}
+        'sounds': {},
+        'videos': {}
     }
 
     res['sounds']['main_menu_music'] = config.main_menu_music
@@ -196,16 +197,32 @@ def if_to_str(renpy_nodes, renpy_ast, node, acc):
     return nexts_of_blocks
 
 
+VIDEO = re.compile(r'^renpy\.movie_cutscene\((.+)\)$')
+
 def python_to_str(renpy_nodes, renpy_ast, node, acc):
     next = real_next(renpy_nodes, renpy_ast, node.next)
 
-    acc['nodes'][id(node)] = {
-        'class_name': 'PyExpr',
-        'arguments': [
-            replace_bools(node.code.source),
-            [str(id(next))] if next else []
-        ]
-    }
+    match = re.search(VIDEO, node.code.source)
+
+    if match != None and len(match.groups()) == 1: # it's a video
+        file = match.group(1)[1:-1]
+        vid_name = remove_invalid_chars(file)
+        acc['videos'][vid_name] = file
+        acc['nodes'][id(node)] = {
+            'class_name': 'Video',
+            'arguments': [
+                vid_name,
+                [str(id(next))] if next else []
+            ]
+        }
+    else:
+        acc['nodes'][id(node)] = {
+            'class_name': 'PyExpr',
+            'arguments': [
+                replace_bools(node.code.source),
+                [str(id(next))] if next else []
+            ]
+        }
     return [next]
 
 

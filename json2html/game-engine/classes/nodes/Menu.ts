@@ -17,7 +17,7 @@ export default class Menu extends NodeWithChar {
         return `Menu(${args})`;
     }
 
-    execute(): void {
+    execute() {
         super.execute(); // ensures that game isn't null
 
         const choices: Choice[] =
@@ -32,6 +32,11 @@ export default class Menu extends NodeWithChar {
             );
 
         (this.game as GameController).menu(this.who, this.what, choices);
+    }
+
+    beforeNext() {
+        super.beforeNext();
+        if (this.game !== null) this.game.afterMenu();
     }
 
     nexts(): MenuItem[] {

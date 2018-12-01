@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import '../styles/menus.css';
 
 import App from './App';
-import Saves from './Saves';
+import SaveSlots from './SaveSlots';
 import Help from './Help';
 import MenuButton from './MenuButton';
 
@@ -101,8 +101,9 @@ export default class GameMenu extends React.Component<IProps, IState> implements
     }
 
     private getSubmenu(): JSX.Element | null {
-        if (this.state.selectedBtn === GameMenuBtn.History)
+        if (this.state.selectedBtn === GameMenuBtn.History) {
             return this.getHistory();
+        }
         if (this.state.selectedBtn === GameMenuBtn.Save) return this.getSave();
         if (this.state.selectedBtn === GameMenuBtn.Load) return this.getLoad();
         if (this.state.selectedBtn === GameMenuBtn.Help) return this.getHelp();
@@ -154,9 +155,9 @@ export default class GameMenu extends React.Component<IProps, IState> implements
             else this.props.app.confirmOverride(() => { save(iSlot); });
         };
 
-        return <Saves app={this.props.app}
-                      action={saveWithConfirm}
-                      saves={this.storage.getSaves()} />;
+        return <SaveSlots app={this.props.app}
+                          action={saveWithConfirm}
+                          saves={this.storage.getSaves()} />;
     }
 
     private getLoad(): JSX.Element {
@@ -171,9 +172,9 @@ export default class GameMenu extends React.Component<IProps, IState> implements
             );
         };
 
-        return <Saves app={this.props.app}
-                      action={load}
-                      saves={this.storage.getSaves()} />;
+        return <SaveSlots app={this.props.app}
+                          action={load}
+                          saves={this.storage.getSaves()} />;
     }
 
     private getHelp(): JSX.Element {

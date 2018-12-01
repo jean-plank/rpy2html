@@ -63,9 +63,26 @@ export default class App extends React.Component<IProps, IState> {
             ? translations[props.datas.lang]
             : translations.en;
 
-        if (_.has(this.props.datas.sounds, 'main_menu_music')) {
-            this.mainMenuMusic = this.props.datas.sounds.main_menu_music;
+        if (_.has(props.datas.sounds, 'main_menu_music')) {
+            this.mainMenuMusic = props.datas.sounds.main_menu_music;
             (this.mainMenuMusic as Sound).load();
+        }
+
+        document.title = props.datas.gameName;
+        this.setIcon();
+    }
+
+    private setIcon() {
+        if (_.has(this.props.datas.images, 'game_icon')) {
+            let link = document.querySelector('link[rel*="icon"]') as (
+                HTMLLinkElement | null
+            );
+            if (link === null) {
+                link = document.createElement('link');
+                link.rel = 'shortcut icon';
+                document.getElementsByTagName('head')[0].appendChild(link);
+            }
+            link.href = this.props.datas.images.game_icon.file;
         }
     }
 
@@ -95,18 +112,20 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     private onKeyUp = () => (e: React.KeyboardEvent) => {
-        if (this.confirmKbrdHandler !== null)
+        if (this.confirmKbrdHandler !== null) {
             this.confirmKbrdHandler.onKeyUp(e);
-        else if (this.viewKbrdHndlr !== null)
+        } else if (this.viewKbrdHndlr !== null) {
             this.viewKbrdHndlr.onKeyUp(e);
+        }
     }
 
     // showing views
     showMainMenu = () => () => {
         _.forEach(this.channels, (chan: Channel) => { chan.stop(); });
 
-        if (this.mainMenuMusic !== null)
+        if (this.mainMenuMusic !== null) {
             this.channels.music.play(this.mainMenuMusic);
+        }
 
         this.setState({
             view: <MainMenu ref={this.setViewKbrdHndlr()}
@@ -139,7 +158,9 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     // confirm
-    private confirm(msg: string, buttons: IButton[], escapeAction?: () => void) {
+    private confirm(msg: string,
+                    buttons: IButton[],
+                    escapeAction?: () => void) {
         this.setState({
             confirm: <Confirm ref={this.setConfirmKbrdHndlr()}
                               app={this}

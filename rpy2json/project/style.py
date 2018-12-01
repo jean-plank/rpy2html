@@ -149,7 +149,7 @@ def old_style(gui, config, fonts_usages, Borders):
     res = {}
 
     res["selected_color"] = "#ffffff"
-    res["disabledbtn_color"] = "#888888"
+    res["disabledbtn_color"] = "#666666"
     res["accent_color"] = "#0099cc"
 
     # game
@@ -234,8 +234,8 @@ def old_style(gui, config, fonts_usages, Borders):
     res["choicebtn_width"] = "auto"
 
     # save slots
-    slot_button_width = 0.9 * submenu_width / 3.0 # 312 # 414
-    slot_button_height = 233.0 * slot_button_width / 312.0 # 233 # 309
+    slot_button_width = 0.9 * submenu_width / 3.0
+    slot_button_height = slot_button_width * HEIGHT / WIDTH
     slot_fsize = fontsize(HEIGHT, WIDTH, 21)
     res["slot_width"] = percent(slot_button_width, WIDTH - mmenuitems_width)
     res["slot_height"] = percent(slot_button_height, HEIGHT)

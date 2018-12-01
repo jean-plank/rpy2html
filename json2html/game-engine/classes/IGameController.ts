@@ -4,4 +4,5 @@ export default interface IGameController {
         previousBlock: () => void;
         nextBlock: () => void;
     };
+    showGameMenu: () => void;
 }

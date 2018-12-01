@@ -9,6 +9,7 @@ export default interface IRenpyJson {
     help: string;
     images: IObj<string>;
     sounds: IObj<string>;
+    videos: IObj<string>;
     characters: IObj<IRawChar>;
     nodes: IObj<IRawNode>;
     fonts: IObj<IRawDefinition>;

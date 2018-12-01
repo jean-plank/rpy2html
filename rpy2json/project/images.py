@@ -9,15 +9,17 @@ def parse(GAME_BASE_DIR,
           config,
           gui,
           style):
-    """
+    '''
     Retrieves all declared images in renpy_nodes
 
-    :param renpy_nodes: all nodes from renpy game (renpy.game.script.namemap)
-    :param renpy_Image: the renpy Image class (renpy.ast.Image)
+    :param renpy_nodes:      all nodes from renpy game (renpy.game.script.namemap)
+    :param renpy_Image:      the renpy Image class (renpy.ast.Image)
     :param py_eval_bytecode: the renpy py_eval_bytecode function (renpy.python.py_eval_bytecode)
-    :param ATLTransform: the renpy ATLTransform function (renpy.display.motion.ATLTransform)
+    :param ATLTransform:     the renpy ATLTransform function (renpy.display.motion.ATLTransform)
     :returns: a dict with all images
-    """
+    '''
+
+    # functions
     def img_name_and_file(img):
         name = img.imgname[0]
         if img.code is not None:
@@ -57,7 +59,22 @@ def parse(GAME_BASE_DIR,
                 return res
 
 
+    def add_file_if_found(res, img_name):
+        for ext in ['png', 'jpg', 'jpeg', 'ico']:
+            img_file = path.join(GAME_BASE_DIR, 'images', '%s.%s' % (img_name, ext))
+            if path.isfile(img_file):
+                res[img_name] = img_file
+                return
+        if not img_name in [
+            'black',
+            'config.gl_test_image',
+            '"#000"'
+        ]:
+            print('[WARNING] couldn\'t import %s' % img_name)
+
+    # body
     res = {}
+    used_imgs = []
 
     add(res, 'game_icon', config.window_icon)
     add(res, 'main_menu_bg', main_menu_bg())
@@ -78,6 +95,12 @@ def parse(GAME_BASE_DIR,
             (img_name, img_file) = img_name_and_file(value)
 
             if isinstance(img_file, basestring):
-                res[img_name] = img_file
+                add(res, img_name, path.join('images', img_file))
+        elif hasattr(value, 'imspec') and not value.imspec[0][0] in used_imgs:
+            used_imgs.append(value.imspec[0][0])
+
+    for img_name in used_imgs:
+        if not img_name in res:
+            add_file_if_found(res, img_name)
 
     return res

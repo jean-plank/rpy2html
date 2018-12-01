@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import Image from './Image';
 import Char from './Char';
 import Choice from './Choice';
+import Video from './Video';
 
 
 export interface IGameProps {
@@ -12,6 +13,7 @@ export interface IGameProps {
     textboxChar: Char | null;
     textboxText: string;
     choices: Choice[];
+    video: Video | null;
 }
 
 export default class GameProps implements IGameProps {
@@ -21,6 +23,7 @@ export default class GameProps implements IGameProps {
     textboxChar: Char | null;
     textboxText: string;
     choices: Choice[];
+    video: Video | null;
 
     static fromAny(props: any): GameProps | null {
         if (  _.keys(props).length === 6
@@ -29,7 +32,8 @@ export default class GameProps implements IGameProps {
            && _.has(props, 'textboxHide') && _.isBoolean(props.textboxHide)
            && _.has(props, 'textboxChar')
            && _.has(props, 'textboxText') && _.isString(props.textboxText)
-           && _.has(props, 'choices') && _.isArray(props.choices)) {
+           && _.has(props, 'choices') && _.isArray(props.choices)
+           && _.has(props, 'video')) {
 
             const images: Image[] = [];
             _.forEach(props.charImgs,
@@ -47,7 +51,8 @@ export default class GameProps implements IGameProps {
                 textboxHide: props.textboxHide,
                 textboxChar: Char.fromAny(props.textboxChar),
                 textboxText: props.textboxText,
-                choices: theChoices
+                choices: theChoices,
+                video: Video.fromAny(props.video),
             };
         }
         return null;

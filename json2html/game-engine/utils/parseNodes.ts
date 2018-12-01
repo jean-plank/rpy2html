@@ -9,6 +9,7 @@ import IfBlock from '../classes/nodes/IfBlock';
 import Menu from '../classes/nodes/Menu';
 import MenuItem from '../classes/nodes/MenuItem';
 import Play from '../classes/nodes/Play';
+import PlayVideo from '../classes/nodes/PlayVideo';
 import PyExpr from '../classes/nodes/PyExpr';
 import Say from '../classes/nodes/Say';
 import Scene from '../classes/nodes/Scene';
@@ -18,33 +19,38 @@ import Stop from '../classes/nodes/Stop';
 
 export default (rawNode: IRawNode): Node => {
     switch (rawNode.class_name) {
-        case "Hide": return parseHide(rawNode.arguments);
-        case "If": return parseIf(rawNode.arguments);
-        case "IfBlock": return parseIfBlock(rawNode.arguments);
-        case "Menu": return parseMenu(rawNode.arguments);
-        case "MenuItem": return parseMenuItem(rawNode.arguments);
-        case "Play": return parsePlay(rawNode.arguments);
-        case "PyExpr": return parsePyExpr(rawNode.arguments);
-        case "Say": return parseSay(rawNode.arguments);
-        case "Scene": return parseScene(rawNode.arguments);
-        case "Show": return parseShow(rawNode.arguments);
-        case "Stop": return parseStop(rawNode.arguments);
+        case 'Hide': return parseHide(rawNode.arguments);
+        case 'If': return parseIf(rawNode.arguments);
+        case 'IfBlock': return parseIfBlock(rawNode.arguments);
+        case 'Menu': return parseMenu(rawNode.arguments);
+        case 'MenuItem': return parseMenuItem(rawNode.arguments);
+        case 'Play': return parsePlay(rawNode.arguments);
+        case 'PyExpr': return parsePyExpr(rawNode.arguments);
+        case 'Video': return parseVideo(rawNode.arguments);
+        case 'Say': return parseSay(rawNode.arguments);
+        case 'Scene': return parseScene(rawNode.arguments);
+        case 'Show': return parseShow(rawNode.arguments);
+        case 'Stop': return parseStop(rawNode.arguments);
     }
     throw new EvalError(`JSON: unknown node class_name: ${rawNode.class_name}`);
 };
 
 
-const unknownArgsError = (className: string, args: any[]): EvalError => {
-    return EvalError(`JSON: unknown arguments for classe ${className}: ${args.join(', ')}`);
+const unknownArgsError = (className: string,
+                          args: any[]): EvalError => {
+    return EvalError(
+        `JSON: unknown arguments for classe ${className}: ${args.join(', ')}`);
 };
 
 const isValidIdNext = (idNext: any): boolean => {
     return (  idNext === null
            || (  _.isArray(idNext)
-              && _.every(idNext, (id: any) => _.isString(id))));
+              && _.every(idNext, _.isString)));
 };
 
-const checkNodeImgArgs = (className: string, args: any[]): [string, number[] | null | undefined] => {
+const checkNodeImgArgs = (className: string,
+                          args: any[]) :
+                              [string, number[] | null | undefined] => {
     if (args.length <= 2) {
         let imgName: string | undefined;
         let idNext: number[] | null | undefined = null;
@@ -63,7 +69,7 @@ const checkNodeImgArgs = (className: string, args: any[]): [string, number[] | n
  * parsers
  */
 const parseHide = (args: any[]): Hide => {
-    const [imgName, idNext] = checkNodeImgArgs("Hide", args);
+    const [imgName, idNext] = checkNodeImgArgs('Hide', args);
     return new Hide(imgName, idNext);
 };
 
@@ -75,7 +81,7 @@ const parseIf = (args: any[]): If => {
 
         return new If(idNext);
     }
-    throw unknownArgsError("If", args);
+    throw unknownArgsError('If', args);
 };
 
 const parseIfBlock = (args: any[]): IfBlock => {
@@ -90,7 +96,7 @@ const parseIfBlock = (args: any[]): IfBlock => {
             return new IfBlock(condition, idNext);
         }
     }
-    throw unknownArgsError("IfBlock", args);
+    throw unknownArgsError('IfBlock', args);
 };
 
 const parseMenu = (args: any[]): Menu => {
@@ -106,7 +112,7 @@ const parseMenu = (args: any[]): Menu => {
             return new Menu(null, displayTxt, idNext);
         }
     }
-    throw unknownArgsError("Menu", args);
+    throw unknownArgsError('Menu', args);
 };
 
 const parseMenuItem = (args: any[]): MenuItem => {
@@ -123,7 +129,7 @@ const parseMenuItem = (args: any[]): MenuItem => {
             return new MenuItem(text, condition, idNext);
         }
     }
-    throw unknownArgsError("MenuItem", args);
+    throw unknownArgsError('MenuItem', args);
 };
 
 const parsePlay = (args: any[]): Play => {
@@ -140,7 +146,7 @@ const parsePlay = (args: any[]): Play => {
             return new Play(chanName, sndName, idNext);
         }
     }
-    throw unknownArgsError("Play", args);
+    throw unknownArgsError('Play', args);
 };
 
 const parsePyExpr = (args: any[]): PyExpr => {
@@ -155,7 +161,22 @@ const parsePyExpr = (args: any[]): PyExpr => {
             return new PyExpr(code, idNext);
         }
     }
-    throw unknownArgsError("PyExpr", args);
+    throw unknownArgsError('PyExpr', args);
+};
+
+const parseVideo = (args: any[]): PlayVideo => {
+    if (args.length <= 2) {
+        let vidName: string | undefined;
+        let idNext: number[] | null | undefined;
+
+        if (_.isString(args[0])) vidName = args[0];
+        if (isValidIdNext(args[1])) idNext = args[1];
+
+        if (vidName !== undefined) {
+            return new PlayVideo(vidName, idNext);
+        }
+    }
+    throw unknownArgsError('PlayVideo', args);
 };
 
 const parseSay = (args: any[]): Say => {
@@ -172,16 +193,16 @@ const parseSay = (args: any[]): Say => {
             return new Say(whosName, what, idNext);
         }
     }
-    throw unknownArgsError("Say", args);
+    throw unknownArgsError('Say', args);
 };
 
 const parseScene = (args: any[]): Scene => {
-    const [imgName, idNext] = checkNodeImgArgs("Scene", args);
+    const [imgName, idNext] = checkNodeImgArgs('Scene', args);
     return new Scene(imgName, idNext);
 };
 
 const parseShow = (args: any[]): Show => {
-    const [imgName, idNext] = checkNodeImgArgs("Show", args);
+    const [imgName, idNext] = checkNodeImgArgs('Show', args);
     return new Show(imgName, idNext);
 };
 
@@ -197,5 +218,5 @@ const parseStop = (args: any[]): Stop => {
             return new Stop(chanName, idNext);
         }
     }
-    throw unknownArgsError("Stop", args);
+    throw unknownArgsError('Stop', args);
 };
