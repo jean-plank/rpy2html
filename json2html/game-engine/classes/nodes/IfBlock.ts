@@ -9,7 +9,6 @@ export default class IfBlock extends Node {
 
     constructor (condition: string, idNext?: number[] | null) {
         super(idNext);
-
         this.condition = convertToJs(condition);
     }
 

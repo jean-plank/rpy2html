@@ -18,6 +18,7 @@ import Channel from '../classes/Channel';
 // components
 import MainMenu from './MainMenu';
 import GameMenu, { GameMenuBtn } from './GameMenu';
+import Notifications from './Notifications';
 import Confirm from './Confirm';
 import { IButton } from './MenuButton';
 
@@ -29,12 +30,14 @@ interface IProps {
 interface IState {
     view: JSX.Element | null;
     confirm: JSX.Element | null;
+    notification: string | null;
 }
 
 export default class App extends React.Component<IProps, IState> {
     state: IState = {
         view: null,
         confirm: null,
+        notification: null,
     };
     channels: IObj<Channel> = {
         music: new Channel(this, true, 0.5),
@@ -44,20 +47,17 @@ export default class App extends React.Component<IProps, IState> {
     gameController: GameController;
     lang: ILanguage;
 
-    private styleContent: string;
     private viewKbrdHndlr: IKeyboardHandler | null = null;
     private confirmKbrdHandler: IKeyboardHandler | null = null;
     private confirmAudioShown: boolean = false;
     private mainMenuMusic: Sound | null = null;
+    private notifs: Notifications | null = null;
 
     constructor (props: IProps) {
         super(props);
 
-        this.styleContent = parseAppStyle(props.datas.style,
-                                          props.datas.fonts,
-                                          props.datas.images);
         this.gameController =
-            new GameController(this, props.datas, this.setViewKbrdHndlr());
+            new GameController(this, props.datas, this.setViewKbrdHndlr);
 
         this.lang = _.has(translations, props.datas.lang)
             ? translations[props.datas.lang]
@@ -69,10 +69,21 @@ export default class App extends React.Component<IProps, IState> {
         }
 
         document.title = props.datas.gameName;
-        this.setIcon();
+        this.setStyleAndIcon();
     }
 
-    private setIcon() {
+    private setStyleAndIcon() {
+        const head: HTMLHeadElement = (() => {
+            if (document.head !== null) return document.head;
+            const res = document.createElement('head');
+            document.prepend(res);
+            return res;
+        })();
+
+        head.appendChild(parseAppStyle(this.props.datas.style,
+                                       this.props.datas.fonts,
+                                       this.props.datas.images));
+
         if (_.has(this.props.datas.images, 'game_icon')) {
             let link = document.querySelector('link[rel*="icon"]') as (
                 HTMLLinkElement | null
@@ -80,14 +91,14 @@ export default class App extends React.Component<IProps, IState> {
             if (link === null) {
                 link = document.createElement('link');
                 link.rel = 'shortcut icon';
-                document.getElementsByTagName('head')[0].appendChild(link);
+                head.appendChild(link);
             }
             link.href = this.props.datas.images.game_icon.file;
         }
     }
 
     componentDidMount() {
-        this.showMainMenu()();
+        this.showMainMenu();
     }
 
     render() {
@@ -95,23 +106,23 @@ export default class App extends React.Component<IProps, IState> {
             <div className='App'
                  tabIndex={0}
                  ref={div => { if (div !== null) div.focus(); }}
-                 onKeyUp={this.onKeyUp()}>
-                <style>{this.styleContent}</style>
+                 onKeyUp={this.onKeyUp}>
                 {this.state.view}
+                <Notifications ref={this.setNotifsRef} />
                 {this.state.confirm}
             </div>
         );
     }
 
-    private setViewKbrdHndlr = () => (handler: IKeyboardHandler | null) => {
+    private setViewKbrdHndlr = (handler: IKeyboardHandler | null) => {
         this.viewKbrdHndlr = handler;
     }
 
-    private setConfirmKbrdHndlr = () => (handler: IKeyboardHandler | null) => {
+    private setConfirmKbrdHndlr = (handler: IKeyboardHandler | null) => {
         this.confirmKbrdHandler = handler;
     }
 
-    private onKeyUp = () => (e: React.KeyboardEvent) => {
+    private onKeyUp = (e: React.KeyboardEvent) => {
         if (this.confirmKbrdHandler !== null) {
             this.confirmKbrdHandler.onKeyUp(e);
         } else if (this.viewKbrdHndlr !== null) {
@@ -120,7 +131,7 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     // showing views
-    showMainMenu = () => () => {
+    showMainMenu = () => {
         _.forEach(this.channels, (chan: Channel) => { chan.stop(); });
 
         if (this.mainMenuMusic !== null) {
@@ -128,18 +139,21 @@ export default class App extends React.Component<IProps, IState> {
         }
 
         this.setState({
-            view: <MainMenu ref={this.setViewKbrdHndlr()}
+            view: <MainMenu ref={this.setViewKbrdHndlr}
                             app={this}
                             lang={this.props.datas.lang}
                             help={this.props.datas.help} />
         });
     }
 
+    startGame() {
+        this.gameController.start();
+    }
+
     showGameMenu(gameMenuBtn?: GameMenuBtn) {
         _.forEach(this.channels, (chan: Channel) => { chan.pause(); });
-
         this.setState({
-            view: <GameMenu ref={this.setViewKbrdHndlr()}
+            view: <GameMenu ref={this.setViewKbrdHndlr}
                             app={this}
                             lang={this.props.datas.lang}
                             help={this.props.datas.help}
@@ -149,12 +163,7 @@ export default class App extends React.Component<IProps, IState> {
 
     hideGameMenu() {
         _.forEach(this.channels, (chan: Channel) => { chan.resume(); });
-
-        this.gameController.update();
-    }
-
-    startGame() {
-        this.gameController.start();
+        this.gameController.show();
     }
 
     // confirm
@@ -162,7 +171,7 @@ export default class App extends React.Component<IProps, IState> {
                     buttons: IButton[],
                     escapeAction?: () => void) {
         this.setState({
-            confirm: <Confirm ref={this.setConfirmKbrdHndlr()}
+            confirm: <Confirm ref={this.setConfirmKbrdHndlr}
                               app={this}
                               msg={msg}
                               buttons={buttons}
@@ -197,11 +206,20 @@ export default class App extends React.Component<IProps, IState> {
 
     confirmMMenu(unselectBtn: () => void) {
         this.confirmYesNo(this.lang.confirm.unsaved,
-                          this.showMainMenu(),
+                          this.showMainMenu,
                           unselectBtn);
     }
 
     confirmOverride(save: () => void) {
         this.confirmYesNo(this.lang.confirm.override, save);
+    }
+
+    // notification
+    notify(txt: string) {
+        if (this.notifs !== null) this.notifs.notify(txt);
+    }
+
+    private setNotifsRef = (notifs: Notifications | null) => {
+        this.notifs = notifs;
     }
 }

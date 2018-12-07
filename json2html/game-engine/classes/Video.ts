@@ -16,11 +16,22 @@ export default class Video extends Media<HTMLVideoElement> {
         this.getElt().play();
     }
 
+    pause() {
+        if (this.isLoaded()) (this.elt as HTMLVideoElement).pause();
+    }
+
     stop() {
-        if (this.elt !== null) {
-            this.elt.pause();
-            this.elt.currentTime = 0;
+        if (this.isLoaded()) {
+            const elt = this.elt as HTMLVideoElement;
+            elt.pause();
+            elt.currentTime = 0;
         }
+    }
+
+    clone(): Video {
+        const res = new Video(this.file);
+        res.load();
+        return res;
     }
 
     onEnded(f: () => void) {
@@ -28,10 +39,7 @@ export default class Video extends Media<HTMLVideoElement> {
     }
 
     static fromAny(video: any): Video | null {
-        if (  _.keys(video).length === 1
-           && _.has(video, 'file') && _.isString(video.file)) {
-            return new Video(video.file);
-        }
-        return null;
+        const file = Media.fileFromAny(video);
+        if (file !== null) return new Video(file); else return null;
     }
 }

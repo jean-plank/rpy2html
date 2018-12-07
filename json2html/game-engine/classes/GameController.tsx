@@ -6,17 +6,11 @@ import * as _ from 'lodash';
 import IObj from './IObj';
 import IKeyboardHandler from './IKeyboardHandler';
 import IGameController from './IGameController';
-import { IGameProps } from './GameProps';
+import GameProps, { IGameProps, mergeProps } from './GameProps';
 import IAppDatas from './IAppDatas';
 import StoryHistory from './StoryHistory';
 import StorageService from './StorageService';
 import QuickSave from './QuickSave';
-import Image from './Image';
-import Char from './Char';
-import Sound from './Sound';
-import Channel from './Channel';
-import Choice from './Choice';
-import Video from './Video';
 
 // nodes
 import Node from './nodes/Node';
@@ -27,18 +21,14 @@ import App from '../components/App';
 import Game from '../components/Game';
 import ArmlessWankerMenu from '../components/ArmlessWankerMenu';
 
+import { blocksFromHist, partialGamePropsToString } from '../utils/utils';
+import Block from './Block';
+import Channel from './Channel';
+
 
 export default class GameController implements IGameController, IKeyboardHandler {
     app: App;
-    gameProps: IGameProps = {
-        sceneImg: null,
-        charImgs: [],
-        textboxHide: false,
-        textboxChar: null,
-        textboxText: '',
-        choices: [],
-        video: null,
-    };
+    gameProps: GameProps = new GameProps(GameProps.empty());
     history: StoryHistory;
     setHandler: (handler: IKeyboardHandler | null) => void = () => {};
 
@@ -98,14 +88,13 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     quickSave() {
         const nodes = this.history.getNodes();
-        const onSave = () => {
-            if (this.armlessWankerMenu !== null) {
-                this.armlessWankerMenu.setState({
-                    disableQuickLoad: this.storage.getQuickSave() === null
-                });
-            }
-        };
-        this.storage.storeQuickSave(QuickSave.fromNodes(nodes), onSave);
+        this.storage.storeQuickSave(QuickSave.fromNodes(nodes));
+        if (this.armlessWankerMenu !== null) {
+            this.armlessWankerMenu.setState({
+                disableQuickLoad: this.storage.getQuickSave() === null
+            });
+        }
+        this.app.notify(this.app.lang.menu.saved);
     }
 
     quickLoad() {
@@ -113,15 +102,24 @@ export default class GameController implements IGameController, IKeyboardHandler
         if (qSave !== null) this.restoreSave(qSave.history);
     }
 
-    execute(node: Node) {
-        if (this.currentNode !== null) this.currentNode.beforeNext();
-        node.execute();
+    execute = ([nodes, props]: Block) => {
+        const node = _.last(nodes);
+        if (node !== undefined) {
+            if (!node.stopExecution) this.app.showMainMenu();
+            else {
+                this.setCurrentNode(node);
+                this.updateAndRefreshDOM(props);
+            }
+        }
+    }
+
+    setCurrentNode(node: Node) {
         this.currentNode = node;
     }
 
-    executeAndAddToHistory(node: Node) {
-        this.execute(node);
-        this.history.addNode(node);
+    private executeAndAddToHistory(block: Block) {
+        this.execute(block);
+        this.history.addBlock(block);
     }
 
     execNextIfNotMenu() {
@@ -132,41 +130,110 @@ export default class GameController implements IGameController, IKeyboardHandler
     }
 
     execThenExecNext(node: Node) {
-        this.executeAndAddToHistory(node);
-        if (!node.stopExecution) this.execNext(node);
-    }
-
-    // Executes recursively all nodes following this node to next stopping node.
-    private execNext(node: Node) {
-        const nexts = node.nexts();
-
-        if (nexts.length === 0) this.app.showMainMenu()();
-        else {
-            let next: Node | null = null;
-
-            if (nexts.length === 1) next = nexts[0];
-            else throw EvalError(`Node ${node} has more than one next node.`);
-
-            this.execThenExecNext(next);
+        let props: IGameProps = this.gameProps.cleanedIProps();
+        if (this.currentNode !== null) {
+            props = mergeProps(props, this.currentNode.beforeNext(props));
         }
+        props = mergeProps(props, node.execute(props));
+
+        const block: Block = !node.stopExecution
+            ? this.getBlock(this.currentNode, node, [[node], props])
+            : [[node], props];
+
+        this.executeAndAddToHistory(block);
     }
 
-    update<K extends keyof IGameProps>(props?: Pick<IGameProps, K>) {
-        _.forEach(props, (value, key: K) => { this.gameProps[key] = value; });
-
-        const menu = <ArmlessWankerMenu ref={this.setWankerMenu()}
-                                        app={this.app} />;
-
-        this.app.setState({
-            view:
-                <Game ref={() => { this.setHandler(this); }}
-                      controller={this}
-                      game={this.gameProps}
-                      armlessWankerMenu={menu}/>
-        });
+    // Executes recursively all nodes following node to next stopping node.
+    private execNext(node: Node) {
+        const block = this.getBlock(
+            this.currentNode,
+            node,
+            [[], this.gameProps.cleanedIProps()]
+        );
+        this.executeAndAddToHistory(block);
     }
 
-    private setWankerMenu = () => (menu: ArmlessWankerMenu | null) => {
+    private getBlock(prev: Node | null,
+                     node: Node,
+                     acc: Block): Block {
+
+        const nexts = node.nexts();
+        if (nexts.length === 0) return acc;
+        else if (nexts.length === 1) {
+            let props = acc[1];
+            if (prev !== null) {
+                props = mergeProps(props, prev.beforeNext(props));
+            }
+            props = mergeProps(props, nexts[0].execute(props));
+
+            const newAcc: Block = [_.concat(acc[0], nexts[0]), props];
+
+            if (nexts[0].stopExecution) return newAcc;
+            else return this.getBlock(node, nexts[0], newAcc);
+        } else throw EvalError(`Node ${node} has more than one next node.`);
+    }
+
+    private update(gameProps: Partial<IGameProps>) {
+        this.gameProps =
+            new GameProps(mergeProps(this.gameProps.toIProps(), gameProps));
+    }
+
+    private updateAndRefreshDOM(gameProps: Partial<IGameProps>) {
+        if (__DEV) {
+            console.log(
+                `%cexecuting ${partialGamePropsToString(gameProps)}`, 'color: blue; font-wheight: bold');
+        }
+
+        // video
+        if (  gameProps.video !== undefined && gameProps.video !== null) {
+            gameProps.video.onEnded(() => {
+                if (this.history.noNextBlock()) this.execNextIfNotMenu();
+                else this.history.nextBlock();
+            });
+        }
+
+        // sounds
+        _.forEach(
+            this.app.channels,
+            (chan: Channel, chanName: string) => {
+                if (  gameProps.sounds !== undefined
+                   && _.has(gameProps.sounds, chanName)) {
+                    // if props has chan
+                    const sound = gameProps.sounds[chanName];
+                    if (sound !== null) {
+                        if (!(  chanName === 'music'
+                             && chan.isAlreadyPlaying(sound))) {
+                            chan.play(sound);
+                        }
+                        return;
+                    }
+                }
+                chan.stop();
+            }
+        );
+
+        this.update(gameProps);
+        this.show();
+    }
+
+    show() {
+        const game: JSX.Element =
+            <Game ref={() => this.setHandler(this)}
+                  controller={this}
+                  sceneImg={this.gameProps.sceneImg}
+                  charImgs={this.gameProps.charImgs}
+                  textboxHide={this.gameProps.textboxHide}
+                  textboxChar={this.gameProps.textboxChar}
+                  textboxText={this.gameProps.textboxText}
+                  choices={this.gameProps.choices}
+                  video={this.gameProps.video}
+                  armlessWankerMenu={<ArmlessWankerMenu ref={this.setWankerMenu}
+                                                        app={this.app} />} />;
+
+        this.app.setState({ view: game });
+    }
+
+    private setWankerMenu = (menu: ArmlessWankerMenu | null) => {
         this.armlessWankerMenu = menu;
         if (menu !== null) {
             menu.setState({
@@ -175,108 +242,23 @@ export default class GameController implements IGameController, IKeyboardHandler
         }
     }
 
-    // interface for Nodes
-    cleanup() {
-        _.forEach(this.app.channels, (chan: Channel) => { chan.stop(); });
-        this.update({ choices: [],
-                      sceneImg: null,
-                      charImgs: [],
-                      video: null });
-    }
-
-    scene(image: Image) {
-        this.update({ sceneImg: image,
-                      charImgs: [],
-                      textboxChar: null,
-                      textboxText: '' });
-    }
-
-    show(image: Image) {
-        if (this.gameProps.charImgs.indexOf(image) === -1) {
-            this.update({ charImgs: _.concat(this.gameProps.charImgs, image) });
-        }
-    }
-
-    hide(image: Image) {
-        this.update({
-            charImgs: _.filter(this.gameProps.charImgs, img => img !== image)
-        });
-    }
-
-    say(who: Char | null, what: string) {
-        this.update({ textboxChar: who,
-                      textboxText: what });
-    }
-
-    menu(who: Char | null, what: string, theChoices: Choice[]) {
-        if (what === '') {
-            this.update({
-                textboxHide: true,
-                choices: theChoices
-            });
-        } else {
-            this.update({
-                textboxChar: who,
-                textboxText: what,
-                choices: theChoices
-            });
-        }
-    }
-
-    afterMenu() {
-        this.update({ textboxHide: false,
-                      choices: [] });
-    }
-
-    play(chanName: string, sound: Sound) {
-        if (_.has(this.app.channels, chanName)) {
-            // Normal channels support playing and queueing audio, but only
-            // play back one audio file at a time.
-            this.app.channels[chanName].play(sound);
-        } else if (chanName === "audio") {
-            // The audio channel supports playing back multiple audio files at
-            // one time, but does not support queueing sound or stopping
-            // playback.
-            // TODO
-        }
-    }
-
-    stop(chanName: string) {
-        if (_.has(this.app.channels, chanName)) {
-            this.app.channels[chanName].stop();
-        } else if (chanName === "audio") {
-            // TODO
-        }
-    }
-
-    cutscene(vid: Video) {
-        this.update({ video: vid });
-    }
-
-    afterCutscene() {
-        this.update({ video: null });
-    }
-
     // restore save
     restoreSave(history: string[]) {
         this.history = new StoryHistory(this);
-        this.restoreRec(history, [this.nodes[0]]);
-    }
 
-    private restoreRec(history: string[], nexts: Node[]) {
-        const head = _.head(history);
-        if (head === undefined) return;
+        const blocks: Block[] | null = blocksFromHist(history, [this.nodes[0]]);
 
-        const realNexts = _.filter(nexts, node => node.toString() === head);
-        if (realNexts.length === 1) {
-            this.executeAndAddToHistory(realNexts[0]);
-            this.restoreRec(_.tail(history), realNexts[0].nexts());
-        } else if (realNexts.length === 0) {
-            console.error(
-                `Error while restoring save: couldn't find node "${head}"`);
-        } else {
-            console.error(
-                `Error while restoring save: find several matching nodes for "${head}":\n`, realNexts);
+        if (blocks !== null) {
+            const lastBlock: Block | undefined = _.last(blocks);
+            if (lastBlock !== undefined) {
+                const lastNode: Node | undefined = _.last(lastBlock[0]);
+                if (lastNode !== undefined) {
+                    this.updateAndRefreshDOM(lastBlock[1]);
+                    this.setCurrentNode(lastNode);
+                }
+            }
+            return;
         }
+        // TODO: else notify "couldn't restore save"
     }
 }

@@ -3,11 +3,7 @@ import * as _ from 'lodash';
 import Node from './nodes/Node';
 
 
-interface IQuickSave {
-    history: string[];
-}
-
-export default class QuickSave implements IQuickSave {
+export default class QuickSave {
     history: string[];
 
     constructor (history: string[]) {

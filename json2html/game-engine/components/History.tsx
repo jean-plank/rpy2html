@@ -16,8 +16,7 @@ interface IProps {
 export default class History extends React.Component<IProps> {
     render() {
         const says: JSX.Element[] = [];
-
-        _.forEach(this.props.nodes, (node, i) => {
+        _.forEach(this.props.nodes, (node: Node, i: number) => {
             if (node instanceof NodeWithChar) {
                 says.push(<HistoryLine key={i}
                                        char={node.who}
@@ -25,11 +24,11 @@ export default class History extends React.Component<IProps> {
             }
         });
 
-        return <div ref={this.scrollToBottom()}
+        return <div ref={this.scrollToBottom}
                     className='History'>{says}</div>;
     }
 
-    private scrollToBottom = () => (elt: HTMLDivElement | null) => {
+    private scrollToBottom = (elt: HTMLDivElement | null) => {
         if (elt !== null) elt.scrollTop = elt.scrollHeight - elt.clientHeight;
     }
 }

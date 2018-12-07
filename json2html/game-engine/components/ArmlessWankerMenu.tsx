@@ -28,7 +28,7 @@ export default class ArmlessWankerMenu extends React.Component<IProps, IState> {
         return (
             <div className='ArmlessWankerMenu'>
                 <MenuButton text={this.props.app.lang.menu.back}
-                            action={this.goBack()}
+                            action={this.goBack}
                             disabled={isDisabled} />
 
                 <MenuButton text={this.props.app.lang.menu.history}
@@ -38,10 +38,10 @@ export default class ArmlessWankerMenu extends React.Component<IProps, IState> {
                             action={this.showGameMenu(GameMenuBtn.Save)} />
 
                 <MenuButton text={this.props.app.lang.menu.qSave}
-                            action={this.quickSave()} />
+                            action={this.quickSave} />
 
                 <MenuButton text={this.props.app.lang.menu.qLoad}
-                            action={this.quickLoad()}
+                            action={this.quickLoad}
                             disabled={this.state.disableQuickLoad} />
 
                 <MenuButton text={this.props.app.lang.menu.pause}
@@ -50,17 +50,17 @@ export default class ArmlessWankerMenu extends React.Component<IProps, IState> {
         );
     }
 
-    private goBack = () => (e: React.MouseEvent) => {
+    private goBack = (e: React.MouseEvent) => {
         e.stopPropagation();
         this.props.app.gameController.history.previousBlock();
     }
 
-    private quickSave = () => (e: React.MouseEvent) => {
+    private quickSave = (e: React.MouseEvent) => {
         e.stopPropagation();
         this.props.app.gameController.quickSave();
     }
 
-    private quickLoad = () => (e: React.MouseEvent) => {
+    private quickLoad = (e: React.MouseEvent) => {
         e.stopPropagation();
         this.props.app.gameController.quickLoad();
     }

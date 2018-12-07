@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import NodeWithChar from './NodeWithChar';
 
-import GameController from '../GameController';
+import { IGameProps } from '../GameProps';
 
 
 export default class Say extends NodeWithChar {
@@ -10,8 +10,10 @@ export default class Say extends NodeWithChar {
         return `Say(${this.who?`"${this.who.name}", `:''}"${this.what}")`;
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
-        (this.game as GameController).say(this.who, this.what);
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
+        res.textboxChar = this.who;
+        res.textboxText = this.what;
+        return res;
     }
 }

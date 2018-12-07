@@ -23,7 +23,10 @@ export default class SaveSlots extends React.Component<IProps> {
                 return <SaveSlot key={i}
                                  save={save}
                                  action={f}
-                                 emptySlot={this.props.app.lang.emptySlot} />;
+                                 emptySlot={this.props.app.lang.emptySlot}
+                                 firstNode={
+                                     this.props.app.props.datas.nodes[0]
+                                 } />;
             });
 
         return <div className='SaveSlots'>{slots}</div>;

@@ -1,6 +1,6 @@
 import NodeWithImg from './NodeWithImg';
 
-import GameController from '../GameController';
+import { IGameProps } from '../GameProps';
 
 
 export default class Scene extends NodeWithImg {
@@ -9,10 +9,14 @@ export default class Scene extends NodeWithImg {
         if (this.image !== null) this.image.load();
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
         if (this.image !== null) {
-            (this.game as GameController).scene(this.image);
+            res.sceneImg = this.image;
+            res.charImgs = [];
+            res.textboxChar = null;
+            res.textboxText = '';
         }
+        return res;
     }
 }

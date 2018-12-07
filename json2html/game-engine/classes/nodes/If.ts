@@ -17,7 +17,6 @@ export default class If extends Node {
 
     nexts(): IfBlock[] {
         const res = _.find(this._nexts, next => eval(next.condition) === true);
-
         if (res === undefined) return [];
         else return [res];
     }

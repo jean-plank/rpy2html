@@ -14,9 +14,10 @@ export default class LayerScene extends React.Component<IProps> {
         return <div className='LayerScene' ref={this.setImage()} />;
     }
 
+    // keep this method partial (or it won't work)
     private setImage = () => (div: HTMLDivElement | null) => {
         if (div !== null && this.props.img !== null) {
-            div.append(this.props.img.getElt().cloneNode());
+            div.appendChild(this.props.img.getElt().cloneNode());
         }
     }
 }

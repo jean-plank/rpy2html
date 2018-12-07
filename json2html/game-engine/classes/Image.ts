@@ -11,15 +11,8 @@ export default class Image extends Media<HTMLImageElement> {
         }
     }
 
-    toJSON(): { file: string } {
-        return { file: this.file };
-    }
-
-    static fromAny(img: any): Image | null {
-        if (  _.keys(img).length === 1
-           && _.has(img, 'file') && _.isString(img.file)) {
-            return new Image(img.file);
-        }
-        return null;
+    static fromAny(image: any): Image | null {
+        const file = Media.fileFromAny(image);
+        if (file !== null) return new Image(file); else return null;
     }
 }

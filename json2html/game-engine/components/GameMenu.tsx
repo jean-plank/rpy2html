@@ -7,12 +7,13 @@ import App from './App';
 import SaveSlots from './SaveSlots';
 import Help from './Help';
 import MenuButton from './MenuButton';
+import History from './History';
 
 import IObj from '../classes/IObj';
 import Save from '../classes/Save';
 import IKeyboardHandler from '../classes/IKeyboardHandler';
 import StorageService from '../classes/StorageService';
-import History from './History';
+import Node from '../classes/nodes/Node';
 
 
 interface IProps {
@@ -23,7 +24,6 @@ interface IProps {
 }
 
 interface IState {
-    // submenu: JSX.Element | null;
     selectedBtn: GameMenuBtn;
 }
 
@@ -53,12 +53,29 @@ export default class GameMenu extends React.Component<IProps, IState> implements
     }
 
     render() {
+        const submenuTitle: string = (() => {
+            switch (this.state.selectedBtn) {
+                case GameMenuBtn.History:
+                    return this.props.app.lang.menu.history;
+                case GameMenuBtn.Save:
+                    return this.props.app.lang.menu.save;
+                case GameMenuBtn.Load:
+                    return this.props.app.lang.menu.load;
+                case GameMenuBtn.MMenu:
+                    return this.props.app.lang.menu.mmenu;
+                case GameMenuBtn.Help:
+                    return this.props.app.lang.menu.help;
+                case GameMenuBtn.None:
+                    return '';
+            }
+        })();
+
         return (
-            <div className='GameMenu'>
+            <div className='menu GameMenu'>
                 <div className='game-menu-overlay' />
-                <div className='menu-items'>
+                <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.resume}
-                                action={this.hide()} />
+                                action={this.hide} />
 
                     <MenuButton text={this.props.app.lang.menu.history}
                                 action={this.selectBtn(GameMenuBtn.History)}
@@ -74,13 +91,14 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                                 selected={this.isSelected(GameMenuBtn.Load)} />
 
                     <MenuButton text={this.props.app.lang.menu.mmenu}
-                                action={this.confirmMMenu()}
+                                action={this.confirmMMenu}
                                 selected={this.isSelected(GameMenuBtn.MMenu)} />
 
                     <MenuButton text={this.props.app.lang.menu.help}
                                 action={this.selectBtn(GameMenuBtn.Help)}
                                 selected={this.isSelected(GameMenuBtn.Help)} />
                 </div>
+                <div className='submenu-title'>{submenuTitle}</div>
                 <div className='submenu'>{this.getSubmenu()}</div>
             </div>
         );
@@ -90,7 +108,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         const keyEvents: IObj<(e: React.KeyboardEvent) => void> = {
             Escape: (evt: React.KeyboardEvent) => {
                 evt.stopPropagation();
-                this.hide()();
+                this.hide();
             },
         };
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
@@ -110,7 +128,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         return null;
     }
 
-    private hide = () => () => {
+    private hide = () => {
         this.props.app.hideGameMenu();
     }
 
@@ -118,12 +136,12 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         this.setState({ selectedBtn: btn });
     }
 
-    private confirmMMenu = () => () => {
+    private confirmMMenu = () => {
         this.selectBtn(GameMenuBtn.MMenu)();
-        this.props.app.confirmMMenu(this.unselectBtn());
+        this.props.app.confirmMMenu(this.unselectBtn);
     }
 
-    private unselectBtn = () => () => {
+    private unselectBtn = () => {
         this.setState({ selectedBtn: GameMenuBtn.None });
     }
 
@@ -135,7 +153,6 @@ export default class GameMenu extends React.Component<IProps, IState> implements
 
     private getSave(): JSX.Element {
         const save = (iSlot: number) => {
-            const props = _.clone(this.props.app.gameController.gameProps);
             const date: string =
                 new Date().toLocaleDateString(this.props.app.props.datas.lang,
                                               { day: 'numeric',
@@ -144,9 +161,10 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                                                 year: 'numeric',
                                                 hour: 'numeric',
                                                 minute: 'numeric' });
-            const nodes = this.props.app.gameController.history.getNodes();
+            const nodes: Node[] =
+                this.props.app.gameController.history.getNodes();
 
-            this.storage.storeSave(Save.fromNodes(props, date, nodes), iSlot);
+            this.storage.storeSave(Save.fromNodes(nodes, date), iSlot);
             this.forceUpdate();
         };
 

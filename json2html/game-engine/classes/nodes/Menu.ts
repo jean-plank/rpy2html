@@ -4,6 +4,7 @@ import MenuItem from './MenuItem';
 import GameController from '../GameController';
 import Choice from '../Choice';
 import NodeWithChar from './NodeWithChar';
+import { IGameProps } from '../GameProps';
 
 
 export default class Menu extends NodeWithChar {
@@ -17,9 +18,8 @@ export default class Menu extends NodeWithChar {
         return `Menu(${args})`;
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
-
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
         const choices: Choice[] =
             _.map(this.nexts(), (item: MenuItem) =>
                 new Choice(
@@ -31,12 +31,24 @@ export default class Menu extends NodeWithChar {
                 )
             );
 
-        (this.game as GameController).menu(this.who, this.what, choices);
+        if (this.what === '') {
+            res.textboxHide = true;
+            res.choices = choices;
+        } else {
+            res.textboxChar = this.who;
+            res.textboxText = this.what;
+            res.choices = choices;
+        }
+        return res;
     }
 
-    beforeNext() {
-        super.beforeNext();
-        if (this.game !== null) this.game.afterMenu();
+    beforeNext(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.beforeNext(gameProps);
+        if (this.game !== null) {
+            res.textboxHide = false;
+            res.choices = [];
+        }
+        return res;
     }
 
     nexts(): MenuItem[] {

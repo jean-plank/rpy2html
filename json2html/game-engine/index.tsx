@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 
 import IRenpyJson, { IRawChar, IRawDefinition } from '../renpy-json-loader/IRenpyJson';
 
-import registerServiceWorker from './utils/registerServiceWorker';
+// import registerServiceWorker from './utils/registerServiceWorker';
 import { mapColl } from './utils/utils';
 import parseNode from './utils/parseNodes';
 
@@ -39,7 +39,7 @@ const main = (json: IRenpyJson) => {
     };
 
     ReactDOM.render(<App datas={datas} />, document.getElementById('root'));
-    registerServiceWorker();
+    // registerServiceWorker();
 };
 
 main(renpyJson);

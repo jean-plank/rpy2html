@@ -30,9 +30,9 @@ export default class Confirm extends React.Component<IProps> implements IKeyboar
 
         return (
             <div className='Confirm'
-                 onClick={this.onClickBg()}>
+                 onClick={this.onClickBg}>
                 <div className='frame'
-                     onClick={this.onClickFrame()}>
+                     onClick={this.onClickFrame}>
                     <div className='msg'
                          dangerouslySetInnerHTML={{ __html: this.props.msg }} />
                     <div className='items'>{buttons}</div>
@@ -54,13 +54,13 @@ export default class Confirm extends React.Component<IProps> implements IKeyboar
         if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
     }
 
-    private onClickBg = () => (e: React.MouseEvent) => {
+    private onClickBg = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (this.props.escapeAction !== undefined) this.props.escapeAction();
         this.props.app.hideConfirm();
     }
 
-    private onClickFrame = () => (e: React.MouseEvent) => {
+    private onClickFrame = (e: React.MouseEvent) => {
         e.stopPropagation();
     }
 }

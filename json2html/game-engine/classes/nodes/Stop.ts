@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import Node from './Node';
-import GameController from '../GameController';
+import { IGameProps } from '../GameProps';
 
 
 export default class Stop extends Node {
@@ -16,8 +16,10 @@ export default class Stop extends Node {
         return `Stop("${this.chanName}")`;
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
-        (this.game as GameController).stop(this.chanName);
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
+        if (res.sounds === undefined) res.sounds = {};
+        res.sounds[this.chanName] = null;
+        return res;
     }
 }

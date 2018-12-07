@@ -1,10 +1,16 @@
+import * as _ from 'lodash';
+
 import NodeWithImg from './NodeWithImg';
-import GameController from '../GameController';
+import { IGameProps } from '../GameProps';
 
 
 export default class Hide extends NodeWithImg {
-    execute() {
-        super.execute(); // ensures that game isn't null
-        if (this.image !== null) (this.game as GameController).hide(this.image);
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
+        if (this.image !== null) {
+            res.charImgs =
+                _.filter(gameProps.charImgs, img => img !== this.image);
+        }
+        return res;
     }
 }

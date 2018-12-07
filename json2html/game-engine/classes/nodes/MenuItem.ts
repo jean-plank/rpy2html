@@ -10,7 +10,6 @@ export default class MenuItem extends Node {
 
     constructor (text: string, condition='false', idNext?: number[] | null) {
         super(idNext);
-
         this.text = text;
         this.condition = convertToJs(condition);
     }

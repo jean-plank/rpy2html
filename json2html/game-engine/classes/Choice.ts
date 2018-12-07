@@ -18,7 +18,6 @@ export default class Choice {
         if (  _.keys(choice).length === 1
            && _.has(choice, 'text') && _.isString(choice.text)) {
             return new Choice(choice.text, () => {});
-        }
-        return null;
+        } else return null;
     }
 }

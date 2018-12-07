@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 
 import GameController from '../GameController';
 import IAppDatas from '../IAppDatas';
+import { IGameProps } from '../GameProps';
 
 
 export default abstract class Node {
@@ -38,19 +39,18 @@ export default abstract class Node {
         if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55');
     }
 
-    execute() {
+    execute(_gameProps: IGameProps): Partial<IGameProps> {
         // ensures that game and _nexts aren't null
         this.throwErrorIfNotInitiated();
-        if (__DEV) {
-            console.log(
-                `%cexecuting ${this}`, 'color: blue; font-wheight: bold');
-        }
         if (this.stopExecution) {
             _.forEach(this._nexts, (next: Node) => { next.loadBlock(); });
         }
+        return {};
     }
 
-    beforeNext() {}
+    beforeNext(gameProps: IGameProps): Partial<IGameProps> {
+        return {};
+    }
 
     nexts(): Node[] {
         // ensures that game and _nexts aren't null

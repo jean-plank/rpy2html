@@ -7,17 +7,19 @@ import Font from '../classes/Font';
 import Image from '../classes/Image';
 
 
-export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string => {
+export default (style: IStyle,
+                fonts: IObj<Font>,
+                images: IObj<Image>): HTMLStyleElement => {
     const newStyle = _.has(images, 'main_menu_overlay');
-
-    return (
+    const res = document.createElement('style');
+    res.innerHTML = (
 `${getFonts(fonts)}
 
 .App>* {
     width: ${100 * style.game_width / style.game_height}vh;
 }
 
-.MainMenu, .GameMenu, .Confirm {
+.menu, .Confirm {
     font-family: ${style.mmenu_ffamily};
     font-size: ${style.mmenu_fsize_h}vh;
 }
@@ -64,25 +66,29 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     ${getBgOrElse(images, 'main_menu_bg', '#5f777f')}
 }
 
-.main-menu-overlay {
+.menu .main-menu-overlay {
     ${getBgOrElse(images, 'main_menu_overlay')}
 }
 
-.game-menu-overlay {
+.menu .game-menu-overlay {
     ${getBgOrElse(images, 'game_menu_overlay', 'rgba(19, 24, 25, 0.75)')}
 }
 
-.menu-items {
+.menu .submenu-title {
+    font-size: ${style.title_fsize_h}vh;
+}
+
+.menu .menu-bar {
     width: ${style.mmenuitems_width};${
         newStyle ? '' : `
     background-color: rgba(19, 24, 25, 0.75);`}
 }
 
-.submenu {
+.menu .submenu {
     width: ${style.submenu_width};
 }
 
-.MenuButton, .submenu {
+.Notification, .MenuButton, .menu .submenu {
     font-family: ${style.guibtn_ffamily};
     font-size: ${style.guibtn_fsize_h}vh;
 }
@@ -101,7 +107,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     text-align: ${style.guibtn_txtalign};
 }
 
-.MainMenu .MenuButton, .GameMenu .MenuButton {
+.menu .MenuButton {
     padding: ${style.guibtn_padding};
     height: ${style.guibtn_height};
 }
@@ -118,7 +124,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     color: ${style.disabledbtn_color};
 }
 
-.Help td:first-child, .MemoryGame>.key {
+.menu .submenu-title, .Help td:first-child, .MemoryGame>.key {
     color: ${style.accent_color};
 }
 
@@ -202,7 +208,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
         height: ${100 * style.game_height / style.game_width}vw;
     }
 
-    .MainMenu, .GameMenu, .Confirm {
+    .menu, .Confirm {
         font-size: ${style.mmenu_fsize_v}vw;
     }
 
@@ -230,7 +236,11 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
         font-size: ${style.choicebtn_fsize_v * style.thumb_width_scale}vw;
     }
 
-    .MenuButton, .submenu {
+    .menu .submenu-title {
+        font-size: ${style.title_fsize_v}vw;
+    }
+
+    .Notification, .MenuButton, .menu .submenu {
         font-size: ${style.guibtn_fsize_v}vw;
     }
 
@@ -243,6 +253,7 @@ export default (style: IStyle, fonts: IObj<Font>, images: IObj<Image>): string =
     }
 }`
     );
+    return res;
 };
 
 const getFonts = (fonts: IObj<Font>): string => {

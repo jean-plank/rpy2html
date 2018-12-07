@@ -1,6 +1,8 @@
+import * as _ from 'lodash';
+
 import NodeWithImg from './NodeWithImg';
 
-import GameController from '../GameController';
+import { IGameProps } from '../GameProps';
 
 
 export default class Show extends NodeWithImg {
@@ -9,10 +11,13 @@ export default class Show extends NodeWithImg {
         if (this.image !== null) this.image.load();
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
         if (this.image !== null) {
-            (this.game as GameController).show(this.image);
+            if (gameProps.charImgs.indexOf(this.image) === -1) {
+                res.charImgs = _.concat(gameProps.charImgs, this.image);
+            }
         }
+        return res;
     }
 }
