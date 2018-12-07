@@ -79,6 +79,7 @@ export default class App extends React.Component<IProps, IState> {
             document.prepend(res);
             return res;
         })();
+
         head.appendChild(parseAppStyle(this.props.datas.style,
                                        this.props.datas.fonts,
                                        this.props.datas.images));
@@ -101,7 +102,6 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     render() {
-
         return (
             <div className='App'
                  tabIndex={0}
@@ -146,9 +146,12 @@ export default class App extends React.Component<IProps, IState> {
         });
     }
 
+    startGame() {
+        this.gameController.start();
+    }
+
     showGameMenu(gameMenuBtn?: GameMenuBtn) {
         _.forEach(this.channels, (chan: Channel) => { chan.pause(); });
-
         this.setState({
             view: <GameMenu ref={this.setViewKbrdHndlr}
                             app={this}
@@ -160,12 +163,7 @@ export default class App extends React.Component<IProps, IState> {
 
     hideGameMenu() {
         _.forEach(this.channels, (chan: Channel) => { chan.resume(); });
-
-        this.gameController.update();
-    }
-
-    startGame() {
-        this.gameController.start();
+        this.gameController.updateAndRefreshDOM({});
     }
 
     // confirm

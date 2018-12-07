@@ -4,12 +4,10 @@ import Save from './Save';
 import QuickSave from './QuickSave';
 
 
-interface ISaves {
-    quickSave: QuickSave | null;
-    slots: Array<Save | null>;
-}
-
-export default class Saves implements ISaves {
+export default class Saves {
+    /**
+     * Wraps quick save and save slots.
+     */
     quickSave: QuickSave | null;
     slots: Array<Save | null>;
 
@@ -27,7 +25,6 @@ export default class Saves implements ISaves {
             const slots: Array<Save | null> =
                 _.map((saves.slots as any[]), Save.fromAny);
             return new Saves(quickSave, slots);
-        }
-        return null;
+        } else return null;
     }
 }

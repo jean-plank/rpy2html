@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 
 import '../styles/Textbox.css';
 
@@ -24,7 +25,10 @@ export default class Textbox extends React.Component<IProps> {
         return (
             <div className='Textbox' style={textboxStyle}>
                 <div className='namebox' style={charStyle}>{charName}</div>
-                <div className='dialog'>{this.props.text}</div>
+                <div className='dialog'
+                     dangerouslySetInnerHTML={{
+                         __html: _.escape(this.props.text).replace('\n', '<br>')
+                     }} />
             </div>
         );
     }

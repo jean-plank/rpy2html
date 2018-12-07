@@ -16,8 +16,7 @@ interface IProps {
 export default class History extends React.Component<IProps> {
     render() {
         const says: JSX.Element[] = [];
-
-        _.forEach(this.props.nodes, (node, i) => {
+        _.forEach(this.props.nodes, (node: Node, i: number) => {
             if (node instanceof NodeWithChar) {
                 says.push(<HistoryLine key={i}
                                        char={node.who}

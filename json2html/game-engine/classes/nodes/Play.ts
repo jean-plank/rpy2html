@@ -5,6 +5,7 @@ import IAppDatas from '../IAppDatas';
 import Sound from '../Sound';
 
 import GameController from '../GameController';
+import { IGameProps } from '../GameProps';
 
 
 export default class Play extends Node {
@@ -14,7 +15,6 @@ export default class Play extends Node {
 
     constructor (chanName: string, sndName: string, idNext?: number[] | null) {
         super(idNext);
-
         this.chanName = chanName;
         this.sndName = sndName;
         this.sound = null;
@@ -37,10 +37,12 @@ export default class Play extends Node {
         if (this.sound !== null) this.sound.load();
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
         if (this.sound !== null) {
-            (this.game as GameController).play(this.chanName, this.sound);
+            if (res.sounds === undefined) res.sounds = {};
+            res.sounds[this.chanName] = this.sound;
         }
+        return res;
     }
 }

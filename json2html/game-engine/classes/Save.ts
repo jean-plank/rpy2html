@@ -1,41 +1,33 @@
 import * as _ from 'lodash';
 
-import GameProps, { IGameProps } from './GameProps';
-
+import QuickSave from './QuickSave';
 import Node from './nodes/Node';
 
 
-interface ISave {
-    gameProps: IGameProps;
+export default class Save extends QuickSave {
     date: string;
-    history: string[];
-}
 
-export default class Save implements ISave {
-    gameProps: IGameProps;
-    date: string;
-    history: string[];
-
-    constructor (props: IGameProps, date: string, history: string[]) {
-        this.gameProps = props;
+    constructor (date: string, history: string[]) {
+        super(history);
         this.date = date;
-        this.history = history;
     }
 
-    static fromNodes(props: IGameProps, date: string, history: Node[]): Save {
-        return new Save(props, date, _.map(history, node => node.toString()));
+    static fromNodes(history: Node[], date?: string): Save {
+        const quickSave = QuickSave.fromNodes(history);
+        if (date === undefined) date = '';
+        return new Save(date, quickSave.history);
     }
 
     static fromAny(save: any): Save | null {
-        if (  _.keys(save).length === 3
+        if (  _.keys(save).length === 2
            && _.has(save, 'date') && _.isString(save.date)
-           && _.has(save, 'history') && _.isArray(save.history)
-                                     && _.every(save.history, _.isString)
-           && _.has(save, 'gameProps')) {
+           && _.has(save, 'history') && _.isArray(save.history)) {
 
-            const props = GameProps.fromAny(save.gameProps);
+            const quickSave = QuickSave.fromAny({ history: save.history });
 
-            if (props !== null) return new Save(props, save.date, save.history);
+            if (quickSave !== null) {
+                return new Save(save.date, quickSave.history);
+            }
         }
         return null;
     }

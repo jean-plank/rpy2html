@@ -10,13 +10,18 @@ export default class Char {
         this.color = color;
     }
 
+    toString(): string {
+        return `Char("${this.name}${this.color !== undefined
+            ? ', this.color'
+            : ''}")`;
+    }
+
     static fromAny(char: any): Char | null {
         if (  _.keys(char).length === 2
            && _.has(char, 'name') && _.isString(char.name)
            && _.has(char, 'color') &&
                (_.isString(char.color) || char.color === undefined)) {
             return new Char(char.name, char.color);
-        }
-        return null;
+        } else return null;
     }
 }

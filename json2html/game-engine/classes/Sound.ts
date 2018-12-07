@@ -31,4 +31,9 @@ export default class Sound extends Media<HTMLAudioElement> {
         this.loadIfNot();
         (this.elt as HTMLAudioElement).onended = f;
     }
+
+    static fromAny(sound: any): Sound | null {
+        const file = Media.fileFromAny(sound);
+        if (file !== null) return new Sound(file); else return null;
+    }
 }

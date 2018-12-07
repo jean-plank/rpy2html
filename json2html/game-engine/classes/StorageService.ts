@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
 
-import { byteCount } from '../utils/utils';
+import { byteCount, blocksFromHist } from '../utils/utils';
 
 import IObj from './IObj';
+import Block from './Block';
 import QuickSave from './QuickSave';
 import Save from './Save';
 import Saves from './Saves';
+import { IGameProps } from './GameProps';
 
 import App from '../components/App';
 
@@ -18,6 +20,13 @@ export default class StorageService {
 
     private storageKey: string;
     private saves: Saves;
+
+    static getInstance(app: App): StorageService {
+        if (StorageService.instance === null) {
+            StorageService.instance = new StorageService(app);
+        }
+        return StorageService.instance;
+    }
 
     private constructor (app: App) {
         StorageService.instance = this;
@@ -32,39 +41,36 @@ export default class StorageService {
          * Storage).
          */
         const saves = localStorage.getItem(this.storageKey);
-        let res: Saves | null = null;
-
-        if (saves !== null) {
-            let anySaves: any;
-            try {
-                anySaves = JSON.parse(saves);
-            } catch (e) {
-                console.warn('Error while parsing localStorage:', e);
-            }
-            res = Saves.fromAny(anySaves);
-        }
+        const res: Saves | null = (() => {
+            if (saves !== null) {
+                const anySaves: any = (() => {
+                    try {
+                        return JSON.parse(saves);
+                    } catch (e) {
+                        console.warn('Error while parsing localStorage:', e);
+                    }
+                })();
+                return Saves.fromAny(anySaves);
+            } else return null;
+        })();
 
         this.saves = res === null
             ? new Saves(null, _.times(StorageService.nbSlots, _.constant(null)))
             : res;
-        this.loadSaves();
+        this.loadSaves(app);
     }
 
-    static getInstance(app: App): StorageService {
-        if (StorageService.instance === null) {
-            StorageService.instance = new StorageService(app);
-        }
-
-        return StorageService.instance;
-    }
-
-    private loadSaves() {
+    private loadSaves(app: App) {
         _.forEach(this.saves.slots, (save: Save | null) => {
             if (save !== null) {
-                if (save.gameProps.sceneImg !== null) {
-                    save.gameProps.sceneImg.load();
+                const block: Block | undefined = _.last(
+                    blocksFromHist(save.history, [app.props.datas.nodes[0]])
+                );
+                if (block !== undefined) {
+                    const props: IGameProps = block[1];
+                    if (props.sceneImg !== null) props.sceneImg.load();
+                    _.forEach(props.charImgs, img => { img.load(); });
                 }
-                _.forEach(save.gameProps.charImgs, img => { img.load(); });
             }
         });
     }

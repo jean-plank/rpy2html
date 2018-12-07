@@ -20,6 +20,11 @@ export default class Channel {
         this.stop();
     }
 
+    isAlreadyPlaying(sound: Sound): boolean {
+        return (  this.currentlyPlaying !== null
+               && this.currentlyPlaying.file === sound.file);
+    }
+
     // Stops current channel and plays sounds.
     play(...sounds: Sound[]) {
         this.stop();
@@ -38,8 +43,7 @@ export default class Channel {
     // Plays immediatly sound but does nothing to the pending queue.
     private _play(sound: Sound): Promise<void> {
         if (this.currentlyPlaying !== null) this.currentlyPlaying.stop();
-
-        sound.onEnded(this.onEnded());
+        sound.onEnded(this.onEnded);
         this.currentlyPlaying = sound;
         return sound.play(this.volume);
     }
@@ -57,7 +61,7 @@ export default class Channel {
         if (this.currentlyPlaying !== null) this.currentlyPlaying.pause();
     }
 
-    //
+    // Resume after pause
     resume() {
         if (this.currentlyPlaying !== null) {
             this.currentlyPlaying
@@ -66,24 +70,20 @@ export default class Channel {
         }
     }
 
-    private onEnded(): () => void {
-        const siht = this;
-
-        return () => {
-            const head = _.head(siht.pending);
-            if (head !== undefined) {
-                // if sounds in pending queue
-                siht._play(head);
-                siht.pending = _.tail(siht.pending);
-            } else if (siht.loop) {
-                // if loop start over
-                if (siht.currentlyPlaying !== null) {
-                    siht._play(siht.currentlyPlaying);
-                }
-            } else {
-                // else nothing is playing anymore
-                siht.currentlyPlaying = null;
+    private onEnded = (): void => {
+        const head = _.head(this.pending);
+        if (head !== undefined) {
+            // if sounds in pending queue
+            this._play(head);
+            this.pending = _.tail(this.pending);
+        } else if (this.loop) {
+            // if loop start over
+            if (this.currentlyPlaying !== null) {
+                this._play(this.currentlyPlaying);
             }
-        };
+        } else {
+            // else nothing is playing anymore
+            this.currentlyPlaying = null;
+        }
     }
 }

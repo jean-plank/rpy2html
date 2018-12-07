@@ -1,13 +1,18 @@
 import * as _ from 'lodash';
 
 import Node from './nodes/Node';
+
+import Block from './Block';
+// import GameProps from './GameProps';
 import GameController from './GameController';
+
+// import { partialGamePropsToString } from '../utils/utils';
 
 
 export default class StoryHistory {
     private game: GameController;
-    private blocks: Node[][] = [];
-    private blockAcc: Node[] = [];
+    private blocks: Block[] = [];
+    // private blockAcc: Node[] = [];
 
     /**
      * @property {number} iCurrentBlock Index of the block being displayed.
@@ -21,31 +26,26 @@ export default class StoryHistory {
     }
 
     getNodes(): Node[] {
-        return _.flatten(_.take(this.blocks, this.iCurrentBlock + 1));
+        return _(this.blocks).take(this.iCurrentBlock + 1)
+                             .flatMap(([nodes, _gameProps]) => nodes)
+                             .value();
     }
 
-    addNode(node: Node) {
-        this.blockAcc.push(node);
+    addBlock(block: Block) {
+        this.blocks = _(this.blocks).take(this.iCurrentBlock + 1)
+                                    .push(block)
+                                    .value();
+        this.iCurrentBlock = this.blocks.length - 1;
+    }
 
-        if (node.stopExecution) {
-            // add block
-            this.blocks = _(this.blocks).take(this.iCurrentBlock + 1)
-                                        .push(this.blockAcc)
-                                        .value();
-            this.iCurrentBlock = this.blocks.length - 1;
-            this.blockAcc = [];
-        }
+    noNextBlock(): boolean {
+        return this.iCurrentBlock === this.blocks.length - 1;
     }
 
     nextBlock() {
-        const newI: number = this.iCurrentBlock + 1;
-
-        if (_.inRange(newI, this.blocks.length)) {
-            const block: Node[] = this.blocks[newI];
-
-            _.forEach(block, (node: Node) => { this.game.execute(node); });
-
-            this.iCurrentBlock = newI;
+        if (!this.noNextBlock()) {
+            this.iCurrentBlock += 1;
+            this.game.execute(this.blocks[this.iCurrentBlock]);
         }
     }
 
@@ -54,17 +54,9 @@ export default class StoryHistory {
     }
 
     previousBlock() {
-        if (this.noPreviousBlock()) return;
-
-        this.game.cleanup();
-
-        const newI = this.iCurrentBlock - 1;
-
-        for (let i = 0; i <= newI; i++) {
-            const block: Node[] = this.blocks[i];
-            _.forEach(block, (node: Node) => { this.game.execute(node); });
+        if (!this.noPreviousBlock()) {
+            this.iCurrentBlock -= 1;
+            this.game.execute(this.blocks[this.iCurrentBlock]);
         }
-
-        this.iCurrentBlock = newI;
     }
 }

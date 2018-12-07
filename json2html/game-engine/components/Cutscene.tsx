@@ -7,6 +7,7 @@ import Video from '../classes/Video';
 
 export interface IProps {
     video: Video;
+    paused?: boolean;
 }
 
 export default class Cutscene extends React.Component<IProps> {
@@ -17,7 +18,7 @@ export default class Cutscene extends React.Component<IProps> {
     private setVideo = (elt: HTMLDivElement | null) => {
         if (elt !== null) {
             elt.appendChild(this.props.video.getElt());
-            this.props.video.play();
-        }
+            if (this.props.paused !== true) this.props.video.play();
+        } else this.props.video.pause();
     }
 }

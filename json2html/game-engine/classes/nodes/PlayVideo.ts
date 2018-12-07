@@ -5,6 +5,7 @@ import IAppDatas from '../IAppDatas';
 
 import GameController from '../GameController';
 import Video from '../Video';
+import { IGameProps } from '../GameProps';
 
 
 export default class PlayVideo extends Node {
@@ -31,26 +32,22 @@ export default class PlayVideo extends Node {
     }
 
     load() {
-        super.load(); // ensures that game isn't null
-        if (this.video !== null) {
-            this.video.load();
-            const f = () => {
-                (this.game as GameController).execNextIfNotMenu();
-            };
-            this.video.onEnded(f);
-        }
+        super.load();
+        if (this.video !== null) this.video.load();
     }
 
-    execute() {
-        super.execute(); // ensures that game isn't null
+    execute(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.execute(gameProps);
         if (this.video !== null) {
-            (this.game as GameController).cutscene(this.video);
+            res.video = this.video.clone();
         }
+        return res;
     }
 
-    beforeNext() {
-        super.beforeNext();
+    beforeNext(gameProps: IGameProps): Partial<IGameProps> {
+        const res = super.beforeNext(gameProps);
         if (this.video !== null) this.video.stop();
-        if (this.game !== null) this.game.afterCutscene();
+        res.video = null;
+        return res;
     }
 }

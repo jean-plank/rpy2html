@@ -7,12 +7,13 @@ import App from './App';
 import SaveSlots from './SaveSlots';
 import Help from './Help';
 import MenuButton from './MenuButton';
+import History from './History';
 
 import IObj from '../classes/IObj';
 import Save from '../classes/Save';
 import IKeyboardHandler from '../classes/IKeyboardHandler';
 import StorageService from '../classes/StorageService';
-import History from './History';
+import Node from '../classes/nodes/Node';
 
 
 interface IProps {
@@ -23,7 +24,6 @@ interface IProps {
 }
 
 interface IState {
-    // submenu: JSX.Element | null;
     selectedBtn: GameMenuBtn;
 }
 
@@ -153,7 +153,6 @@ export default class GameMenu extends React.Component<IProps, IState> implements
 
     private getSave(): JSX.Element {
         const save = (iSlot: number) => {
-            const props = _.clone(this.props.app.gameController.gameProps);
             const date: string =
                 new Date().toLocaleDateString(this.props.app.props.datas.lang,
                                               { day: 'numeric',
@@ -162,9 +161,10 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                                                 year: 'numeric',
                                                 hour: 'numeric',
                                                 minute: 'numeric' });
-            const nodes = this.props.app.gameController.history.getNodes();
+            const nodes: Node[] =
+                this.props.app.gameController.history.getNodes();
 
-            this.storage.storeSave(Save.fromNodes(props, date, nodes), iSlot);
+            this.storage.storeSave(Save.fromNodes(nodes, date), iSlot);
             this.forceUpdate();
         };
 
