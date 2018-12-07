@@ -178,7 +178,7 @@ export default class GameController implements IGameController, IKeyboardHandler
             new GameProps(mergeProps(this.gameProps.toIProps(), gameProps));
     }
 
-    updateAndRefreshDOM(gameProps: Partial<IGameProps>) {
+    private updateAndRefreshDOM(gameProps: Partial<IGameProps>) {
         if (__DEV) {
             console.log(
                 `%cexecuting ${partialGamePropsToString(gameProps)}`, 'color: blue; font-wheight: bold');
@@ -213,7 +213,10 @@ export default class GameController implements IGameController, IKeyboardHandler
         );
 
         this.update(gameProps);
+        this.show();
+    }
 
+    show() {
         const game: JSX.Element =
             <Game ref={() => this.setHandler(this)}
                   controller={this}

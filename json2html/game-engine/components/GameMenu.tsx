@@ -73,7 +73,6 @@ export default class GameMenu extends React.Component<IProps, IState> implements
         return (
             <div className='menu GameMenu'>
                 <div className='game-menu-overlay' />
-                <div className='submenu-title'>{submenuTitle}</div>
                 <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.resume}
                                 action={this.hide} />
@@ -99,6 +98,7 @@ export default class GameMenu extends React.Component<IProps, IState> implements
                                 action={this.selectBtn(GameMenuBtn.Help)}
                                 selected={this.isSelected(GameMenuBtn.Help)} />
                 </div>
+                <div className='submenu-title'>{submenuTitle}</div>
                 <div className='submenu'>{this.getSubmenu()}</div>
             </div>
         );

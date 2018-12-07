@@ -64,7 +64,6 @@ export default class MainMenu extends React.Component<IProps, IState> implements
         return (
             <div className='menu MainMenu'>
                 <div className={this.state.overlayClassName} />
-                <div className='submenu-title'>{submenuTitle}</div>
                 <div className='menu-bar'>
                     <MenuButton text={this.props.app.lang.menu.start}
                                 action={this.startGame} />
@@ -82,6 +81,7 @@ export default class MainMenu extends React.Component<IProps, IState> implements
                                 action={this.showHelp}
                                 selected={this.state.selectedBtn===Btn.Help} />
                 </div>
+                <div className='submenu-title'>{submenuTitle}</div>
                 <div className='submenu'>{this.state.submenu}</div>
             </div>
         );

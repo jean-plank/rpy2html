@@ -163,7 +163,7 @@ export default class App extends React.Component<IProps, IState> {
 
     hideGameMenu() {
         _.forEach(this.channels, (chan: Channel) => { chan.resume(); });
-        this.gameController.updateAndRefreshDOM({});
+        this.gameController.show();
     }
 
     // confirm
