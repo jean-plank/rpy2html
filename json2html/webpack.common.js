@@ -63,7 +63,7 @@ module.exports = {
             },
             // videos
             {
-                test: /\.(mp4)$/,
+                test: /\.(webm)$/,
                 use: [
                     {
                         loader: 'file-loader',
