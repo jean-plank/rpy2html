@@ -13,13 +13,33 @@ module.exports = {
     module: {
         rules: [
             // ts
-            { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
+            {
+                test: /\.tsx?$/,
+                use: [
+                    'awesome-typescript-loader',
+                ],
+            },
             // css
             {
                 test: /\.css$/,
                 use: [
                     'style-loader',
-                    'css-loader',
+                    {
+                        loader: 'typings-for-css-modules-loader',
+                        options: {
+                            modules: true,
+                            namedExport: true,
+                            camelCase: true,
+                        },
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: [
+                                require('autoprefixer'),
+                            ],
+                        },
+                    },
                 ]
             },
             // fonts

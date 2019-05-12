@@ -218,6 +218,7 @@ export default class GameController implements IGameController, IKeyboardHandler
 
     show() {
         const game: JSX.Element =
+            // tslint:disable-next-line: no-void-expression
             <Game ref={() => this.setHandler(this)}
                   controller={this}
                   sceneImg={this.gameProps.sceneImg}

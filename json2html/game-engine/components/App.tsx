@@ -73,16 +73,13 @@ export default class App extends React.Component<IProps, IState> {
     }
 
     private setStyleAndIcon() {
-        const head: HTMLHeadElement = (() => {
-            if (document.head !== null) return document.head;
-            const res = document.createElement('head');
-            document.prepend(res);
-            return res;
-        })();
-
-        head.appendChild(parseAppStyle(this.props.datas.style,
-                                       this.props.datas.fonts,
-                                       this.props.datas.images));
+        document.head.appendChild(
+            parseAppStyle(
+                this.props.datas.style,
+                this.props.datas.fonts,
+                this.props.datas.images
+            )
+        );
 
         if (_.has(this.props.datas.images, 'game_icon')) {
             let link = document.querySelector('link[rel*="icon"]') as (
@@ -91,7 +88,7 @@ export default class App extends React.Component<IProps, IState> {
             if (link === null) {
                 link = document.createElement('link');
                 link.rel = 'shortcut icon';
-                head.appendChild(link);
+                document.head.appendChild(link);
             }
             link.href = this.props.datas.images.game_icon.file;
         }

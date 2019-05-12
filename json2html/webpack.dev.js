@@ -16,20 +16,22 @@ module.exports = merge(common, {
         contentBase: common.output.path,
         inline: true, // iframe or inline script
         host: '0.0.0.0',
+        overlay: {
+            errors: true,
+            warnings: true
+        },
+        hot: true,
     },
-
-    // When importing a module whose path matches one of the following, just
-    // assume a corresponding global variable exists and use that instead.
-    // This is important because it allows us to avoid bundling all of our
-    // dependencies, which allows browsers to cache those libraries between builds.
     externals: {
         'react': 'React',
         'react-dom': 'ReactDOM'
     },
-
     plugins: [
         new DefinePlugin({
             __DEV: JSON.stringify(true),
+            __INPUT_JSON: JSON.stringify(
+                path.resolve(__dirname, '../generated-json/game.json')
+            ),
         }),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, 'game-engine/templates/index.dev.html'),
@@ -48,5 +50,5 @@ module.exports = merge(common, {
                 to: 'lib/'
             }
         ])
-    ],
+],
 });

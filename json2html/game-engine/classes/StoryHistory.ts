@@ -28,13 +28,13 @@ export default class StoryHistory {
     getNodes(): Node[] {
         return _(this.blocks).take(this.iCurrentBlock + 1)
                              .flatMap(([nodes, _gameProps]) => nodes)
-                             .value();
+                             .value() as Node[];
     }
 
     addBlock(block: Block) {
         this.blocks = _(this.blocks).take(this.iCurrentBlock + 1)
                                     .push(block)
-                                    .value();
+                                    .value() as Block[];
         this.iCurrentBlock = this.blocks.length - 1;
     }
 
