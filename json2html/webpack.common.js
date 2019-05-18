@@ -1,23 +1,22 @@
 const path = require('path');
 
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: path.resolve(__dirname, './game-engine/index.tsx'),
     output: {
         path: path.resolve(__dirname, '../dist/'),
-        filename: 'bundle.js',
+        filename: 'bundle.js'
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js'],
+        extensions: ['.ts', '.tsx', '.js']
     },
     module: {
         rules: [
             // ts
             {
                 test: /\.tsx?$/,
-                use: [
-                    'awesome-typescript-loader',
-                ],
+                use: ['awesome-typescript-loader']
             },
             // css
             {
@@ -30,16 +29,15 @@ module.exports = {
                             modules: true,
                             namedExport: true,
                             camelCase: true,
-                        },
+                            localIdentName: '[local]-[hash:base64:12]'
+                        }
                     },
                     {
                         loader: 'postcss-loader',
                         options: {
-                            plugins: [
-                                require('autoprefixer'),
-                            ],
-                        },
-                    },
+                            plugins: [require('autoprefixer')]
+                        }
+                    }
                 ]
             },
             // fonts
@@ -50,10 +48,10 @@ module.exports = {
                         loader: 'file-loader',
                         options: {
                             name: '[name]-[hash].[ext]',
-                            outputPath: 'fonts/',
-                        },
-                    },
-                ],
+                            outputPath: 'fonts/'
+                        }
+                    }
+                ]
             },
             // images
             {
@@ -63,10 +61,10 @@ module.exports = {
                         loader: 'file-loader',
                         options: {
                             name: '[name]-[hash].[ext]',
-                            outputPath: 'images/',
-                        },
-                    },
-                ],
+                            outputPath: 'images/'
+                        }
+                    }
+                ]
             },
             // sounds
             {
@@ -76,10 +74,10 @@ module.exports = {
                         loader: 'file-loader',
                         options: {
                             name: '[name]-[hash].[ext]',
-                            outputPath: 'sounds/',
-                        },
-                    },
-                ],
+                            outputPath: 'sounds/'
+                        }
+                    }
+                ]
             },
             // videos
             {
@@ -89,19 +87,28 @@ module.exports = {
                         loader: 'file-loader',
                         options: {
                             name: '[name]-[hash].[ext]',
-                            outputPath: 'videos/',
-                        },
-                    },
-                ],
+                            outputPath: 'videos/'
+                        }
+                    }
+                ]
             },
             // md
             {
                 test: /\.md$/,
-                use: [
-                    'html-loader',
-                    'markdown-loader',
-                ]
-            },
-        ],
+                use: ['html-loader', 'markdown-loader']
+            }
+        ]
     },
-}
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: path.resolve(
+                __dirname,
+                'game-engine/templates/index.html'
+            ),
+            favicon: path.resolve(
+                __dirname,
+                'game-engine/templates/default.ico'
+            )
+        })
+    ]
+};

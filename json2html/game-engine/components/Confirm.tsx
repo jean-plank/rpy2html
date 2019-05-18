@@ -1,66 +1,67 @@
+import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import * as React from 'react';
-import * as _ from 'lodash';
+import { FunctionComponent } from 'react';
 
-import '../styles/Confirm.css';
+import * as styles from './__style/Confirm.css';
 
-import App from './App';
-import MenuButton, { IButton } from './MenuButton';
+import MenuButton, { IButton } from './menus/MenuButton';
 
-import IObj from '../classes/IObj';
-import IKeyboardHandler from '../classes/IKeyboardHandler';
-
-
-interface IProps {
-    app: App;
+interface Props {
     msg: string;
     buttons: IButton[];
     escapeAction?: () => void;
+    hideConfirm: () => void;
 }
 
-export default class Confirm extends React.Component<IProps> implements IKeyboardHandler {
-    render() {
-        const buttons = _.map(this.props.buttons, (btn: IButton, i: number) => {
+const Confirm: FunctionComponent<Props> = ({
+    msg,
+    buttons,
+    escapeAction,
+    hideConfirm
+}) => {
+    return (
+        <div
+            className={styles.confirm}
+            tabIndex={0}
+            onKeyUp={onKeyUp}
+            onClick={onClickBg}
+        >
+            <div className={styles.frame} onClick={onClickFrame}>
+                <div
+                    className={styles.msg}
+                    dangerouslySetInnerHTML={{ __html: msg }}
+                />
+                <div className={styles.items}>{buttonsElts()}</div>
+            </div>
+        </div>
+    );
+
+    function onKeyUp(e: React.KeyboardEvent) {
+        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
+            Escape: onClickBg
+        });
+        lookup(e.key, keyEvents).map(_ => _(e));
+    }
+
+    function onClickBg(e: React.SyntheticEvent) {
+        e.stopPropagation();
+        if (escapeAction !== undefined) escapeAction();
+        hideConfirm();
+    }
+
+    function onClickFrame(e: React.MouseEvent) {
+        e.stopPropagation();
+    }
+
+    function buttonsElts(): JSX.Element[] {
+        return buttons.map((btn: IButton, i: number) => {
             const f = (e: React.MouseEvent) => {
                 e.stopPropagation();
-                if (btn.action !== undefined) btn.action(e);
-                this.props.app.hideConfirm();
+                if (btn.onClick !== undefined) btn.onClick(e);
+                hideConfirm();
             };
-            return <MenuButton key={i} text={btn.text} action={f} />;
+            return <MenuButton key={i} text={btn.text} onClick={f} />;
         });
-
-        return (
-            <div className='Confirm'
-                 onClick={this.onClickBg}>
-                <div className='frame'
-                     onClick={this.onClickFrame}>
-                    <div className='msg'
-                         dangerouslySetInnerHTML={{ __html: this.props.msg }} />
-                    <div className='items'>{buttons}</div>
-                </div>
-            </div>
-        );
     }
-
-    onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents: IObj<(e: React.KeyboardEvent) => void> = {
-            Escape: evt => {
-                evt.stopPropagation();
-                if (this.props.escapeAction !== undefined) {
-                    this.props.escapeAction();
-                }
-                this.props.app.hideConfirm();
-            },
-        };
-        if (_.has(keyEvents, e.key)) keyEvents[e.key](e);
-    }
-
-    private onClickBg = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (this.props.escapeAction !== undefined) this.props.escapeAction();
-        this.props.app.hideConfirm();
-    }
-
-    private onClickFrame = (e: React.MouseEvent) => {
-        e.stopPropagation();
-    }
-}
+};
+export default Confirm;

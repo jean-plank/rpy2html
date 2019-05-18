@@ -1,0 +1,15 @@
+.textbox {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-size: 100% 100%;
+}
+
+.namebox {
+    position: absolute;
+    color: #0099cc;
+}
+
+.dialog {
+    position: absolute;
+}
