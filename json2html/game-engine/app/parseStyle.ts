@@ -1,4 +1,3 @@
-/* tslint:disable:max-line-length */
 import { fromNullable } from 'fp-ts/lib/Option';
 import { lookup, StrMap, toArray } from 'fp-ts/lib/StrMap';
 

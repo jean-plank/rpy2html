@@ -32,25 +32,34 @@ const getArmlessWankerMenu = ({
                 text={transl.menu.back}
                 onClick={withStopPropagation(gameService.undo)}
                 disabled={disableUndo}
+                className={styles.menuButton}
             />
             <MenuButton
                 text={transl.menu.history}
                 onClick={showGameMenuWSP(GameMenuBtn.History)}
+                className={styles.menuButton}
             />
             <MenuButton
                 text={transl.menu.save}
                 onClick={showGameMenuWSP(GameMenuBtn.Save)}
+                className={styles.menuButton}
             />
             <MenuButton
                 text={transl.menu.qSave}
                 onClick={withStopPropagation(gameService.quickSave)}
+                className={styles.menuButton}
             />
             <MenuButton
                 text={transl.menu.qLoad}
                 onClick={withStopPropagation(gameService.quickLoad)}
                 disabled={disableQuickLoad}
+                className={styles.menuButton}
             />
-            <MenuButton text={transl.menu.pause} onClick={showGameMenuWSP()} />
+            <MenuButton
+                text={transl.menu.pause}
+                onClick={showGameMenuWSP()}
+                className={styles.menuButton}
+            />
         </div>
     );
 
