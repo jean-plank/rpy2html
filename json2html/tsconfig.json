@@ -10,17 +10,16 @@
         "jsx": "react",
         "moduleResolution": "node",
         "rootDir": ".",
+        "esModuleInterop": true,
+        "alwaysStrict": true,
         "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
-        "noImplicitAny": true,
-        "importHelpers": true,
-        "strictNullChecks": true,
         "noUnusedLocals": true,
-        "alwaysStrict": true
+        "noUnusedParameters": true,
+        "strictNullChecks": true
     },
-    "include": [
-        "./**/*",
-        "../generated-json/**/*"
-    ]
+    "include": ["./**/*", "../generated-json/**/*"]
 }
