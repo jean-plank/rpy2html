@@ -95,9 +95,11 @@ export default class App extends React.Component<Props, State> {
 
     render = () => (
         <div className={styles.container}>
-            {this.state.view}
-            {this.notificationsService.element}
-            {this.state.confirm.toNullable()}
+            <div className={styles.view}>
+                {this.state.view}
+                {this.notificationsService.element}
+                {this.state.confirm.toNullable()}
+            </div>
         </div>
     )
 

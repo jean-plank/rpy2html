@@ -5,13 +5,11 @@ import * as confirmStyles from '../components/__style/Confirm.css';
 import * as notificationsStyles from '../components/__style/Notifications.css';
 import * as armlessWankerMenuStyles from '../components/game/__style/ArmlessWankerMenu.css';
 import * as choicesStyles from '../components/game/__style/Choices.css';
-import * as gameStyles from '../components/game/__style/Game.css';
 import * as textBoxStyles from '../components/game/__style/Textbox.css';
 import * as helpStyles from '../components/menus/__style/Help.css';
 import * as menuButtonStyles from '../components/menus/__style/MenuButton.css';
 import * as menuStyles from '../components/menus/__style/menus.css';
 import * as saveSlotStyles from '../components/menus/__style/SaveSlot.css';
-import * as gameMenuStyles from '../components/menus/gameMenu/__style/GameMenu.css';
 import * as mainMenuStyles from '../components/menus/mainMenu/__style/MainMenu.css';
 import * as memoryStyles from '../components/menus/mainMenu/__style/Memory.css';
 import * as memoryGameStyles from '../components/menus/mainMenu/__style/MemoryGame.css';
@@ -35,10 +33,7 @@ const parseStyle = (
     const res = document.createElement('style');
     res.innerHTML = `${getFonts(fonts)}
 
-.${mainMenuStyles.mainMenu},
-.${gameStyles.game},
-.${gameMenuStyles.gameMenu},
-.${confirmStyles.confirm} {
+.${appStyles.view} {
     width: ${(100 * style.game_width) / style.game_height}vh;
 }
 
@@ -226,10 +221,7 @@ const parseStyle = (
         flex-direction: column;
     }
 
-    .${mainMenuStyles.mainMenu},
-    .${gameStyles.game},
-    .${gameMenuStyles.gameMenu},
-    .${confirmStyles.confirm} {
+    .${appStyles.view} {
         width: 100vw;
         height: ${(100 * style.game_height) / style.game_width}vw;
     }

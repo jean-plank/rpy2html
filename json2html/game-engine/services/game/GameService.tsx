@@ -3,7 +3,6 @@ import * as React from 'react';
 
 import App from '../../app/App';
 import Context from '../../app/Context';
-import { Translation } from '../../app/translations';
 import getArmlessWankerMenu, {
     ArmlessWankerMenuType
 } from '../../components/game/getArmlessWankerMenu';
@@ -33,12 +32,11 @@ interface Args {
 
 export default class GameService {
     private app: App;
+    private context: Context;
     private storageService: StorageService;
     private notificationsService: NotificationsService;
     private soundService: SoundService;
     private mainMenuService: MainMenuService;
-    private transl: Translation;
-    private firstNode: AstNode;
     private history: GameHistory;
     private Game: GameType;
     private ArmlessWankerMenu: ArmlessWankerMenuType;
@@ -53,6 +51,7 @@ export default class GameService {
         gameMenuService
     }: Args) => {
         this.app = app;
+        this.context = context;
         this.storageService = storageService;
         this.notificationsService = notificationsService;
         this.soundService = soundService;
@@ -143,7 +142,7 @@ export default class GameService {
 
     restoreSave = (history: string[]) => {
         this.initHistory();
-        blocksFromHistory(history, [this.firstNode]).map(_ =>
+        blocksFromHistory(history, [this.context.firstNode]).map(_ =>
             this.execute(
                 _.reduce<Block>((acc, [block]) => acc.concat(block), [])
             )
@@ -154,7 +153,7 @@ export default class GameService {
     quickSave = () => {
         this.storageService.storeQuickSave(this.history.nodes());
         this.history.props().map(_ => this.update(_));
-        this.notificationsService.notify(this.transl.menu.saved);
+        this.notificationsService.notify(this.context.transl.menu.saved);
     }
 
     quickLoad = () =>

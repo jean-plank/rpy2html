@@ -9,3 +9,9 @@
     /* make it unselectable */
     user-select: none;
 }
+
+.view {
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}

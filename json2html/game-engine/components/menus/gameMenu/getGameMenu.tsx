@@ -4,7 +4,6 @@ import * as React from 'react';
 import { FunctionComponent, useState } from 'react';
 
 import * as menuStyles from '../__style/menus.css';
-import * as mainMenuStyles from './__style/GameMenu.css';
 
 import Context from '../../../app/Context';
 import AstNode from '../../../nodes/AstNode';
@@ -44,11 +43,7 @@ const getGameMenu = ({
     );
 
     return (
-        <div
-            className={`${menuStyles.menu} ${mainMenuStyles.gameMenu}`}
-            tabIndex={1}
-            onKeyUp={onKeyUp}
-        >
+        <div className={menuStyles.menu} tabIndex={1} onKeyUp={onKeyUp}>
             <div className={menuStyles.gameMenuOverlay} />
             <div className={menuStyles.menuBar}>
                 <MenuButton
