@@ -27,7 +27,7 @@ describe(GameHistory, () => {
 
     it('should construct and be empty', () => {
         const history = new GameHistory();
-        expect(history.state).toEqual({
+        expect(history.state()).toEqual({
             past: [],
             present: none,
             future: []
@@ -54,29 +54,31 @@ describe(GameHistory, () => {
 
     const block1Props = {
         ...GameProps.empty,
-        sounds: {
+        sounds: new StrMap({
             music: some(new Sound('fmusic1')),
             sound: some(new Sound('fsound1'))
-        }
+        })
     };
     const block2Props = {
         ...GameProps.empty,
         charImgs: [new Image('ftoto'), new Image('ftiti')],
-        sounds: {
+        sounds: new StrMap({
             music: some(new Sound('fmusic1')),
             sound: none
-        }
+        })
     };
 
     it('should have one block', () => {
         const history = new GameHistory();
         history.addBlock(block1);
 
-        expect(history.state).toEqual({
-            past: [],
-            present: some([block1Props, block1]),
-            future: []
-        });
+        expect(history.state().toString()).toBe(
+            {
+                past: [],
+                present: some([block1Props, block1]),
+                future: []
+            }.toString()
+        );
     });
 
     it('should have two blocks', () => {
@@ -84,11 +86,13 @@ describe(GameHistory, () => {
         history.addBlock(block1);
         history.addBlock(block2);
 
-        expect(history.state).toEqual({
-            past: [[block1Props, block1]],
-            present: some([block2Props, block2]),
-            future: []
-        });
+        expect(history.state().toString()).toEqual(
+            {
+                past: [[block1Props, block1]],
+                present: some([block2Props, block2]),
+                future: []
+            }.toString()
+        );
     });
 
     it('should undo', () => {
@@ -97,11 +101,13 @@ describe(GameHistory, () => {
         history.addBlock(block2);
         history.undo();
 
-        expect(history.state).toEqual({
-            past: [],
-            present: some([block1Props, block1]),
-            future: [[block2Props, block2]]
-        });
+        expect(history.state().toString()).toEqual(
+            {
+                past: [],
+                present: some([block1Props, block1]),
+                future: [[block2Props, block2]]
+            }.toString()
+        );
     });
 
     it('should redo', () => {
@@ -111,10 +117,12 @@ describe(GameHistory, () => {
         history.undo();
         history.redo();
 
-        expect(history.state).toEqual({
-            past: [[block1Props, block1]],
-            present: some([block2Props, block2]),
-            future: []
-        });
+        expect(history.state().toString()).toEqual(
+            {
+                past: [[block1Props, block1]],
+                present: some([block2Props, block2]),
+                future: []
+            }.toString()
+        );
     });
 });
