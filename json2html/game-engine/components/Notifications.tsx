@@ -1,30 +1,28 @@
 import * as React from 'react';
-import * as _ from 'lodash';
+import {
+    forwardRef,
+    RefForwardingComponent,
+    useImperativeHandle,
+    useState
+} from 'react';
 
-import '../styles/Notifications.css';
+import * as styles from './__style/Notifications.css';
 
-export default class Notifications extends React.Component {
-    private div: HTMLDivElement | null = null;
-
-    render() {
-        return <div className='Notifications' ref={this.setRef} />;
-    }
-
-    notify(txt: string) {
-        if (this.div !== null) {
-            const notif = document.createElement('div');
-            notif.textContent = txt;
-            this.div.appendChild(notif);
-            setTimeout(() => {
-                notif.classList.add('reduce');
-                setTimeout(() => {
-                    if (this.div !== null) this.div.removeChild(notif);
-                }, 1500);
-            }, 1500);
-        }
-    }
-
-    private setRef = (div: HTMLDivElement | null) => {
-        this.div = div;
-    }
+export interface Notifiable {
+    notify: (message: string) => void;
 }
+
+const Notifications: RefForwardingComponent<Notifiable> = (_, ref) => {
+    const [notifs, setNotifs] = useState<JSX.Element[]>([]);
+
+    useImperativeHandle(ref, () => ({
+        notify: (message: string) => {
+            const notif = <div className={styles.notification}>{message}</div>;
+            setNotifs(notifs.concat(notif));
+            setTimeout(() => setNotifs(notifs.filter(_ => _ !== notif)), 2000);
+        }
+    }));
+
+    return <div className={styles.notifications}>{notifs}</div>;
+};
+export default forwardRef(Notifications);

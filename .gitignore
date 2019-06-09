@@ -1,5 +1,5 @@
-generated-json
-dist
-.~lock.*
-*.odp
-deploy.sh
+/generated-json
+/dist
+/.~lock.*
+/*.odp
+/deploy.sh

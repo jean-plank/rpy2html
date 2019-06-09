@@ -1,0 +1,24 @@
+.memory-game {
+    width: 100%;
+    padding: 0 3em;
+    display: flex;
+    align-items: center;
+}
+
+.memory-game>div {
+    display: flex;
+    padding: 0.67em 0;
+}
+
+.key {
+    flex-grow: 1;
+}
+
+.bytes {
+    justify-content: right;
+    padding: 0.67em;
+}
+
+.btn>div {
+    padding: 0em !important;
+}

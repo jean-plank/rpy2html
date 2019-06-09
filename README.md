@@ -14,7 +14,7 @@ Converts RenPy games to a single index.html
 * [Ren'Py](https://www.renpy.org/latest.html) 
 
 
-Install dependencies of the project (in `./json2html`):
+Install dependencies of the project (from `.`, but will be installed in `./json2html`):
 
     npm i --production --prefix json2html
 
@@ -35,24 +35,24 @@ Default `output_dir` is `./dist`.
   Default `output_file` is `./generated-json/game.json`.
 
 
-* Making the bundle:
+* Making the bundle (needs json):
 
       json2html/bin/json2html <json_file> [-o <output_dir>]
 
   Default `output_dir` is `./dist`.
 
 
-## What it does (but without any waranty)
+## What it does (without any waranty)
 
 ![what it does](what-it-does.svg)
 
 
-## Game engine editing
+## Game engine development
 
     cd json2html
     npm i
 
-Make sure to have the `rpy2html/generated-json/game.json` file.
+Make sure to have the `./generated-json/game.json` file.
 
 * Start development server:
 
