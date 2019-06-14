@@ -11,7 +11,7 @@ export default class Show extends NodeWithImage {
             .filter(_ => !gameProps.charImgs.includes(_))
             .map<Partial<GameProps>>(_ => ({
                 ...res,
-                charImgs: gameProps.charImgs.concat(_)
+                charImgs: [...gameProps.charImgs, _]
             }))
             .getOrElse(res);
     }

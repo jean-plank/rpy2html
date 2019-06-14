@@ -1,12 +1,15 @@
 import { none, some } from 'fp-ts/lib/Option';
 import * as React from 'react';
+import { createRef, RefObject } from 'react';
 
 import App from '../app/App';
 import Context from '../app/Context';
 import { Translation } from '../app/translations';
-import Confirm from '../components/Confirm';
+import getConfirm, { ConfirmType } from '../components/getConfirm';
 import { IButton } from '../components/menus/MenuButton';
+import KeyUpAble from './KeyUpAble';
 import MainMenuService from './MainMenuService';
+import Service from './Service';
 
 interface Args {
     app: App;
@@ -14,16 +17,20 @@ interface Args {
     mainMenuService: MainMenuService;
 }
 
-export default class ConfirmService {
+export default class ConfirmService implements Service {
+    keyUpAble: RefObject<KeyUpAble> = createRef();
+
     private app: App;
     private mainMenuService: MainMenuService;
     private transl: Translation;
     private confirmAudioShown = false;
+    private Confirm: ConfirmType;
 
     init({ app, mainMenuService, context: { transl } }: Args) {
         this.app = app;
         this.mainMenuService = mainMenuService;
         this.transl = transl;
+        this.Confirm = getConfirm({ confirmService: this });
     }
 
     private confirm = (
@@ -32,16 +39,18 @@ export default class ConfirmService {
         escapeAction?: () => void
     ) => {
         this.app.setConfirm(
-            some(
-                <Confirm
+            some([
+                this,
+                // tslint:disable-next-line: jsx-key
+                <this.Confirm
+                    ref={this.keyUpAble}
                     {...{ msg, buttons, escapeAction }}
-                    hideConfirm={this.hideConfirm}
                 />
-            )
+            ])
         );
     }
 
-    private hideConfirm = () => this.app.setConfirm(none);
+    hideConfirm = () => this.app.setConfirm(none);
 
     confirmAudio = (okAction: () => void) => {
         if (this.confirmAudioShown) return;

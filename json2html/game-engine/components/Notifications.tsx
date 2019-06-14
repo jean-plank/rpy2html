@@ -22,7 +22,7 @@ const Notifications: RefForwardingComponent<Notifiable> = (_, ref) => {
                     {message}
                 </div>
             );
-            setNotifs(notifs.concat(notif));
+            setNotifs([...notifs, notif]);
             setTimeout(() => setNotifs(notifs.filter(_ => _ !== notif)), 2000);
         }
     }));

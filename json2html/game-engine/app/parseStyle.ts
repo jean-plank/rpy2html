@@ -24,8 +24,9 @@ const parseStyle = (
     fonts: StrMap<Font>,
     images: StrMap<Image>
 ): HTMLStyleElement => {
-    const newStyleIsSome = lookup('main_menu_overlay', images).isSome();
-    const ifNewStyle = (style: string): string => (newStyleIsSome ? style : '');
+    const newStyleIsNone = lookup('main_menu_overlay', images).isNone();
+    const ifNotNewStyle = (style: string): string =>
+        newStyleIsNone ? style : '';
 
     const slotBgIsNone = lookup('slot_bg', images).isNone();
     const ifNoSlotBg = (style: string): string => (slotBgIsNone ? style : '');
@@ -98,7 +99,7 @@ const parseStyle = (
 }
 
 .${menuStyles.menuBar} {
-    width: ${style.mmenuitems_width};${ifNewStyle(`
+    width: ${style.mmenuitems_width};${ifNotNewStyle(`
     background-color: rgba(19, 24, 25, 0.75);`)}
 }
 
@@ -117,7 +118,7 @@ const parseStyle = (
     font-size: ${style.quickbtn_fsize_h}vh;
 }
 
-.${memoryStyles.about} {
+.${memoryStyles.header} {
     border-color: ${style.interface_text_color};
 }
 
@@ -212,7 +213,7 @@ const parseStyle = (
 
 .${confirmStyles.frame} {
     padding: ${style.confirmframe_padding};
-    ${getBgOrElse(images, 'frame_bg', 'black')};${ifNewStyle(`
+    ${getBgOrElse(images, 'frame_bg', 'black')};${ifNotNewStyle(`
     border: 3px solid #0095c7;`)}
 }
 

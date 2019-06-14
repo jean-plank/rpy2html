@@ -1,4 +1,5 @@
-import { fromNullable } from 'fp-ts/lib/Option';
+import { catOptions } from 'fp-ts/lib/Array';
+import { fromNullable, some } from 'fp-ts/lib/Option';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 
@@ -19,10 +20,12 @@ const MenuButton: FunctionComponent<IButton> = ({
     disabled,
     className
 }) => {
-    const classes: string = [styles.menuButton]
-        .concat(selected ? [styles.selected] : [])
-        .concat(fromNullable(className).fold([], _ => [_]))
-        .join(' ');
+    const classes: string = catOptions([
+        some(styles.menuButton),
+        some(styles.selected).filter(_ => selected),
+        fromNullable(className)
+    ]).join(' ');
+
     return (
         <button className={classes} {...{ onClick, disabled }}>
             {text}

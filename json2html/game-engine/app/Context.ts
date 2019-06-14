@@ -24,7 +24,7 @@ export default class Context {
         const firstNode = lookup('0', data.nodes).getOrElseL(() => {
             throw EvalError('A node with id 0 is needed to start the story.');
         });
-        const SaveSlots = getSaveSlots(transl, firstNode);
+        const SaveSlots = getSaveSlots(data.nodes, firstNode, transl);
         const help = getHelp(data.help);
         return { data, lang, transl, firstNode, SaveSlots, help };
     }

@@ -1,7 +1,13 @@
 import { none, Option, some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import * as React from 'react';
-import { FunctionComponent, KeyboardEvent, useState } from 'react';
+import {
+    forwardRef,
+    FunctionComponent,
+    KeyboardEvent,
+    useImperativeHandle,
+    useState
+} from 'react';
 
 import * as menuStyles from '../__style/menus.css';
 import * as mainMenuStyles from './__style/MainMenu.css';
@@ -26,11 +32,12 @@ interface Props {
     gameService: GameService;
 }
 
-const MainMenu: FunctionComponent<Props> = ({
-    context,
-    storageService,
-    gameService
-}) => {
+const MainMenu: FunctionComponent<Props> = (
+    { context, storageService, gameService },
+    ref
+) => {
+    useImperativeHandle(ref, () => ({ onKeyUp }));
+
     const [overlayClassName, setOverlay] = useState<string>(
         menuStyles.mainMenuOverlay
     );
@@ -41,11 +48,7 @@ const MainMenu: FunctionComponent<Props> = ({
     const { transl, SaveSlots, help } = context;
 
     return (
-        <div
-            className={`${menuStyles.menu} ${mainMenuStyles.mainMenu}`}
-            tabIndex={1}
-            onKeyUp={onKeyUp}
-        >
+        <div className={`${menuStyles.menu} ${mainMenuStyles.mainMenu}`}>
             <div className={overlayClassName} />
             <div className={menuStyles.menuBar}>
                 <MenuButton
@@ -87,13 +90,15 @@ const MainMenu: FunctionComponent<Props> = ({
     }
 
     function showLoad() {
-        const load = (_: number, save: Option<Save>) =>
-            save.map(_ => gameService.restoreSave(_.history));
         setOverlay(menuStyles.gameMenuOverlay);
         setSelectedBtn(Btn.Load);
         setSubmenu(
-            some(<SaveSlots action={load} saves={storageService.getSaves()} />)
+            some(<SaveSlots saves={storageService.getSaves()} onClick={load} />)
         );
+
+        function load(_: number, save: Option<Save>) {
+            save.map(_ => gameService.restoreSave(_));
+        }
     }
 
     function showMemory() {
@@ -123,4 +128,4 @@ const MainMenu: FunctionComponent<Props> = ({
     }
 };
 
-export default MainMenu;
+export default forwardRef(MainMenu);

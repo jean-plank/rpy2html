@@ -1,4 +1,5 @@
 .save-slot {
+    position: relative;
     background-size: 100% 100%;
     display: flex;
     flex-direction: column;
@@ -11,7 +12,9 @@
 
 .empty-slot {}
 
-.game {}
+.game {
+    position: relative;
+}
 
 /* .save-slot>.game {
     position: relative;

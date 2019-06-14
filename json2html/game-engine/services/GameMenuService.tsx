@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createRef, RefObject } from 'react';
 
 import App from '../app/App';
 import Context from '../app/Context';
@@ -9,6 +10,8 @@ import getGameMenu, {
 import AstNode from '../nodes/AstNode';
 import ConfirmService from './ConfirmService';
 import GameService from './game/GameService';
+import KeyUpAble from './KeyUpAble';
+import Service from './Service';
 import SoundService from './SoundService';
 import StorageService from './storage/StorageService';
 
@@ -22,7 +25,9 @@ interface Args {
     gameMenuService: GameMenuService;
 }
 
-export default class GameMenuService {
+export default class GameMenuService implements Service {
+    keyUpAble: RefObject<KeyUpAble> = createRef();
+
     private app: App;
     private soundService: SoundService;
     private gameService: GameService;
@@ -51,7 +56,13 @@ export default class GameMenuService {
 
     show = (getHistory: () => AstNode[]) => (selectedBtn?: GameMenuBtn) => {
         this.soundService.pauseChannels();
-        this.app.setView(<this.GameMenu {...{ getHistory, selectedBtn }} />);
+        this.app.setView(
+            this,
+            <this.GameMenu
+                ref={this.keyUpAble}
+                {...{ getHistory, selectedBtn }}
+            />
+        );
     }
 
     hide = () => {

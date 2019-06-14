@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 
 import * as styles from './__style/Game.css';
 
@@ -13,9 +13,7 @@ import Textbox from './Textbox';
 
 interface Props {
     gameProps: GameProps;
-    mountCallback?: () => void;
     armlessWankerMenu?: JSX.Element;
-    onKeyUp?: (e: React.KeyboardEvent) => void;
     onClick?: (e: React.MouseEvent) => void;
     onWheel?: (e: React.WheelEvent) => void;
     style?: string;
@@ -23,18 +21,13 @@ interface Props {
 
 const Game: FunctionComponent<Props> = ({
     gameProps,
-    mountCallback = () => {},
     armlessWankerMenu,
-    onKeyUp,
     onClick,
     onWheel,
     style
 }) => {
-    useEffect(mountCallback, []);
-
-    const classes = [styles.game]
-        .concat(style === undefined ? [] : style)
-        .join(' ');
+    const classes =
+        style === undefined ? styles.game : `${styles.game} ${style}`;
 
     return gameProps.video
         .map(_ => cutsceneLayout(_))
@@ -42,11 +35,7 @@ const Game: FunctionComponent<Props> = ({
 
     function cutsceneLayout(video: Video): JSX.Element {
         return (
-            <div
-                className={classes}
-                tabIndex={0}
-                {...{ onKeyUp, onClick, onWheel }}
-            >
+            <div className={classes} {...{ onClick, onWheel }}>
                 <Cutscene video={video} />
             </div>
         );
@@ -54,11 +43,7 @@ const Game: FunctionComponent<Props> = ({
 
     function defaultLayout(): JSX.Element {
         return (
-            <div
-                className={classes}
-                tabIndex={1}
-                {...{ onKeyUp, onClick, onWheel }}
-            >
+            <div className={classes} {...{ onClick, onWheel }}>
                 <LayerScene image={gameProps.sceneImg} />
                 <LayerImages images={gameProps.charImgs} />
                 <Textbox

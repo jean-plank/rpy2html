@@ -6,7 +6,6 @@ import { insert, StrMap } from 'fp-ts/lib/StrMap';
 
 import Context from '../../app/Context';
 import AstNode from '../../nodes/AstNode';
-import blocksFromHistory from '../../utils/blocksFromHistory';
 import byteCount from './byteCount';
 import QuickSave from './QuickSave';
 import Save from './Save';
@@ -26,7 +25,7 @@ export default class StorageService {
 
     init = ({
         context: {
-            data: { gameName },
+            data: { gameName, nodes },
             lang,
             firstNode
         }
@@ -65,15 +64,15 @@ export default class StorageService {
                         )
                     )
             );
-        this.loadSaves(firstNode);
+        this.loadSaves(nodes, firstNode);
     }
 
-    private loadSaves = (firstNode: AstNode) =>
+    private loadSaves = (nodes: StrMap<AstNode>, firstNode: AstNode) =>
         this.saves.slots.forEach(_ =>
-            _.map(save =>
-                blocksFromHistory(save.history, [firstNode])
+            _.map(_ =>
+                fromEither(_.blocks(nodes, firstNode))
                     .chain(_ => last(_))
-                    .map(([, props]) => {
+                    .map(([props]) => {
                         props.sceneImg.map(_ => _.load());
                         props.charImgs.forEach(_ => _.load());
                     })
