@@ -1,8 +1,14 @@
-import Block from '../nodes/Block';
+import AstNode from '../nodes/AstNode';
+import GameProps from './GameProps';
 
 export interface AddBlockAction {
     type: 'ADD_BLOCK';
-    block: Block;
+    block: AstNode[];
+}
+
+export interface SetPastAction {
+    type: 'SET_PAST';
+    past: Array<[GameProps, AstNode[]]>;
 }
 
 export interface UndoAction {
@@ -13,5 +19,5 @@ export interface RedoAction {
     type: 'REDO';
 }
 
-type GameAction = AddBlockAction | UndoAction | RedoAction;
+type GameAction = AddBlockAction | SetPastAction | UndoAction | RedoAction;
 export default GameAction;

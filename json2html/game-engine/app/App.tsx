@@ -1,4 +1,4 @@
-import { fromNullable, none, Option } from 'fp-ts/lib/Option';
+import { fromNullable, none, Option, some } from 'fp-ts/lib/Option';
 import { lookup } from 'fp-ts/lib/StrMap';
 import * as React from 'react';
 
@@ -12,6 +12,7 @@ import GameService from '../services/game/GameService';
 import GameMenuService from '../services/GameMenuService';
 import MainMenuService from '../services/MainMenuService';
 import NotificationsService from '../services/NotificationsService';
+import Service from '../services/Service';
 import SoundService from '../services/SoundService';
 import StorageService from '../services/storage/StorageService';
 import Context from './Context';
@@ -22,13 +23,13 @@ interface Props {
 }
 
 interface State {
-    view: JSX.Element;
-    confirm: Option<JSX.Element>;
+    view: Option<[Service, JSX.Element]>;
+    confirm: Option<[Service, JSX.Element]>;
 }
 
 export default class App extends React.Component<Props, State> {
     state: State = {
-        view: <div />,
+        view: none,
         confirm: none
     };
 
@@ -94,15 +95,32 @@ export default class App extends React.Component<Props, State> {
     componentDidMount = () => this.mainMenuService.show();
 
     render = () => (
-        <div className={styles.container}>
-            {this.state.view}
-            {this.notificationsService.element}
-            {this.state.confirm.toNullable()}
+        <div tabIndex={0} onKeyUp={this.onKeyUp} className={styles.container}>
+            <div className={styles.view}>
+                {this.state.view.map(([, _]) => _).toNullable()}
+                {this.notificationsService.element}
+                {this.state.confirm.map(([, _]) => _).toNullable()}
+            </div>
         </div>
     )
 
-    setView = (view: JSX.Element) => this.setState({ view });
-    setConfirm = (confirm: Option<JSX.Element>) => this.setState({ confirm });
+    setView = (view: Service, element: JSX.Element) =>
+        this.setState({ view: some([view, element]) })
+
+    setConfirm = (confirm: Option<[Service, JSX.Element]>) =>
+        this.setState({ confirm })
+
+    private onKeyUp = (e: React.KeyboardEvent) => {
+        this.state.confirm
+            .map<void>(([_]) =>
+                fromNullable(_.keyUpAble.current).map(_ => _.onKeyUp(e))
+            )
+            .getOrElseL(() =>
+                this.state.view.map(([_]) =>
+                    fromNullable(_.keyUpAble.current).map(_ => _.onKeyUp(e))
+                )
+            );
+    }
 }
 
 const initDom = (data: AppData) => {

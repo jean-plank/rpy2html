@@ -2,21 +2,33 @@ import { head, init, last, tail } from 'fp-ts/lib/Array';
 import { none, Option, some } from 'fp-ts/lib/Option';
 import { Reducer } from 'redux';
 
-import Block from '../nodes/Block';
-import GameAction from './GameAction';
+import AstNode from '../nodes/AstNode';
+import GameAction, {
+    AddBlockAction,
+    RedoAction,
+    UndoAction
+} from './GameAction';
 import GameProps from './GameProps';
 import isAddBlockAction from './isAddBlockAction';
 
 export interface GameState {
-    past: Array<[GameProps, Block]>;
-    present: Option<[GameProps, Block]>;
-    future: Array<[GameProps, Block]>;
+    past: Array<[GameProps, AstNode[]]>;
+    present: Option<[GameProps, AstNode[]]>;
+    future: Array<[GameProps, AstNode[]]>;
 }
 
 const gameReducer: Reducer<GameState, GameAction> = (
     state: GameState | undefined,
     action: GameAction
 ): GameState => {
+    if (action.type === 'SET_PAST') {
+        return {
+            past: init(action.past).getOrElse([]),
+            present: last(action.past),
+            future: []
+        };
+    }
+
     if (state === undefined) {
         return {
             past: [],
@@ -40,10 +52,10 @@ export default gameReducer;
 
 const reduceSomePresent = (
     state: GameState,
-    past: Array<[GameProps, Block]>,
-    present: [GameProps, Block],
-    future: Array<[GameProps, Block]>,
-    action: GameAction
+    past: Array<[GameProps, AstNode[]]>,
+    present: [GameProps, AstNode[]],
+    future: Array<[GameProps, AstNode[]]>,
+    action: UndoAction | RedoAction | AddBlockAction
 ): GameState => {
     switch (action.type) {
         case 'UNDO':
@@ -66,7 +78,7 @@ const reduceSomePresent = (
                     }))
                 )
                 .getOrElse(state);
-        default:
+        case 'ADD_BLOCK':
             const newPresent = gamePropsReducer(present, action);
             if (present === newPresent) return state;
             return {
@@ -77,10 +89,10 @@ const reduceSomePresent = (
     }
 };
 
-const gamePropsReducer: Reducer<[GameProps, Block], GameAction> = (
-    state: [GameProps, Block] | undefined,
+const gamePropsReducer: Reducer<[GameProps, AstNode[]], GameAction> = (
+    state: [GameProps, AstNode[]] | undefined,
     action: GameAction
-): [GameProps, Block] => {
+): [GameProps, AstNode[]] => {
     if (!isAddBlockAction(action)) {
         return [GameProps.empty, []];
     }

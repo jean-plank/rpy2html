@@ -5,13 +5,11 @@ import * as confirmStyles from '../components/__style/Confirm.css';
 import * as notificationsStyles from '../components/__style/Notifications.css';
 import * as armlessWankerMenuStyles from '../components/game/__style/ArmlessWankerMenu.css';
 import * as choicesStyles from '../components/game/__style/Choices.css';
-import * as gameStyles from '../components/game/__style/Game.css';
 import * as textBoxStyles from '../components/game/__style/Textbox.css';
 import * as helpStyles from '../components/menus/__style/Help.css';
 import * as menuButtonStyles from '../components/menus/__style/MenuButton.css';
 import * as menuStyles from '../components/menus/__style/menus.css';
 import * as saveSlotStyles from '../components/menus/__style/SaveSlot.css';
-import * as gameMenuStyles from '../components/menus/gameMenu/__style/GameMenu.css';
 import * as mainMenuStyles from '../components/menus/mainMenu/__style/MainMenu.css';
 import * as memoryStyles from '../components/menus/mainMenu/__style/Memory.css';
 import * as memoryGameStyles from '../components/menus/mainMenu/__style/MemoryGame.css';
@@ -26,8 +24,9 @@ const parseStyle = (
     fonts: StrMap<Font>,
     images: StrMap<Image>
 ): HTMLStyleElement => {
-    const newStyleIsSome = lookup('main_menu_overlay', images).isSome();
-    const ifNewStyle = (style: string): string => (newStyleIsSome ? style : '');
+    const newStyleIsNone = lookup('main_menu_overlay', images).isNone();
+    const ifNotNewStyle = (style: string): string =>
+        newStyleIsNone ? style : '';
 
     const slotBgIsNone = lookup('slot_bg', images).isNone();
     const ifNoSlotBg = (style: string): string => (slotBgIsNone ? style : '');
@@ -35,10 +34,7 @@ const parseStyle = (
     const res = document.createElement('style');
     res.innerHTML = `${getFonts(fonts)}
 
-.${mainMenuStyles.mainMenu},
-.${gameStyles.game},
-.${gameMenuStyles.gameMenu},
-.${confirmStyles.confirm} {
+.${appStyles.view} {
     width: ${(100 * style.game_width) / style.game_height}vh;
 }
 
@@ -103,7 +99,7 @@ const parseStyle = (
 }
 
 .${menuStyles.menuBar} {
-    width: ${style.mmenuitems_width};${ifNewStyle(`
+    width: ${style.mmenuitems_width};${ifNotNewStyle(`
     background-color: rgba(19, 24, 25, 0.75);`)}
 }
 
@@ -122,7 +118,7 @@ const parseStyle = (
     font-size: ${style.quickbtn_fsize_h}vh;
 }
 
-.${memoryStyles.about} {
+.${memoryStyles.header} {
     border-color: ${style.interface_text_color};
 }
 
@@ -217,7 +213,7 @@ const parseStyle = (
 
 .${confirmStyles.frame} {
     padding: ${style.confirmframe_padding};
-    ${getBgOrElse(images, 'frame_bg', 'black')};${ifNewStyle(`
+    ${getBgOrElse(images, 'frame_bg', 'black')};${ifNotNewStyle(`
     border: 3px solid #0095c7;`)}
 }
 
@@ -226,10 +222,7 @@ const parseStyle = (
         flex-direction: column;
     }
 
-    .${mainMenuStyles.mainMenu},
-    .${gameStyles.game},
-    .${gameMenuStyles.gameMenu},
-    .${confirmStyles.confirm} {
+    .${appStyles.view} {
         width: 100vw;
         height: ${(100 * style.game_height) / style.game_width}vw;
     }

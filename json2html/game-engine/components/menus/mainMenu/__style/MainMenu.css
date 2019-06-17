@@ -1,7 +1,3 @@
 .main-menu {
-    position: absolute;
-    height: 100vh;
-    overflow: hidden;
     font-size: inherit;
-    outline: none;
 }

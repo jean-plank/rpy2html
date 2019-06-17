@@ -16,13 +16,14 @@ const History: FunctionComponent<Props> = ({ nodes }) => (
         {nodes.reduce<JSX.Element[]>(
             (acc, node, i) =>
                 node instanceof NodeWithChar
-                    ? acc.concat(
+                    ? [
+                          ...acc,
                           <HistoryLine
                               key={i}
                               char={node.who}
                               text={node.what}
                           />
-                      )
+                      ]
                     : acc,
             []
         )}

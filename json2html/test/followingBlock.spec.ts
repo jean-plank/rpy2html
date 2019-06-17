@@ -26,7 +26,7 @@ describe(followingBlock, () => {
             images: new StrMap({ toto: new Image('toto') })
         } as unknown) as AppData;
         [node, node1, node2, node3].map(_ =>
-            _.init({ data, execThenExecNext })
+            _.init({ id: '', data, execThenExecNext })
         );
 
         expect(followingBlock(node)).toEqual([node1, node2]);
@@ -40,7 +40,7 @@ describe(followingBlock, () => {
             nodes: new StrMap({ node1 }),
             images: new StrMap({ toto: new Image('toto') })
         } as unknown) as AppData;
-        [node, node1].map(_ => _.init({ data, execThenExecNext }));
+        [node, node1].map(_ => _.init({ id: '', data, execThenExecNext }));
 
         expect(followingBlock(node)).toEqual([node1]);
     });
@@ -54,7 +54,9 @@ describe(followingBlock, () => {
             nodes: new StrMap({ node1, node2 }),
             images: new StrMap({ toto: new Image('toto') })
         } as unknown) as AppData;
-        [node, node1, node2].map(_ => _.init({ data, execThenExecNext }));
+        [node, node1, node2].map(_ =>
+            _.init({ id: '', data, execThenExecNext })
+        );
 
         expect(() => followingBlock(node)).toThrow(
             EvalError('Node Show("toto") has more than one next node')

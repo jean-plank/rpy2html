@@ -4,7 +4,7 @@ import { StrMap } from 'fp-ts/lib/StrMap';
 import AppData from '../game-engine/app/AppData';
 import Image from '../game-engine/models/medias/Image';
 import Sound from '../game-engine/models/medias/Sound';
-import Block from '../game-engine/nodes/Block';
+import AstNode from '../game-engine/nodes/AstNode';
 import Play from '../game-engine/nodes/Play';
 import Show from '../game-engine/nodes/Show';
 import GameHistory from '../game-engine/store/GameHistory';
@@ -48,9 +48,11 @@ describe(GameHistory, () => {
     const node2 = new Play('sound', 'sound1');
     const node3 = new Show('toto');
     const node4 = new Show('titi');
-    const block1: Block = [node1, node2];
-    const block2: Block = [node3, node4];
-    [block1, block2].map(_ => _.map(_ => _.init({ data, execThenExecNext })));
+    const block1: AstNode[] = [node1, node2];
+    const block2: AstNode[] = [node3, node4];
+    [block1, block2].map(_ =>
+        _.map(_ => _.init({ id: '', data, execThenExecNext }))
+    );
 
     const block1Props = {
         ...GameProps.empty,

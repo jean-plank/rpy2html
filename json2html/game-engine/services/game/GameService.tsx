@@ -1,23 +1,24 @@
 import { isEmpty } from 'fp-ts/lib/Array';
 import * as React from 'react';
+import { createRef, RefObject } from 'react';
 
 import App from '../../app/App';
 import Context from '../../app/Context';
-import { Translation } from '../../app/translations';
 import getArmlessWankerMenu, {
     ArmlessWankerMenuType
 } from '../../components/game/getArmlessWankerMenu';
 import getGame, { GameType } from '../../components/game/getGame';
 import AstNode from '../../nodes/AstNode';
-import Block from '../../nodes/Block';
 import Menu from '../../nodes/Menu';
 import GameHistory from '../../store/GameHistory';
 import GameProps from '../../store/GameProps';
-import blocksFromHistory from '../../utils/blocksFromHistory';
 import GameMenuService from '../GameMenuService';
+import KeyUpAble from '../KeyUpAble';
 import MainMenuService from '../MainMenuService';
 import NotificationsService from '../NotificationsService';
+import Service from '../Service';
 import SoundService from '../SoundService';
+import QuickSave from '../storage/QuickSave';
 import StorageService from '../storage/StorageService';
 import followingBlock from './followingBlock';
 
@@ -31,14 +32,15 @@ interface Args {
     gameMenuService: GameMenuService;
 }
 
-export default class GameService {
+export default class GameService implements Service {
+    keyUpAble: RefObject<KeyUpAble> = createRef();
+
     private app: App;
+    private context: Context;
     private storageService: StorageService;
     private notificationsService: NotificationsService;
     private soundService: SoundService;
     private mainMenuService: MainMenuService;
-    private transl: Translation;
-    private firstNode: AstNode;
     private history: GameHistory;
     private Game: GameType;
     private ArmlessWankerMenu: ArmlessWankerMenuType;
@@ -53,6 +55,7 @@ export default class GameService {
         gameMenuService
     }: Args) => {
         this.app = app;
+        this.context = context;
         this.storageService = storageService;
         this.notificationsService = notificationsService;
         this.soundService = soundService;
@@ -60,13 +63,11 @@ export default class GameService {
 
         const { data, firstNode } = context;
         const gameService = this;
-        const mountCallback = this.execThenExecNext(firstNode);
         const showGameMenu = gameMenuService.show(() => this.history.nodes());
 
         this.Game = getGame({
             gameService,
-            showGameMenu,
-            mountCallback
+            showGameMenu
         });
         this.ArmlessWankerMenu = getArmlessWankerMenu({
             context,
@@ -74,25 +75,22 @@ export default class GameService {
             showGameMenu
         });
 
-        data.nodes.map(_ =>
-            _.init({ data, execThenExecNext: this.execThenExecNext })
+        data.nodes.mapWithKey((id, node) =>
+            node.init({ id, data, execThenExecNext: this.execThenExecNext })
         );
         firstNode.loadBlock();
     }
 
     start = () => {
         this.initHistory();
-        this.show();
+        this.execThenExecNext(this.context.firstNode)();
     }
 
-    show = () =>
-        this.app.setView(
-            <this.Game
-                gameProps={this.history.props().getOrElse(GameProps.empty)}
-            />
-        )
+    show = () => {
+        this.update(this.history.props().getOrElse(GameProps.empty));
+    }
 
-    update = (gameProps: GameProps) => {
+    private update = (gameProps: GameProps) => {
         // video
         gameProps.video.map(_ =>
             _.onEnded(() => {
@@ -110,10 +108,16 @@ export default class GameService {
                 disableQuickLoad={this.storageService.getQuickSave().isNone()}
             />
         );
-        this.app.setView(<this.Game {...{ gameProps, armlessWankerMenu }} />);
+        this.app.setView(
+            this,
+            <this.Game
+                ref={this.keyUpAble}
+                {...{ gameProps, armlessWankerMenu }}
+            />
+        );
     }
 
-    private execThenExecNext = (node: AstNode) => () =>
+    execThenExecNext = (node: AstNode) => () =>
         this.execute([node, ...followingBlock(node)])
 
     execNextIfNotMenu = () =>
@@ -123,7 +127,7 @@ export default class GameService {
 
     private execNext = (node: AstNode) => this.execute(followingBlock(node));
 
-    private execute = (block: Block) => {
+    private execute = (block: AstNode[]) => {
         if (this.history.currentNode().exists(_ => isEmpty(_.nexts()))) {
             return this.mainMenuService.show();
         }
@@ -141,24 +145,21 @@ export default class GameService {
 
     redo = () => this.history.redo();
 
-    restoreSave = (history: string[]) => {
+    restoreSave = (save: QuickSave) => {
         this.initHistory();
-        blocksFromHistory(history, [this.firstNode]).map(_ =>
-            this.execute(
-                _.reduce<Block>((acc, [block]) => acc.concat(block), [])
-            )
-        );
-        // TODO: getOrElse notify "couldn't restore save"
+        save.blocks(this.context.firstNode)
+            .map(_ => this.history.setPast(_))
+            .mapLeft(error => {
+                console.error(error);
+                this.notificationsService.notify("Couldn't restore save");
+            });
     }
 
     quickSave = () => {
         this.storageService.storeQuickSave(this.history.nodes());
         this.history.props().map(_ => this.update(_));
-        this.notificationsService.notify(this.transl.menu.saved);
+        this.notificationsService.notify(this.context.transl.menu.saved);
     }
 
-    quickLoad = () =>
-        this.storageService
-            .getQuickSave()
-            .map(_ => this.restoreSave(_.history))
+    quickLoad = () => this.storageService.getQuickSave().map(this.restoreSave);
 }

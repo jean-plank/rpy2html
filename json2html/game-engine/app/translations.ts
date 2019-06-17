@@ -72,7 +72,7 @@ const translations: StrMap<Translation> = new StrMap({
         },
         memory: {
             about:
-                'Jean Plank games are saved on local browser storage. They are only avaible on this computer.',
+                'Saves are stored on local browser storage. They are only avaible on this computer.',
             delete: 'delete',
             deleteAll: 'delete all',
             total: 'total'
@@ -112,7 +112,7 @@ const translations: StrMap<Translation> = new StrMap({
         },
         memory: {
             about:
-                'Les sauvegardes des jeux Jean Plank se trouvent dans les fichiers locaux du navigateur. Elles ne sont disponibles que sur cet ordinateur.',
+                'Les sauvegardes sont stockées dans les fichiers locaux du navigateur. Elles ne sont disponibles que sur cet ordinateur.',
             delete: 'supprimer',
             deleteAll: 'tout supprimer',
             total: 'total'

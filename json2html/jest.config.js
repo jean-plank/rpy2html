@@ -7,5 +7,6 @@ module.exports = {
     // moduleNameMapper: {
     //     '^.+\\.css$': path.resolve(__dirname, '__mocks__/stylesMock.js')
     // },
-    testMatch: [path.resolve(__dirname, 'test/**/*.spec.ts?(x)')]
+    testMatch: [path.resolve(__dirname, 'test/**/*.spec.ts?(x)')],
+    globals: { __DEV: false }
 };

@@ -1,32 +1,35 @@
 import { last } from 'fp-ts/lib/Array';
-import { Option } from 'fp-ts/lib/Option';
+import { fromEither, Option } from 'fp-ts/lib/Option';
+import { StrMap } from 'fp-ts/lib/StrMap';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 
 import * as styles from './__style/SaveSlot.css';
 
+import { Translation } from '../../app/translations';
 import AstNode from '../../nodes/AstNode';
 import Save from '../../services/storage/Save';
-import blocksFromHistory from '../../utils/blocksFromHistory';
 import Game from '../game/Game';
+
+interface Args {
+    nodes: StrMap<AstNode>;
+    firstNode: AstNode;
+    transl: Translation;
+}
 
 interface Props {
     save: Option<Save>;
-    action: (e: React.MouseEvent) => void;
-    emptySlot: string; // string for empty slots (instead of save date)
-    firstNode: AstNode;
+    onClick: (e: React.MouseEvent) => void;
 }
 
-const SaveSlot: FunctionComponent<Props> = ({
-    save,
-    action,
-    emptySlot,
-    firstNode
-}) => {
+const getSaveSlot = ({
+    firstNode,
+    transl
+}: Args): FunctionComponent<Props> => ({ save, onClick }) => {
     const gameRect: JSX.Element = save
         .chain(_ =>
-            blocksFromHistory(_.history, [firstNode]).chain(_ =>
-                last(_).map(([, _]) => (
+            fromEither(_.blocks(firstNode)).chain(_ =>
+                last(_).map(([_]) => (
                     // tslint:disable-next-line: jsx-key
                     <Game gameProps={_} style={styles.game} />
                 ))
@@ -35,12 +38,12 @@ const SaveSlot: FunctionComponent<Props> = ({
         .getOrElse(<div className={styles.emptySlot} />);
 
     return (
-        <div className={styles.saveSlot} onClick={action}>
+        <div className={styles.saveSlot} onClick={onClick}>
             {gameRect}
             <div className={styles.text}>
-                {save.map(_ => _.date).getOrElse(emptySlot)}
+                {save.map(_ => _.date).getOrElse(transl.emptySlot)}
             </div>
         </div>
     );
 };
-export default SaveSlot;
+export default getSaveSlot;

@@ -11,18 +11,20 @@ interface ConstructorArgs {
 }
 
 export interface InitArgs {
+    id: string;
     data: AppData;
     execThenExecNext: (node: AstNode) => () => void;
 }
 
 export default abstract class AstNode {
     stopExecution: boolean;
+    id: string;
 
     protected _nexts: Option<AstNode[]> = none;
     protected execThenExecNext: (node: AstNode) => () => void = () => () => {};
     private idNexts: string[];
 
-    constructor({ idNexts = [], stopExecution = false }: ConstructorArgs = {}) {
+    constructor({ idNexts = [], stopExecution = false }: ConstructorArgs) {
         // _nexts will be set in init when all nodes are created
         this.idNexts = idNexts;
         this.stopExecution = stopExecution;
@@ -30,9 +32,10 @@ export default abstract class AstNode {
 
     abstract toString(): string;
 
-    init({ data, execThenExecNext }: InitArgs) {
+    init({ id, data, execThenExecNext }: InitArgs) {
         this._nexts = some(mapOption(this.idNexts, _ => lookup(_, data.nodes)));
         this.execThenExecNext = execThenExecNext;
+        this.id = id;
     }
 
     load() {
@@ -54,7 +57,7 @@ export default abstract class AstNode {
      * Loads recursively all ressources from this node to the next stopping
      * node.
      */
-    loadBlock(): void {
+    loadBlock() {
         this.load();
         if (!this.stopExecution) {
             this._nexts.map(_ => _.forEach(_ => _.loadBlock()));

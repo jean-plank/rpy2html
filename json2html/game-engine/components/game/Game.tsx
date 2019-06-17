@@ -1,9 +1,11 @@
+import { none, Option } from 'fp-ts/lib/Option';
 import * as React from 'react';
-import { FunctionComponent, useEffect } from 'react';
+import { FunctionComponent } from 'react';
 
 import * as styles from './__style/Game.css';
 
 import Video from '../../models/medias/Video';
+import AstNode from '../../nodes/AstNode';
 import GameProps from '../../store/GameProps';
 import Choices from './Choices';
 import Cutscene from './Cutscene';
@@ -13,9 +15,8 @@ import Textbox from './Textbox';
 
 interface Props {
     gameProps: GameProps;
-    mountCallback?: () => void;
+    execThenExecNext?: Option<(next: AstNode) => (e: React.MouseEvent) => void>;
     armlessWankerMenu?: JSX.Element;
-    onKeyUp?: (e: React.KeyboardEvent) => void;
     onClick?: (e: React.MouseEvent) => void;
     onWheel?: (e: React.WheelEvent) => void;
     style?: string;
@@ -23,18 +24,14 @@ interface Props {
 
 const Game: FunctionComponent<Props> = ({
     gameProps,
-    mountCallback = () => {},
+    execThenExecNext = none,
     armlessWankerMenu,
-    onKeyUp,
     onClick,
     onWheel,
     style
 }) => {
-    useEffect(mountCallback, []);
-
-    const classes = [styles.game]
-        .concat(style === undefined ? [] : style)
-        .join(' ');
+    const classes =
+        style === undefined ? styles.game : `${styles.game} ${style}`;
 
     return gameProps.video
         .map(_ => cutsceneLayout(_))
@@ -42,11 +39,7 @@ const Game: FunctionComponent<Props> = ({
 
     function cutsceneLayout(video: Video): JSX.Element {
         return (
-            <div
-                className={classes}
-                tabIndex={0}
-                {...{ onKeyUp, onClick, onWheel }}
-            >
+            <div className={classes} {...{ onClick, onWheel }}>
                 <Cutscene video={video} />
             </div>
         );
@@ -54,11 +47,7 @@ const Game: FunctionComponent<Props> = ({
 
     function defaultLayout(): JSX.Element {
         return (
-            <div
-                className={classes}
-                tabIndex={1}
-                {...{ onKeyUp, onClick, onWheel }}
-            >
+            <div className={classes} {...{ onClick, onWheel }}>
                 <LayerScene image={gameProps.sceneImg} />
                 <LayerImages images={gameProps.charImgs} />
                 <Textbox
@@ -66,7 +55,12 @@ const Game: FunctionComponent<Props> = ({
                     char={gameProps.textboxChar}
                     text={gameProps.textboxText}
                 />
-                <Choices choices={gameProps.choices} />
+                <Choices
+                    choices={gameProps.choices.map(choice => ({
+                        text: choice.text,
+                        onClick: execThenExecNext.map(_ => _(choice))
+                    }))}
+                />
                 {armlessWankerMenu}
             </div>
         );

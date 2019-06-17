@@ -21,7 +21,9 @@ Install dependencies of the project (from `.`, but will be installed in `./json2
 
 ## Use
 
-    ./rpy2html <renpy executable> <renpy game folder> [--lang <en|fr>] [-o <output_dir>]
+    ./rpy2html <renpy executable> <renpy game folder> \
+        [--lang <lang=en] \
+        [-o <output_dir=dist>]
 
 Default `output_dir` is `./dist`.
 
@@ -30,14 +32,17 @@ Default `output_dir` is `./dist`.
 
 * Only generating output json, but don't make the bundle:
 
-      rpy2json/bin/rpy2json <renpy executable> <renpy game folder> [-o <output_file>]
+      rpy2json/bin/rpy2json <renpy executable> <renpy game folder> \
+          [--lang <lang=en>] \
+          [-o <output_file=generated-json/game.json>]
 
   Default `output_file` is `./generated-json/game.json`.
 
 
 * Making the bundle (needs json):
 
-      json2html/bin/json2html <json_file> [-o <output_dir>]
+      json2html/bin/json2html <json_file> \
+          [-o <output_dir=dist>]
 
   Default `output_dir` is `./dist`.
 

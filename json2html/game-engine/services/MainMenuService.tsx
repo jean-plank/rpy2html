@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { createRef, RefObject } from 'react';
 
 import App from '../app/App';
 import Context from '../app/Context';
 import MainMenu from '../components/menus/mainMenu/MainMenu';
 import GameService from './game/GameService';
+import KeyUpAble from './KeyUpAble';
+import Service from './Service';
 import SoundService from './SoundService';
 import StorageService from './storage/StorageService';
 
@@ -15,10 +18,12 @@ interface Args {
     gameService: GameService;
 }
 
-export default class MainMenuService {
+export default class MainMenuService implements Service {
+    keyUpAble: RefObject<KeyUpAble> = createRef();
+
     private app: App;
     private soundService: SoundService;
-    private mainMenu: JSX.Element;
+    private element: JSX.Element;
 
     init = ({
         app,
@@ -29,8 +34,9 @@ export default class MainMenuService {
     }: Args) => {
         this.app = app;
         this.soundService = soundService;
-        this.mainMenu = (
+        this.element = (
             <MainMenu
+                ref={this.keyUpAble}
                 {...{
                     context,
                     storageService,
@@ -42,6 +48,6 @@ export default class MainMenuService {
 
     show = () => {
         this.soundService.playMainMenuMusic();
-        this.app.setView(this.mainMenu);
+        this.app.setView(this, this.element);
     }
 }

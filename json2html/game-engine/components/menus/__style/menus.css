@@ -1,6 +1,10 @@
 .menu {
     display: flex;
     background-size: 100% 100%;
+    position: absolute;
+    outline: none;
+    height: 100%;
+    width: 100%;
 }
 
 .main-menu-overlay, .game-menu-overlay {

@@ -3,7 +3,6 @@ import { Option } from 'fp-ts/lib/Option';
 import { createStore, Store } from 'redux';
 
 import AstNode from '../nodes/AstNode';
-import Block from '../nodes/Block';
 import GameAction from './GameAction';
 import GameProps from './GameProps';
 import gameReducer, { GameState } from './gameReducer';
@@ -22,10 +21,10 @@ export default class GameHistory {
     currentNode = (): Option<AstNode> =>
         this.state().present.chain(([, _]) => last(_))
 
-    nodes = (): Block => {
+    nodes = (): AstNode[] => {
         const { past, present } = this.state();
-        const res = past.reduce<Block>((acc, [, _]) => acc.concat(_), []);
-        return present.map(([, _]) => res.concat(_)).getOrElse(res);
+        const res = past.reduce<AstNode[]>((acc, [, _]) => [...acc, ..._], []);
+        return present.map(([, _]) => [...res, ..._]).getOrElse(res);
     }
 
     nothingToUndo = (): boolean => isEmpty(this.state().past);
@@ -35,8 +34,11 @@ export default class GameHistory {
     subscribe = (listener: (gameProps: GameProps) => void) =>
         this.store.subscribe(() => this.props().map(_ => listener(_)))
 
-    addBlock = (block: Block) =>
+    addBlock = (block: AstNode[]) =>
         this.store.dispatch({ type: 'ADD_BLOCK', block })
+
+    setPast = (past: Array<[GameProps, AstNode[]]>) =>
+        this.store.dispatch({ type: 'SET_PAST', past })
 
     undo = () => this.store.dispatch({ type: 'UNDO' });
 

@@ -54,16 +54,17 @@ const getMemory = ({ context, storageService }: Args): MemoryType => {
             games: StrMap<number>
         ): [number, JSX.Element[], number] {
             return toArray(games).reduce<[number, JSX.Element[], number]>(
-                ([sum, eltsAcc, i], [key, bytes]) => [
+                ([sum, elts, i], [key, bytes]) => [
                     sum + bytes,
-                    eltsAcc.concat(
+                    [
+                        ...elts,
                         <MemoryGame
                             key={i}
                             storageKey={key}
                             bytes={bytes}
                             deleteStorage={deleteStorage(key)}
                         />
-                    ),
+                    ],
                     i + 1
                 ],
                 [0, [], 0]
@@ -84,7 +85,7 @@ const getMemory = ({ context, storageService }: Args): MemoryType => {
         }
 
         function deleteAll() {
-            games.mapWithKey(key => deleteStorage(key));
+            games.mapWithKey(key => deleteStorage(key)());
         }
     };
 };

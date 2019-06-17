@@ -1,17 +1,25 @@
+import { Option } from 'fp-ts/lib/Option';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 
 import * as styles from './__style/Choices.css';
 
-import Choice from '../../models/Choice';
-
 interface Props {
     choices: Choice[];
 }
 
+interface Choice {
+    text: string;
+    onClick: Option<(e: React.MouseEvent) => void>;
+}
+
 const Choices: FunctionComponent<Props> = props => {
     const choices = props.choices.map((choice, i) => (
-        <button key={i} className={styles.choice} onClick={choice.action}>
+        <button
+            key={i}
+            className={styles.choice}
+            onClick={choice.onClick.toUndefined()}
+        >
             {choice.text}
         </button>
     ));

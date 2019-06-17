@@ -17,8 +17,12 @@ const Notifications: RefForwardingComponent<Notifiable> = (_, ref) => {
 
     useImperativeHandle(ref, () => ({
         notify: (message: string) => {
-            const notif = <div className={styles.notification}>{message}</div>;
-            setNotifs(notifs.concat(notif));
+            const notif = (
+                <div key={Math.random()} className={styles.notification}>
+                    {message}
+                </div>
+            );
+            setNotifs([...notifs, notif]);
             setTimeout(() => setNotifs(notifs.filter(_ => _ !== notif)), 2000);
         }
     }));

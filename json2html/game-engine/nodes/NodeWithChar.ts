@@ -26,8 +26,8 @@ export default abstract class NodeWithChar extends AstNode {
         this.whosName = whosName;
     }
 
-    init({ data, execThenExecNext }: InitArgs) {
-        super.init({ data, execThenExecNext });
+    init({ id, data, execThenExecNext }: InitArgs) {
+        super.init({ id, data, execThenExecNext });
         this.who = this.whosName.chain(name => {
             const res = lookup(name, data.chars);
             if (res.isNone()) {

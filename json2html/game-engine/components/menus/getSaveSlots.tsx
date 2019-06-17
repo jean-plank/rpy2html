@@ -1,41 +1,45 @@
 import { Option } from 'fp-ts/lib/Option';
+import { StrMap } from 'fp-ts/lib/StrMap';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 
 import * as styles from './__style/SaveSlots.css';
 
 import { Translation } from '../../app/translations';
-
-import SaveSlot from './SaveSlot';
-
 import AstNode from '../../nodes/AstNode';
 import Save from '../../services/storage/Save';
+import getSaveSlot from './getSaveSlot';
 
 interface Props {
-    action: (iSlot: number, save: Option<Save>) => void;
     saves: Array<Option<Save>>;
+    onClick: (iSlot: number, save: Option<Save>) => void;
 }
 
 export type SaveSlotsType = FunctionComponent<Props>;
 
 const getSaveSlots = (
-    transl: Translation,
-    firstNode: AstNode
+    nodes: StrMap<AstNode>,
+    firstNode: AstNode,
+    transl: Translation
 ): SaveSlotsType => {
-    return props => {
-        const slots = props.saves.map((save: Option<Save>, i: number) => {
-            const action = () => {
-                props.action(i, save);
-            };
-            return (
-                <SaveSlot
-                    key={i}
-                    {...{ save, action, firstNode }}
-                    emptySlot={transl.emptySlot}
-                />
-            );
-        });
-        return <div className={styles.saveSlots}>{slots}</div>;
+    const SaveSlot = getSaveSlot({ nodes, firstNode, transl });
+
+    return ({ saves, onClick }) => {
+        return (
+            <div className={styles.saveSlots}>
+                {saves.map((save, i) => (
+                    <SaveSlot
+                        key={i}
+                        save={save}
+                        onClick={getOnClick(save, i)}
+                    />
+                ))}
+            </div>
+        );
+
+        function getOnClick(save: Option<Save>, i: number): () => void {
+            return () => onClick(i, save);
+        }
     };
 };
 export default getSaveSlots;
