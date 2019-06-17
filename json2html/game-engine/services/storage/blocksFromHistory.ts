@@ -1,20 +1,18 @@
-import { findFirst, head, isEmpty } from 'fp-ts/lib/Array';
+import { findFirstMap, head, isEmpty } from 'fp-ts/lib/Array';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 
+import { none, some } from 'fp-ts/lib/Option';
 import AstNode from '../../nodes/AstNode';
 import GameProps from '../../store/GameProps';
 
 type EitherArray = Either<string, Array<[GameProps, AstNode[]]>>;
 
 const blocksFromHistory = (
-    nodes: StrMap<AstNode>,
     firstNode: AstNode,
     history: string[]
 ): EitherArray => {
     if (isEmpty(history)) return right([]);
     return blocksFromHistRec(
-        nodes,
         [firstNode],
         history,
         GameProps.empty,
@@ -26,7 +24,6 @@ const blocksFromHistory = (
 export default blocksFromHistory;
 
 const blocksFromHistRec = (
-    nodes: StrMap<AstNode>,
     nexts: AstNode[],
     history: string[],
     currentProps: GameProps,
@@ -34,18 +31,18 @@ const blocksFromHistRec = (
     previousWasStopping: boolean,
     acc: Array<[GameProps, AstNode[]]>
 ): EitherArray => {
-    const historyHead = head(history);
+    const maybeId = head(history);
 
-    if (historyHead.isNone()) {
+    if (maybeId.isNone()) {
         return right(
             previousWasStopping ? acc : [...acc, [currentProps, currentBlock]]
         );
     }
+    const id = maybeId.value;
 
-    return lookup(historyHead.value, nodes)
-        .filter(existsIn(nexts))
-        .map(addNode)
-        .getOrElse(left(`Could\'nt find node with id "${historyHead.value}"`));
+    return findFirstMap(nexts, next =>
+        next.id === id ? some(addNode(next)) : none
+    ).getOrElse(left(`Could\'nt find node with id "${id}"`));
 
     function addNode(currentNode: AstNode): EitherArray {
         const [, ...newHistory] = history;
@@ -57,7 +54,6 @@ const blocksFromHistRec = (
 
         if (currentNode.stopExecution) {
             return blocksFromHistRec(
-                nodes,
                 currentNode.nexts(),
                 newHistory,
                 GameProps.cleaned(newProps),
@@ -68,7 +64,6 @@ const blocksFromHistRec = (
         }
 
         return blocksFromHistRec(
-            nodes,
             currentNode.nexts(),
             newHistory,
             newProps,
@@ -78,6 +73,3 @@ const blocksFromHistRec = (
         );
     }
 };
-
-const existsIn = (nexts: AstNode[]) => (node: AstNode): boolean =>
-    findFirst(nexts, _ => _ === node).isSome();

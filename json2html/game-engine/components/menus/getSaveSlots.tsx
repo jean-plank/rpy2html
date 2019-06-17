@@ -28,12 +28,16 @@ const getSaveSlots = (
         return (
             <div className={styles.saveSlots}>
                 {saves.map((save, i) => (
-                    <SaveSlot key={i} save={save} action={getAction(save, i)} />
+                    <SaveSlot
+                        key={i}
+                        save={save}
+                        onClick={getOnClick(save, i)}
+                    />
                 ))}
             </div>
         );
 
-        function getAction(save: Option<Save>, i: number): () => void {
+        function getOnClick(save: Option<Save>, i: number): () => void {
             return () => onClick(i, save);
         }
     };

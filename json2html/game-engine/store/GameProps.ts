@@ -4,10 +4,10 @@ import { StrMap } from 'fp-ts/lib/StrMap';
 import isOption from '../utils/isOption';
 
 import Char from '../models/Char';
-import Choice from '../models/Choice';
 import Image from '../models/medias/Image';
 import Sound from '../models/medias/Sound';
 import Video from '../models/medias/Video';
+import MenuItem from '../nodes/MenuItem';
 
 export default class GameProps {
     sceneImg: Option<Image>;
@@ -15,7 +15,7 @@ export default class GameProps {
     textboxHide: boolean;
     textboxChar: Option<Char>;
     textboxText: string;
-    choices: Choice[];
+    choices: MenuItem[];
     video: Option<Video>;
     sounds: StrMap<Option<Sound>>; // key chanName
 

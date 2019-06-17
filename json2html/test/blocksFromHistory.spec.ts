@@ -16,7 +16,7 @@ describe(blocksFromHistory, () => {
 
     it('should return empty array for node without nexts', () => {
         const node = new Show('');
-        expect(blocksFromHistory(new StrMap({}), node, [])).toEqual(right([]));
+        expect(blocksFromHistory(node, [])).toEqual(right([]));
     });
 
     it('should return block and props for one node', () => {
@@ -34,7 +34,7 @@ describe(blocksFromHistory, () => {
         };
         const block: AstNode[] = [node];
 
-        const got = blocksFromHistory(data.nodes, node, ['0']);
+        const got = blocksFromHistory(node, ['0']);
         const expected = right([[props, block]]);
         expect(got.toString()).toBe(expected.toString());
     });
@@ -63,7 +63,7 @@ describe(blocksFromHistory, () => {
         };
         const block: AstNode[] = [node0, node1];
 
-        const got = blocksFromHistory(data.nodes, node0, ['0', '1']);
+        const got = blocksFromHistory(node0, ['0', '1']);
         const expected = right([[props, block]]);
         expect(got.toString()).toBe(expected.toString());
     });
@@ -108,7 +108,7 @@ describe(blocksFromHistory, () => {
         };
         const block2: AstNode[] = [node3];
 
-        const got = blocksFromHistory(data.nodes, node0, ['0', '1', '2', '3']);
+        const got = blocksFromHistory(node0, ['0', '1', '2', '3']);
         const expected = right([[props1, block1], [props2, block2]]);
         expect(got.toString()).toBe(expected.toString());
     });
@@ -151,7 +151,7 @@ describe(blocksFromHistory, () => {
             textboxText: 'node 3'
         };
 
-        const got = blocksFromHistory(data.nodes, node0, ['0', '1', '2', '3']);
+        const got = blocksFromHistory(node0, ['0', '1', '2', '3']);
         const expected = right([
             [props0, [node0]],
             [props1, [node1]],

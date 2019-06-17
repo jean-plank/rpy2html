@@ -1,5 +1,4 @@
 import { Either } from 'fp-ts/lib/Either';
-import { StrMap } from 'fp-ts/lib/StrMap';
 import * as t from 'io-ts';
 
 import AstNode from '../../nodes/AstNode';
@@ -14,10 +13,9 @@ export default class QuickSave {
     }
 
     blocks = (
-        nodes: StrMap<AstNode>,
         firstNode: AstNode
     ): Either<string, Array<[GameProps, AstNode[]]>> =>
-        blocksFromHistory(nodes, firstNode, this.history)
+        blocksFromHistory(firstNode, this.history)
 
     static fromNodes = (history: AstNode[]): QuickSave =>
         new QuickSave(history.map(_ => _.id))

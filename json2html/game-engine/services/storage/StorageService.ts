@@ -25,7 +25,7 @@ export default class StorageService {
 
     init = ({
         context: {
-            data: { gameName, nodes },
+            data: { gameName },
             lang,
             firstNode
         }
@@ -64,13 +64,13 @@ export default class StorageService {
                         )
                     )
             );
-        this.loadSaves(nodes, firstNode);
+        this.loadSaves(firstNode);
     }
 
-    private loadSaves = (nodes: StrMap<AstNode>, firstNode: AstNode) =>
+    private loadSaves = (firstNode: AstNode) =>
         this.saves.slots.forEach(_ =>
             _.map(_ =>
-                fromEither(_.blocks(nodes, firstNode))
+                fromEither(_.blocks(firstNode))
                     .chain(_ => last(_))
                     .map(([props]) => {
                         props.sceneImg.map(_ => _.load());

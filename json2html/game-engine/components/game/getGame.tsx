@@ -1,3 +1,4 @@
+import { some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import * as React from 'react';
 import {
@@ -7,6 +8,7 @@ import {
     useImperativeHandle
 } from 'react';
 
+import AstNode from 'game-engine/nodes/AstNode';
 import KeyUpAble from 'game-engine/services/KeyUpAble';
 import GameService from '../../services/game/GameService';
 import GameProps from '../../store/GameProps';
@@ -26,14 +28,19 @@ export type GameType = ForwardRefExoticComponent<
     Props & RefAttributes<KeyUpAble>
 >;
 
-const getGame = ({ gameService, showGameMenu }: Args): GameType =>
-    forwardRef(({ gameProps, armlessWankerMenu }, ref) => {
+const getGame = ({ gameService, showGameMenu }: Args): GameType => {
+    const execThenExecNext = some((next: AstNode) => (e: React.MouseEvent) => {
+        e.stopPropagation();
+        gameService.execThenExecNext(next)();
+    });
+    return forwardRef(({ gameProps, armlessWankerMenu }, ref) => {
         useImperativeHandle(ref, () => ({ onKeyUp }));
 
         return (
             <Game
                 {...{
                     gameProps,
+                    execThenExecNext,
                     armlessWankerMenu,
                     onClick,
                     onWheel
@@ -76,4 +83,5 @@ const getGame = ({ gameService, showGameMenu }: Args): GameType =>
             else if (e.deltaY > 0) gameService.redo();
         }
     });
+};
 export default getGame;

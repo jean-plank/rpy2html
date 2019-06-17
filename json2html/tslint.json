@@ -1,6 +1,10 @@
 {
-    "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
-    "plugins": ["react-hooks"],
+    "extends": [
+        "tslint:recommended",
+        "tslint-react",
+        "tslint-config-prettier",
+        "tslint-react-hooks"
+    ],
     "linterOptions": {
         "exclude": ["node_modules/**/*"]
     },
@@ -25,8 +29,6 @@
         "no-var-requires": false,
         "object-literal-sort-keys": false,
         "prefer-const": true,
-        "react-hooks/exhaustive-deps": "warn",
-        "react-hooks/rules-of-hooks": "error",
         "semicolon": [true, "always"],
         "strict-boolean-expressions": true,
         "strict-type-predicates": true,

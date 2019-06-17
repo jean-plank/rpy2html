@@ -19,17 +19,16 @@ interface Args {
 
 interface Props {
     save: Option<Save>;
-    action: (e: React.MouseEvent) => void;
+    onClick: (e: React.MouseEvent) => void;
 }
 
 const getSaveSlot = ({
-    nodes,
     firstNode,
     transl
-}: Args): FunctionComponent<Props> => ({ save, action }) => {
+}: Args): FunctionComponent<Props> => ({ save, onClick }) => {
     const gameRect: JSX.Element = save
         .chain(_ =>
-            fromEither(_.blocks(nodes, firstNode)).chain(_ =>
+            fromEither(_.blocks(firstNode)).chain(_ =>
                 last(_).map(([_]) => (
                     // tslint:disable-next-line: jsx-key
                     <Game gameProps={_} style={styles.game} />
@@ -39,7 +38,7 @@ const getSaveSlot = ({
         .getOrElse(<div className={styles.emptySlot} />);
 
     return (
-        <div className={styles.saveSlot} onClick={action}>
+        <div className={styles.saveSlot} onClick={onClick}>
             {gameRect}
             <div className={styles.text}>
                 {save.map(_ => _.date).getOrElse(transl.emptySlot)}

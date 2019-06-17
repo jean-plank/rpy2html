@@ -4,8 +4,10 @@ import * as React from 'react';
 import {
     forwardRef,
     ForwardRefExoticComponent,
+    Reducer,
     RefAttributes,
     useImperativeHandle,
+    useReducer,
     useState
 } from 'react';
 
@@ -53,9 +55,12 @@ const getGameMenu = ({
         const [selectedBtn, setSelectedBtn] = useState<GameMenuBtn>(
             fromNullable(propsSelectedBtn).getOrElse(GameMenuBtn.None)
         );
-        const [saves, setSaves] = useState<Array<Option<Save>>>(
-            storageService.getSaves()
+        const [, forceUpdate] = useReducer<Reducer<number, void>>(
+            _ => _ + 1,
+            0
         );
+
+        const saves = storageService.getSaves();
 
         return (
             <div className={menuStyles.menu}>
@@ -142,13 +147,15 @@ const getGameMenu = ({
             return <SaveSlots saves={saves} onClick={maybeSave} />;
 
             function maybeSave(iSlot: number, existingSave: Option<Save>) {
-                existingSave.fold(save(iSlot), _ =>
-                    confirmService.confirmOverride(() => save(iSlot))
+                existingSave.foldL(
+                    () => save(iSlot),
+                    _ => confirmService.confirmOverride(() => save(iSlot))
                 );
             }
+
             function save(iSlot: number) {
                 storageService.storeSave(getHistory(), iSlot);
-                setSaves(storageService.getSaves());
+                forceUpdate();
             }
         }
 

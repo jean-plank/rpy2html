@@ -12,11 +12,6 @@
 
 .empty-slot {}
 
-.game {
+.game, .game video {
     position: relative;
 }
-
-/* .save-slot>.game {
-    position: relative;
-    max-width: 100%;
-} */

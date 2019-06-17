@@ -117,7 +117,7 @@ export default class GameService implements Service {
         );
     }
 
-    private execThenExecNext = (node: AstNode) => () =>
+    execThenExecNext = (node: AstNode) => () =>
         this.execute([node, ...followingBlock(node)])
 
     execNextIfNotMenu = () =>
@@ -147,11 +147,7 @@ export default class GameService implements Service {
 
     restoreSave = (save: QuickSave) => {
         this.initHistory();
-        const {
-            data: { nodes },
-            firstNode
-        } = this.context;
-        save.blocks(nodes, firstNode)
+        save.blocks(this.context.firstNode)
             .map(_ => this.history.setPast(_))
             .mapLeft(error => {
                 console.error(error);
