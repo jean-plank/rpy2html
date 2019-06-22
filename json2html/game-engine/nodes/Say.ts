@@ -3,7 +3,7 @@ import { Either } from 'fp-ts/lib/Either';
 import { fromNullable, some } from 'fp-ts/lib/Option';
 import * as t from 'io-ts';
 
-import GameProps from '../store/GameProps';
+import GameProps from '../gameHistory/GameProps';
 import NodeWithChar from './NodeWithChar';
 
 export default class Say extends NodeWithChar {

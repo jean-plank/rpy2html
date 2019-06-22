@@ -1,9 +1,12 @@
 import { mapOption } from 'fp-ts/lib/Array';
 import { none, Option, some } from 'fp-ts/lib/Option';
-import { lookup } from 'fp-ts/lib/StrMap';
+import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 
-import AppData from '../app/AppData';
-import GameProps from '../store/GameProps';
+import GameProps from '../gameHistory/GameProps';
+import Char from '../models/Char';
+import Image from '../models/medias/Image';
+import Sound from '../models/medias/Sound';
+import Video from '../models/medias/Video';
 
 interface ConstructorArgs {
     idNexts?: string[];
@@ -14,6 +17,14 @@ export interface InitArgs {
     id: string;
     data: AppData;
     execThenExecNext: (node: AstNode) => () => void;
+}
+
+export interface AppData {
+    nodes: StrMap<AstNode>;
+    chars: StrMap<Char>;
+    sounds: StrMap<Sound>;
+    videos: StrMap<Video>;
+    images: StrMap<Image>;
 }
 
 export default abstract class AstNode {
@@ -62,5 +73,18 @@ export default abstract class AstNode {
         if (!this.stopExecution) {
             this._nexts.map(_ => _.forEach(_ => _.loadBlock()));
         }
+    }
+
+    followingBlock = (): AstNode[] => this.followingBlockRec([]);
+
+    private followingBlockRec = (acc: AstNode[]): AstNode[] => {
+        const nexts = this.nexts();
+        if (nexts.length === 0) return acc;
+        if (nexts.length !== 1) {
+            throw EvalError(`Node ${this} has more than one next node`);
+        }
+        const next = nexts[0];
+        if (next.stopExecution) return [...acc, next];
+        return next.followingBlockRec([...acc, next]);
     }
 }

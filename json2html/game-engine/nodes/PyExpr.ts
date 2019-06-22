@@ -1,7 +1,7 @@
 import { Either } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
 
-import GameProps from '../store/GameProps';
+import GameProps from '../gameHistory/GameProps';
 import convertToJs from '../utils/convertToJs';
 import AstNode from './AstNode';
 

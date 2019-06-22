@@ -2,8 +2,8 @@ import { Either } from 'fp-ts/lib/Either';
 import { insert, lookup } from 'fp-ts/lib/StrMap';
 import * as t from 'io-ts';
 
+import GameProps from '../gameHistory/GameProps';
 import Sound from '../models/medias/Sound';
-import GameProps from '../store/GameProps';
 import NodeWithMedia from './NodeWithMedia';
 
 interface Args {

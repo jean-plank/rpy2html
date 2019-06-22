@@ -7,11 +7,10 @@ const schemas = [
     require('./validation-jsons/renpyJson.json'),
     require('./validation-jsons/nodes.json'),
     require('./validation-jsons/fonts.json'),
-    require('./validation-jsons/style.json'),
+    require('./validation-jsons/style.json')
 ];
 
-
-module.exports = function (source, map, meta) {
+module.exports = function(source, map, meta) {
     const callback = this.async();
 
     if (typeof source !== 'string')
@@ -25,16 +24,17 @@ module.exports = function (source, map, meta) {
     const validate = ajv.getSchema('renpyJson');
 
     if (!validate(content))
-        return callback(EvalError(`Invalid JSON:\n${
-            JSON.stringify(validate.errors, null, 2)
-        }`));
+        return callback(
+            EvalError(
+                `Invalid JSON:\n${JSON.stringify(validate.errors, null, 2)}`
+            )
+        );
 
     loadAllFiles(this, content, (err, res) => {
         if (err) return callback(err);
         callback(null, res, map, meta);
     });
-}
-
+};
 
 async function loadAllFiles(webpack, content, callback) {
     try {
@@ -46,17 +46,19 @@ async function loadAllFiles(webpack, content, callback) {
             webpack,
             content.fonts,
             font => font.src,
-            (font, newSrc) => ({ src: newSrc,
-                                 bold: font.bold })
+            (font, newSrc) => ({ src: newSrc, bold: font.bold })
         );
 
-        callback(null, JSON.stringify(content).replace(/\u2028/g, '\\u2028')
-                                              .replace(/\u2029/g, '\\u2029'));
+        callback(
+            null,
+            JSON.stringify(content)
+                .replace(/\u2028/g, '\\u2028')
+                .replace(/\u2029/g, '\\u2029')
+        );
     } catch (err) {
         callback(err);
     }
 }
-
 
 /**
  * @param {A => string}                     getPath    In case file isn't
@@ -64,14 +66,23 @@ async function loadAllFiles(webpack, content, callback) {
  * @param {(file: A, newPath: string) => A} changePath In case file isn't
  * directly the path.
  */
-function loadFiles(webpack, files, getPath=f=>f, changePath=(_file, newPath) => newPath) {
+function loadFiles(
+    webpack,
+    files,
+    getPath = f => f,
+    changePath = (_file, newPath) => newPath
+) {
     return new Promise(async (resolve, reject) => {
         const res = {};
         for (const key in files) {
             if (files.hasOwnProperty(key)) {
                 try {
-                    res[key] = await
-                        loadFile(webpack, files[key], getPath, changePath);
+                    res[key] = await loadFile(
+                        webpack,
+                        files[key],
+                        getPath,
+                        changePath
+                    );
                 } catch (e) {
                     return reject(e);
                 }
@@ -80,7 +91,6 @@ function loadFiles(webpack, files, getPath=f=>f, changePath=(_file, newPath) => 
         resolve(res);
     });
 }
-
 
 function loadFile(webpack, file, getPath, changePath) {
     return new Promise((resolve, reject) =>
@@ -91,18 +101,19 @@ function loadFile(webpack, file, getPath, changePath) {
                 for (const res in module.buildInfo.assets) {
                     return resolve(changePath(file, res));
                 }
-                reject(EvalError(
-                    `Loading file: didn't find output file: "${file}"`
-                ));
+                reject(
+                    EvalError(
+                        `Loading file: didn't find output file: "${file}"`
+                    )
+                );
             }
         )
     );
 }
 
-
 function loadHelp(webpack, lang) {
     return new Promise((resolve, reject) => {
-        let file = path.join(__dirname, `../game-engine/help/${lang}.md`);
+        let file = path.join(__dirname, `help/${lang}.md`);
 
         if (fs.existsSync(file) && fs.lstatSync(file).isFile())
             webpack.loadModule(file, (err, res, _sourceMap, module) => {

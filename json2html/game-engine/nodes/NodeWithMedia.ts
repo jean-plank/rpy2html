@@ -1,8 +1,7 @@
 import { none, Option } from 'fp-ts/lib/Option';
 
-import AppData from '../app/AppData';
 import Media from '../models/medias/Media';
-import AstNode, { InitArgs } from './AstNode';
+import AstNode, { AppData, InitArgs } from './AstNode';
 
 interface Args {
     idNexts?: string[];

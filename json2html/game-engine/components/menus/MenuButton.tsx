@@ -1,35 +1,37 @@
-import { catOptions } from 'fp-ts/lib/Array';
-import { fromNullable, some } from 'fp-ts/lib/Option';
-import * as React from 'react';
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core';
 import { FunctionComponent } from 'react';
 
-import * as styles from './__style/MenuButton.css';
+import { style } from '../../context';
+import Button from '../Button';
 
-export interface IButton {
-    text: string;
-    onClick?: (e: React.MouseEvent) => void;
+interface BtnProps {
+    onClick: (e: React.MouseEvent) => void;
     selected?: boolean;
     disabled?: boolean;
-    className?: string;
 }
 
-const MenuButton: FunctionComponent<IButton> = ({
-    text,
+const MenuButton: FunctionComponent<BtnProps> = ({
     onClick,
     selected = false,
     disabled,
-    className
-}) => {
-    const classes: string = catOptions([
-        some(styles.menuButton),
-        some(styles.selected).filter(_ => selected),
-        fromNullable(className)
-    ]).join(' ');
-
-    return (
-        <button className={classes} {...{ onClick, disabled }}>
-            {text}
-        </button>
-    );
-};
+    children
+}) => (
+    <Button
+        {...{ onClick, disabled }}
+        className={selected ? 'selected' : undefined}
+        css={buttonStyles}
+    >
+        {children}
+    </Button>
+);
 export default MenuButton;
+
+const buttonStyles = css({
+    padding: style.guibtn_padding,
+    height: style.guibtn_height,
+
+    '&.selected, &.selected:hover': {
+        color: style.selected_color
+    }
+});
