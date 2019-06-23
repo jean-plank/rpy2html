@@ -1,7 +1,7 @@
 import { Either } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
 
-import GameProps from '../store/GameProps';
+import GameProps from '../gameHistory/GameProps';
 import NodeWithImage from './NodeWithImage';
 
 export default class Show extends NodeWithImage {

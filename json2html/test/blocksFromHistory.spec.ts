@@ -2,21 +2,20 @@ import { right } from 'fp-ts/lib/Either';
 import { none, some } from 'fp-ts/lib/Option';
 import { StrMap } from 'fp-ts/lib/StrMap';
 
-import AppData from '../game-engine/app/AppData';
+import GameProps from '../game-engine/gameHistory/GameProps';
+import statesFromHistory from '../game-engine/gameHistory/statesFromHistory';
 import Image from '../game-engine/models/medias/Image';
-import AstNode from '../game-engine/nodes/AstNode';
+import AstNode, { AppData } from '../game-engine/nodes/AstNode';
 import Say from '../game-engine/nodes/Say';
 import Scene from '../game-engine/nodes/Scene';
 import Show from '../game-engine/nodes/Show';
-import blocksFromHistory from '../game-engine/services/storage/blocksFromHistory';
-import GameProps from '../game-engine/store/GameProps';
 
-describe(blocksFromHistory, () => {
+describe(statesFromHistory, () => {
     const execThenExecNext = () => () => {};
 
     it('should return empty array for node without nexts', () => {
         const node = new Show('');
-        expect(blocksFromHistory(node, [])).toEqual(right([]));
+        expect(statesFromHistory(node, [])).toEqual(right([]));
     });
 
     it('should return block and props for one node', () => {
@@ -34,7 +33,7 @@ describe(blocksFromHistory, () => {
         };
         const block: AstNode[] = [node];
 
-        const got = blocksFromHistory(node, ['0']);
+        const got = statesFromHistory(node, ['0']);
         const expected = right([[props, block]]);
         expect(got.toString()).toBe(expected.toString());
     });
@@ -63,7 +62,7 @@ describe(blocksFromHistory, () => {
         };
         const block: AstNode[] = [node0, node1];
 
-        const got = blocksFromHistory(node0, ['0', '1']);
+        const got = statesFromHistory(node0, ['0', '1']);
         const expected = right([[props, block]]);
         expect(got.toString()).toBe(expected.toString());
     });
@@ -108,7 +107,7 @@ describe(blocksFromHistory, () => {
         };
         const block2: AstNode[] = [node3];
 
-        const got = blocksFromHistory(node0, ['0', '1', '2', '3']);
+        const got = statesFromHistory(node0, ['0', '1', '2', '3']);
         const expected = right([[props1, block1], [props2, block2]]);
         expect(got.toString()).toBe(expected.toString());
     });
@@ -151,7 +150,7 @@ describe(blocksFromHistory, () => {
             textboxText: 'node 3'
         };
 
-        const got = blocksFromHistory(node0, ['0', '1', '2', '3']);
+        const got = statesFromHistory(node0, ['0', '1', '2', '3']);
         const expected = right([
             [props0, [node0]],
             [props1, [node1]],

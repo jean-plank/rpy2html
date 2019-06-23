@@ -6,16 +6,8 @@ export default class Char {
     name: string;
     color: Option<string>;
 
-    constructor(name: string, color: Option<string>) {
-        this.name = name;
-        this.color = color;
-    }
-
-    toString = (): string =>
-        `Char("${this.name}${this.color
-            .map(_ => ', this.color')
-            .getOrElse('')}")`
-
-    static fromRawChar = (char: RawChar): Char =>
-        new Char(char.name, fromNullable(char.color))
+    static fromRawChar = ({ name, color }: RawChar): Char => ({
+        name,
+        color: fromNullable(color)
+    })
 }

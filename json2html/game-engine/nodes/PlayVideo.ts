@@ -2,8 +2,8 @@ import { Either } from 'fp-ts/lib/Either';
 import { lookup } from 'fp-ts/lib/StrMap';
 import * as t from 'io-ts';
 
+import GameProps from '../gameHistory/GameProps';
 import Video from '../models/medias/Video';
-import GameProps from '../store/GameProps';
 import NodeWithMedia from './NodeWithMedia';
 
 interface Args {
@@ -22,14 +22,6 @@ export default class PlayVideo extends NodeWithMedia<Video> {
         ...super.reduce(gameProps),
         video: this.media.map(_ => _.clone())
     })
-
-    // cleanup = (gameProps: GameProps): GameProps => {
-    //     this.media.map(_ => _.stop());
-    //     return {
-    //         ...super.cleanup(gameProps),
-    //         video: none
-    //     };
-    // }
 
     static decode = (playVideo: unknown): Either<t.Errors, PlayVideo> =>
         PlayVideoType.decode(playVideo).map(

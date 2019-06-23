@@ -1,3 +1,4 @@
+import Font from '../game-engine/models/Font';
 import Obj from '../game-engine/models/Obj';
 
 // TypeScript version of the validation jsons.
@@ -11,7 +12,7 @@ export default interface RenpyJson {
     videos: Obj<string>;
     characters: Obj<RawChar>;
     nodes: Obj<RawNode>;
-    fonts: Obj<RawDefinition>;
+    fonts: Obj<Font>;
     style: Style;
 }
 
@@ -23,11 +24,6 @@ export interface RawChar {
 export interface RawNode {
     class_name: string;
     arguments: unknown[];
-}
-
-export interface RawDefinition {
-    src: string;
-    bold: boolean;
 }
 
 export interface Style {
