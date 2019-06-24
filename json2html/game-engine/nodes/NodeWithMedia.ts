@@ -1,5 +1,6 @@
 import { none, Option } from 'fp-ts/lib/Option';
 
+import Image from '../models/Image';
 import Media from '../models/medias/Media';
 import AstNode, { AppData, InitArgs } from './AstNode';
 
@@ -8,7 +9,9 @@ interface Args {
     stopExecution?: boolean;
 }
 
-export default abstract class NodeWithMedia<T extends Media> extends AstNode {
+export default abstract class NodeWithMedia<
+    T extends Media | Image
+> extends AstNode {
     protected mediaName: string;
     protected media: Option<T> = none;
 

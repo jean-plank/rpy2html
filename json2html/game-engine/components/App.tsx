@@ -79,10 +79,12 @@ const App: FunctionComponent = () => {
     );
 
     const data = { nodes, chars, sounds, videos, images };
-    nodes.mapWithKey((id, node) => node.init({ id, data, execThenExecNext }));
-    firstNode.loadBlock();
 
     useEffect(() => {
+        nodes.mapWithKey((id, node) =>
+            node.init({ id, data, execThenExecNext })
+        );
+        firstNode.loadBlock();
         initDom();
         showMainMenu();
     }, []);

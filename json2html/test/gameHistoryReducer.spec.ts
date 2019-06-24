@@ -7,7 +7,7 @@ import gameHistoryReducer, {
 import GameProps from '../game-engine/gameHistory/GameProps';
 import { GameState } from '../game-engine/gameHistory/gameStateReducer';
 import { HistoryState } from '../game-engine/gameHistory/historiable';
-import Image from '../game-engine/models/medias/Image';
+import Image from '../game-engine/models/Image';
 import Sound from '../game-engine/models/medias/Sound';
 import AstNode, { AppData } from '../game-engine/nodes/AstNode';
 import Play from '../game-engine/nodes/Play';

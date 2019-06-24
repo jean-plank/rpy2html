@@ -2,7 +2,7 @@ import { fromNullable, none, Option, tryCatch } from 'fp-ts/lib/Option';
 import { StrMap } from 'fp-ts/lib/StrMap';
 
 import Char from '../models/Char';
-import Image from '../models/medias/Image';
+import Image from '../models/Image';
 import Sound from '../models/medias/Sound';
 import Video from '../models/medias/Video';
 import MenuItem from '../nodes/MenuItem';

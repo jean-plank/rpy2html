@@ -1,7 +1,7 @@
 import { none } from 'fp-ts/lib/Option';
 import { StrMap } from 'fp-ts/lib/StrMap';
 
-import Image from '../game-engine/models/medias/Image';
+import Image from '../game-engine/models/Image';
 import { AppData } from '../game-engine/nodes/AstNode';
 import Say from '../game-engine/nodes/Say';
 import Show from '../game-engine/nodes/Show';

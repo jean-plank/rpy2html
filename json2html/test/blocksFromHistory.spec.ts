@@ -4,7 +4,7 @@ import { StrMap } from 'fp-ts/lib/StrMap';
 
 import GameProps from '../game-engine/gameHistory/GameProps';
 import statesFromHistory from '../game-engine/gameHistory/statesFromHistory';
-import Image from '../game-engine/models/medias/Image';
+import Image from '../game-engine/models/Image';
 import AstNode, { AppData } from '../game-engine/nodes/AstNode';
 import Say from '../game-engine/nodes/Say';
 import Scene from '../game-engine/nodes/Scene';

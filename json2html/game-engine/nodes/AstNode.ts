@@ -4,7 +4,7 @@ import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 
 import GameProps from '../gameHistory/GameProps';
 import Char from '../models/Char';
-import Image from '../models/medias/Image';
+import Image from '../models/Image';
 import Sound from '../models/medias/Sound';
 import Video from '../models/medias/Video';
 
