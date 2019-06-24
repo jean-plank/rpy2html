@@ -2,25 +2,15 @@
 import { css, CSSObject, jsx } from '@emotion/core';
 import { FunctionComponent } from 'react';
 
-import Image from '../../models/medias/Image';
+import Image from '../../models/Image';
 
 interface Props {
     images: Image[];
 }
 
-const LayerImages: FunctionComponent<Props> = ({ images }) => {
-    return <div css={layerImagesStyles} ref={setImages()} />;
-
-    // keep this method partial (or it won't work)
-    function setImages(): (div: HTMLElement | null) => void {
-        return div => {
-            if (div !== null) {
-                div.innerHTML = '';
-                images.forEach(_ => div.appendChild(_.getElt().cloneNode()));
-            }
-        };
-    }
-};
+const LayerImages: FunctionComponent<Props> = ({ images }) => (
+    <div css={layerImagesStyles}>{images.map(img => img.elt(img.file))}</div>
+);
 export default LayerImages;
 
 const layerImagesStyles = css({

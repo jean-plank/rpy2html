@@ -1,6 +1,6 @@
 import { lookup } from 'fp-ts/lib/StrMap';
 
-import Image from '../models/medias/Image';
+import Image from '../models/Image';
 import NodeWithMedia from './NodeWithMedia';
 
 interface Args {

@@ -4,7 +4,7 @@ import * as t from 'io-ts';
 
 import RenpyJson, { RawNode } from '../renpy-json-loader/RenpyJson';
 import Char from './models/Char';
-import Image from './models/medias/Image';
+import Image from './models/Image';
 import Sound from './models/medias/Sound';
 import Video from './models/medias/Video';
 import Obj from './models/Obj';
