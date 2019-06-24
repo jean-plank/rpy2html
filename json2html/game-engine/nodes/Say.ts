@@ -1,17 +1,21 @@
+import { catOptions } from 'fp-ts/lib/Array';
 import { Either } from 'fp-ts/lib/Either';
-import { fromNullable } from 'fp-ts/lib/Option';
+import { fromNullable, some } from 'fp-ts/lib/Option';
 import * as t from 'io-ts';
 
-import GameProps from '../store/GameProps';
+import GameProps from '../gameHistory/GameProps';
 import NodeWithChar from './NodeWithChar';
 
 export default class Say extends NodeWithChar {
-    toString = (): string =>
-        `Say(${this.who
-            .map(_ => `"${_.name}"`)
-            .fold([], _ => [_])
-            .concat(`"${this.what}"`)
-            .join(', ')})`
+    toString = (): string => {
+        const args: string = catOptions([
+            this.who.map(_ => _.name),
+            some(this.what)
+        ])
+            .map(_ => `"${_}"`)
+            .join(', ');
+        return `Say(${args})`;
+    }
 
     reduce = (gameProps: GameProps): Partial<GameProps> => ({
         ...super.reduce(gameProps),

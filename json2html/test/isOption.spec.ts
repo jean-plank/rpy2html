@@ -1,6 +1,6 @@
 import { none, some } from 'fp-ts/lib/Option';
 
-import isOption from '../game-engine/utils/isOption';
+import { isOption } from '../game-engine/gameHistory/GameProps';
 
 describe(isOption, () => {
     it('should return false for base types', () => {

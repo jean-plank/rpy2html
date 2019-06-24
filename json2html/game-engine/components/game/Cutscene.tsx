@@ -1,7 +1,6 @@
-import * as React from 'react';
+/** @jsx jsx */
+import { css, CSSObject, jsx } from '@emotion/core';
 import { FunctionComponent } from 'react';
-
-import * as styles from './__style/Cutscene.css';
 
 import Video from '../../models/medias/Video';
 
@@ -17,6 +16,24 @@ const Cutscene: FunctionComponent<Props> = ({ video, paused = false }) => {
             if (!paused) video.play();
         } else video.pause();
     };
-    return <div ref={setVideo} className={styles.cutscene} />;
+
+    return <div ref={setVideo} css={cutsceneStyles} />;
 };
 export default Cutscene;
+
+const cutsceneStyles = css({
+    ...common(),
+
+    '& > video': {
+        ...common(),
+        objectFit: 'contain'
+    }
+});
+
+function common(): CSSObject {
+    return {
+        position: 'absolute',
+        width: '100%',
+        height: '100%'
+    };
+}

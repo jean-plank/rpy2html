@@ -1,8 +1,7 @@
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core';
 import { Option } from 'fp-ts/lib/Option';
-import * as React from 'react';
 import { CSSProperties, FunctionComponent } from 'react';
-
-import * as styles from './__style/History.css';
 
 import Char from '../../../models/Char';
 
@@ -14,15 +13,39 @@ interface Props {
 const HistoryLine: FunctionComponent<Props> = ({ char, text }) => {
     const charStyle = char
         .chain<CSSProperties>(_ => _.color.map(_ => ({ color: _ })))
-        .getOrElse({});
-    const charName = char.map(_ => _.name).getOrElse('');
+        .toUndefined();
+    const charName = char.map(_ => _.name).toNullable();
+
     return (
-        <div className={styles.historyLine}>
-            <div className={styles.who} style={charStyle}>
+        <div css={styles.historyLine}>
+            <div css={styles.who} style={charStyle}>
                 {charName}
             </div>
-            <div className={styles.what}>{text}</div>
+            <div css={styles.what}>{text}</div>
         </div>
     );
 };
 export default HistoryLine;
+
+const styles = {
+    historyLine: css({
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        margin: '1em 0',
+
+        '& > div': {
+            padding: '0 0.5em'
+        }
+    }),
+
+    who: css({
+        width: '20%',
+        color: '#0099cc',
+        textAlign: 'right'
+    }),
+
+    what: css({
+        width: '80%'
+    })
+};

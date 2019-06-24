@@ -1,17 +1,25 @@
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core';
 import { none, Option, some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
-import * as React from 'react';
-import { FunctionComponent, KeyboardEvent, useState } from 'react';
+import {
+    forwardRef,
+    KeyboardEvent,
+    RefForwardingComponent,
+    useImperativeHandle,
+    useState
+} from 'react';
 
-import * as menuStyles from '../__style/menus.css';
-import * as mainMenuStyles from './__style/MainMenu.css';
-
-import Context from '../../../app/Context';
-import GameService from '../../../services/game/GameService';
-import Save from '../../../services/storage/Save';
-import StorageService from '../../../services/storage/StorageService';
+import { transl } from '../../../context';
+import QuickSave from '../../../storage/QuickSave';
+import Save from '../../../storage/Save';
+import { getBgOrElse } from '../../../utils/styles';
+import { KeyUpAble } from '../../App';
+import Help from '../Help';
 import MenuButton from '../MenuButton';
-import getMemory from './getMemory';
+import menuStyles, { gameMenuOverlay, mainMenuOverlay } from '../menuStyles';
+import SaveSlots from '../SaveSlots';
+import Memory from './Memory';
 
 enum Btn {
     None,
@@ -21,55 +29,48 @@ enum Btn {
 }
 
 interface Props {
-    context: Context;
-    storageService: StorageService;
-    gameService: GameService;
+    startGame: () => void;
+    saves: Array<Option<Save>>;
+    emptySaves: () => void;
+    loadSave: (save: QuickSave) => void;
 }
 
-const MainMenu: FunctionComponent<Props> = ({
-    context,
-    storageService,
-    gameService
-}) => {
-    const [overlayClassName, setOverlay] = useState<string>(
-        menuStyles.mainMenuOverlay
-    );
+const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
+    { startGame, saves, emptySaves, loadSave },
+    ref
+) => {
+    useImperativeHandle(ref, () => ({ onKeyUp }));
+
+    const [overlayClassName, setOverlay] = useState<string>(mainMenuOverlay);
     const [selectedBtn, setSelectedBtn] = useState<Btn>(Btn.None);
     const [submenu, setSubmenu] = useState<Option<JSX.Element>>(none);
 
-    const Memory = getMemory({ context, storageService });
-    const { transl, SaveSlots, help } = context;
-
     return (
-        <div
-            className={`${menuStyles.menu} ${mainMenuStyles.mainMenu}`}
-            tabIndex={1}
-            onKeyUp={onKeyUp}
-        >
+        <div css={[menuStyles.menu, mainMenuStyles]}>
             <div className={overlayClassName} />
-            <div className={menuStyles.menuBar}>
+            <div css={menuStyles.menuBar}>
+                <MenuButton onClick={startGame}>{transl.menu.start}</MenuButton>
                 <MenuButton
-                    text={transl.menu.start}
-                    onClick={gameService.start}
-                />
-                <MenuButton
-                    text={transl.menu.load}
                     onClick={showLoad}
                     selected={selectedBtn === Btn.Load}
-                />
+                >
+                    {transl.menu.load}
+                </MenuButton>
                 <MenuButton
-                    text={transl.menu.memory}
                     onClick={showMemory}
                     selected={selectedBtn === Btn.Memory}
-                />
+                >
+                    {transl.menu.memory}
+                </MenuButton>
                 <MenuButton
-                    text={transl.menu.help}
                     onClick={showHelp}
                     selected={selectedBtn === Btn.Help}
-                />
+                >
+                    {transl.menu.help}
+                </MenuButton>
             </div>
-            <div className={menuStyles.submenuTitle}>{submenuTitle()}</div>
-            <div className={menuStyles.submenu}>{submenu.toNullable()}</div>
+            <div css={menuStyles.submenuTitle}>{submenuTitle()}</div>
+            <div css={menuStyles.submenu}>{submenu.toNullable()}</div>
         </div>
     );
 
@@ -87,25 +88,25 @@ const MainMenu: FunctionComponent<Props> = ({
     }
 
     function showLoad() {
-        const load = (_: number, save: Option<Save>) =>
-            save.map(_ => gameService.restoreSave(_.history));
-        setOverlay(menuStyles.gameMenuOverlay);
+        setOverlay(gameMenuOverlay);
         setSelectedBtn(Btn.Load);
-        setSubmenu(
-            some(<SaveSlots action={load} saves={storageService.getSaves()} />)
-        );
+        setSubmenu(some(<SaveSlots {...{ saves, onClick }} />));
+
+        function onClick(_: number, save: Option<Save>) {
+            save.map(loadSave);
+        }
     }
 
     function showMemory() {
-        setOverlay(menuStyles.gameMenuOverlay);
+        setOverlay(gameMenuOverlay);
         setSelectedBtn(Btn.Memory);
-        setSubmenu(some(<Memory />));
+        setSubmenu(some(<Memory emptySaves={emptySaves} />));
     }
 
     function showHelp() {
-        setOverlay(menuStyles.gameMenuOverlay);
+        setOverlay(gameMenuOverlay);
         setSelectedBtn(Btn.Help);
-        setSubmenu(some(help));
+        setSubmenu(some(<Help />));
     }
 
     function onKeyUp(e: KeyboardEvent) {
@@ -113,7 +114,7 @@ const MainMenu: FunctionComponent<Props> = ({
             Escape: e => {
                 if (selectedBtn !== Btn.None) {
                     e.stopPropagation();
-                    setOverlay(menuStyles.mainMenuOverlay);
+                    setOverlay(mainMenuOverlay);
                     setSubmenu(none);
                     setSelectedBtn(Btn.None);
                 }
@@ -122,5 +123,9 @@ const MainMenu: FunctionComponent<Props> = ({
         lookup(e.key, keyEvents).map(_ => _(e));
     }
 };
+export default forwardRef<KeyUpAble, Props>(MainMenu);
 
-export default MainMenu;
+const mainMenuStyles = css({
+    fontSize: 'inherit',
+    ...getBgOrElse('main_menu_bg', '#5f777f')
+});

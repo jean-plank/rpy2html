@@ -1,9 +1,0 @@
-.game-menu {
-    position: absolute;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.game-menu:focus {
-    outline: blue;
-}

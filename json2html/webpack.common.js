@@ -31,12 +31,6 @@ module.exports = {
                             camelCase: true,
                             localIdentName: '[local]-[hash:base64:12]'
                         }
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            plugins: [require('autoprefixer')]
-                        }
                     }
                 ]
             },
@@ -101,14 +95,8 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: path.resolve(
-                __dirname,
-                'game-engine/templates/index.html'
-            ),
-            favicon: path.resolve(
-                __dirname,
-                'game-engine/templates/default.ico'
-            )
+            template: path.resolve(__dirname, 'templates/index.html'),
+            favicon: path.resolve(__dirname, 'templates/default.ico')
         })
     ]
 };

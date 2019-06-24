@@ -1,25 +1,33 @@
-import * as React from 'react';
+/** @jsx jsx */
+import { css, CSSObject, jsx } from '@emotion/core';
+import { FunctionComponent } from 'react';
 
-import * as styles from './__style/LayerImages.css';
-
-import Image from '../../models/medias/Image';
+import Image from '../../models/Image';
 
 interface Props {
     images: Image[];
 }
 
-export default class LayerImages extends React.Component<Props> {
-    render = () => (
-        <div className={styles.layerImages} ref={this.setImages()} />
-    )
+const LayerImages: FunctionComponent<Props> = ({ images }) => (
+    <div css={layerImagesStyles}>{images.map(img => img.elt(img.file))}</div>
+);
+export default LayerImages;
 
-    // keep this method partial (or it won't work)
-    private setImages = () => (div: HTMLElement | null) => {
-        if (div !== null) {
-            div.innerHTML = '';
-            this.props.images.forEach(_ =>
-                div.appendChild(_.getElt().cloneNode())
-            );
-        }
+const layerImagesStyles = css({
+    ...common(),
+
+    '& > img': {
+        ...common(),
+        top: '0',
+        left: '0',
+        objectFit: 'contain'
     }
+});
+
+function common(): CSSObject {
+    return {
+        position: 'absolute',
+        height: '100%',
+        width: '100%'
+    };
 }

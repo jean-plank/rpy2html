@@ -1,6 +1,4 @@
-import { Either } from 'fp-ts/lib/Either';
 import { some } from 'fp-ts/lib/Option';
-import * as t from 'io-ts';
 
 import Media from './Media';
 
@@ -30,10 +28,6 @@ export default class Sound extends Media<HTMLAudioElement> {
     pause = () => this.elt.map(_ => _.pause());
 
     onEnded = (f: () => void) => {
-        this.loadIfNot();
         this.elt.map(_ => (_.onended = f));
     }
-
-    static decode = (sound: unknown): Either<t.Errors, Sound> =>
-        Media.decodeFile(sound).map(_ => new Sound(_))
 }

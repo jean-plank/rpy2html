@@ -1,7 +1,5 @@
 import { some } from 'fp-ts/lib/Option';
-import * as t from 'io-ts';
 
-import { Either } from 'fp-ts/lib/Either';
 import Media from './Media';
 
 export default class Video extends Media<HTMLVideoElement> {
@@ -31,7 +29,4 @@ export default class Video extends Media<HTMLVideoElement> {
     }
 
     onEnded = (f: () => void) => (this.getElt().onended = f);
-
-    static decode = (video: unknown): Either<t.Errors, Video> =>
-        Media.decodeFile(video).map(_ => new Video(_))
 }

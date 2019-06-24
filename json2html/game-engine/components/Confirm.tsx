@@ -1,40 +1,60 @@
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
-import * as React from 'react';
-import { FunctionComponent } from 'react';
+import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react';
 
-import * as styles from './__style/Confirm.css';
+import { style } from '../context';
+import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles';
+import withStopPropagation from '../utils/withStopPropagation';
+import { KeyUpAble } from './App';
+import Button from './Button';
 
-import MenuButton, { IButton } from './menus/MenuButton';
-
-interface Props {
-    msg: string;
-    buttons: IButton[];
-    escapeAction?: () => void;
-    hideConfirm: () => void;
+export interface IButton {
+    text: string;
+    onClick?: () => void;
+    selected?: boolean;
+    disabled?: boolean;
 }
 
-const Confirm: FunctionComponent<Props> = ({
-    msg,
-    buttons,
-    escapeAction,
-    hideConfirm
-}) => {
+interface Props {
+    hideConfirm: () => void;
+    message: string;
+    buttons: IButton[];
+    escapeAction?: () => void;
+}
+
+// hideConfirm will always be called after escapeAction
+const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
+    { hideConfirm, message, buttons, escapeAction },
+    ref
+) => {
+    useImperativeHandle(ref, () => ({ onKeyUp }));
+
     return (
-        <div
-            className={styles.confirm}
-            tabIndex={0}
-            onKeyUp={onKeyUp}
-            onClick={onClickBg}
-        >
-            <div className={styles.frame} onClick={onClickFrame}>
+        <div css={styles.confirm} onClick={onClickBg}>
+            <div css={styles.frame} onClick={stopPropagation}>
                 <div
-                    className={styles.msg}
-                    dangerouslySetInnerHTML={{ __html: msg }}
+                    css={styles.message}
+                    dangerouslySetInnerHTML={{ __html: message }}
                 />
-                <div className={styles.items}>{buttonsElts()}</div>
+                <div css={styles.items}>{buttonsElts()}</div>
             </div>
         </div>
     );
+
+    function buttonsElts(): JSX.Element[] {
+        return buttons.map((btn: IButton, i: number) => (
+            <Button
+                key={i}
+                onClick={withStopPropagation(() => {
+                    if (btn.onClick !== undefined) btn.onClick();
+                    hideConfirm();
+                })}
+            >
+                {btn.text}
+            </Button>
+        ));
+    }
 
     function onKeyUp(e: React.KeyboardEvent) {
         const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
@@ -44,24 +64,54 @@ const Confirm: FunctionComponent<Props> = ({
     }
 
     function onClickBg(e: React.SyntheticEvent) {
-        e.stopPropagation();
-        if (escapeAction !== undefined) escapeAction();
-        hideConfirm();
+        withStopPropagation(() => {
+            if (escapeAction !== undefined) escapeAction();
+            hideConfirm();
+        })(e);
     }
 
-    function onClickFrame(e: React.MouseEvent) {
+    function stopPropagation(e: React.MouseEvent) {
         e.stopPropagation();
-    }
-
-    function buttonsElts(): JSX.Element[] {
-        return buttons.map((btn: IButton, i: number) => {
-            const f = (e: React.MouseEvent) => {
-                e.stopPropagation();
-                if (btn.onClick !== undefined) btn.onClick(e);
-                hideConfirm();
-            };
-            return <MenuButton key={i} text={btn.text} onClick={f} />;
-        });
     }
 };
+const Confirm = forwardRef<KeyUpAble, Props>(RawConfirm);
 export default Confirm;
+
+const styles = {
+    confirm: css({
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        outline: 'none',
+        fontFamily: style.mmenu_ffamily,
+        fontSize: `${style.mmenu_fsize_h}vh`,
+        ...getBgOrElse('confirm_overlay', 'rgba(19, 24, 25, 0.25)'),
+        [mediaQuery(style)]: {
+            fontSize: `${style.mmenu_fsize_v}vw`
+        }
+    }),
+
+    frame: css({
+        backgroundSize: '100% 100%',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: style.confirmframe_padding,
+        ...getBgOrElse('frame_bg', 'black'),
+        ...ifOldStyle({
+            border: '3px solid #0095c7'
+        })
+    }),
+
+    message: css({
+        textAlign: 'center'
+    }),
+
+    items: css({
+        display: 'flex',
+        justifyContent: 'space-around',
+        marginTop: '1.67em'
+    })
+};

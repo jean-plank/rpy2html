@@ -1,6 +1,4 @@
-import { Either } from 'fp-ts/lib/Either';
 import { none, Option, Some } from 'fp-ts/lib/Option';
-import * as t from 'io-ts';
 
 import { basename } from 'path';
 
@@ -32,13 +30,4 @@ export default abstract class Media<T extends HTMLElement = HTMLElement> {
             this.load();
         }
     }
-
-    protected static decodeFile = (media: unknown): Either<t.Errors, string> =>
-        MediaType.decode(media).map(_ => _.file)
 }
-
-const MediaType = t.exact(
-    t.type({
-        file: t.string
-    })
-);

@@ -1,21 +1,18 @@
-import { reduce } from 'lodash';
+import { fromNullable } from 'fp-ts/lib/Option';
 
-const convertToJs = (code: string): string => {
-    const match = ` ${code} `.match(word);
-
-    return reduce(
-        match,
-        (acc, m) => {
-            const trimedM = m.trim();
-            if (kwords.indexOf(trimedM) === -1) {
-                return acc.replace(trimedM, `window._${trimedM}`);
-            } else {
+const convertToJs = (code: string): string =>
+    fromNullable(` ${code} `.match(word))
+        .map(_ =>
+            _.reduce((acc, m) => {
+                const trimedM = m.trim();
+                if (kwords.indexOf(trimedM) === -1) {
+                    return acc.replace(trimedM, `window._${trimedM}`);
+                }
                 return acc;
-            }
-        },
-        code
-    ).replace('==', '===');
-};
+            }, code).replace('==', '===')
+        )
+        .getOrElse(code);
+
 export default convertToJs;
 
 const word = /\W([a-zA-Z_]\w*)\W/g;

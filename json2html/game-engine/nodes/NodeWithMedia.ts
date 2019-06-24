@@ -1,15 +1,17 @@
 import { none, Option } from 'fp-ts/lib/Option';
 
-import AppData from '../app/AppData';
+import Image from '../models/Image';
 import Media from '../models/medias/Media';
-import AstNode, { InitArgs } from './AstNode';
+import AstNode, { AppData, InitArgs } from './AstNode';
 
 interface Args {
     idNexts?: string[];
     stopExecution?: boolean;
 }
 
-export default abstract class NodeWithMedia<T extends Media> extends AstNode {
+export default abstract class NodeWithMedia<
+    T extends Media | Image
+> extends AstNode {
     protected mediaName: string;
     protected media: Option<T> = none;
 
@@ -33,8 +35,8 @@ export default abstract class NodeWithMedia<T extends Media> extends AstNode {
         this.media.map(_ => _.load());
     }
 
-    init({ data, execThenExecNext }: InitArgs) {
-        super.init({ data, execThenExecNext });
+    init({ id, data, execThenExecNext }: InitArgs) {
+        super.init({ id, data, execThenExecNext });
         this.media = this.fromData(data, this.mediaName);
         if (this.media.isNone()) {
             console.warn(

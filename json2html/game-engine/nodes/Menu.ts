@@ -1,31 +1,29 @@
+import { catOptions } from 'fp-ts/lib/Array';
 import { Either } from 'fp-ts/lib/Either';
-import { none, Option } from 'fp-ts/lib/Option';
+import { none, Option, some } from 'fp-ts/lib/Option';
 import * as t from 'io-ts';
 
-import Choice from '../models/Choice';
-import GameProps from '../store/GameProps';
+import GameProps from '../gameHistory/GameProps';
 import MenuItem from './MenuItem';
 import NodeWithChar from './NodeWithChar';
 
 export default class Menu extends NodeWithChar {
     protected _nexts: Option<MenuItem[]>;
 
-    toString = (): string =>
-        `Menu(${this.who
-            .map(_ => `"${_.name}"`)
-            .fold([], _ => [_])
-            .concat(`"${this.what}"`, this.nexts().map(_ => `"${_.text}"`))
-            .join(', ')})`
+    toString = (): string => {
+        const args: string = catOptions([
+            this.who.map(_ => _.name),
+            some(this.what),
+            ...this.nexts().map(_ => some(_.text))
+        ])
+            .map(_ => `"${_}"`)
+            .join(', ');
+        return `Menu(${args})`;
+    }
 
     reduce = (gameProps: GameProps): Partial<GameProps> => {
         const res = super.reduce(gameProps);
-        const choices: Choice[] = this.nexts().map(
-            next =>
-                new Choice(next.text, (e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    this.execThenExecNext(next)();
-                })
-        );
+        const choices: MenuItem[] = this.nexts();
         if (this.what === '') {
             return {
                 ...res,

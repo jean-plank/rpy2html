@@ -21,5 +21,9 @@
         "noUnusedParameters": true,
         "strictNullChecks": true
     },
-    "include": ["./**/*", "../generated-json/**/*"]
+    "include": [
+        "./renpy-json-loader/**/*",
+        "../generated-json/**/*",
+        "./game-engine/**/*"
+    ]
 }
