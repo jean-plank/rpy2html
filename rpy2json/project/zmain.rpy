@@ -1,4 +1,4 @@
-# need to call it zmain for making it excuted as last
+# need to be named zmain so Ren'Py executes it in last position
 
 init python:
     import json
