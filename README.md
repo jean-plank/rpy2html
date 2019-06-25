@@ -9,7 +9,7 @@ Converts RenPy games to a single index.html
 
 * [Node.js](https://nodejs.org)
 
-* [Python 2](https://www.python.org/downloads/) (must be avaible in PATH)
+* [Python 3](https://www.python.org/downloads/) (must be avaible in PATH)
 
 * [Ren'Py](https://www.renpy.org/latest.html) 
 
