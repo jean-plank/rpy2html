@@ -18,22 +18,6 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: ['awesome-typescript-loader']
             },
-            // css
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'typings-for-css-modules-loader',
-                        options: {
-                            modules: true,
-                            namedExport: true,
-                            camelCase: true,
-                            localIdentName: '[local]-[hash:base64:12]'
-                        }
-                    }
-                ]
-            },
             // fonts
             {
                 test: /\.(ttf|otf)$/,
