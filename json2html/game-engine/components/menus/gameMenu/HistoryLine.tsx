@@ -32,7 +32,11 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        margin: '1em 0',
+        paddingTop: '1em',
+
+        ':last-of-type': {
+            paddingBottom: '1em'
+        },
 
         '& > div': {
             padding: '0 0.5em'

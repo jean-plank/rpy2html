@@ -4,7 +4,7 @@ import { TextAlignProperty } from 'csstype';
 import { style } from '../context';
 import { mediaQuery } from '../utils/styles';
 
-const Button = styled.button({
+const GuiButton = styled.button({
     whiteSpace: 'normal',
     color: style.guibtn_color,
     width: style.guibtn_width,
@@ -21,4 +21,4 @@ const Button = styled.button({
         color: style.disabledbtn_color
     }
 });
-export default Button;
+export default GuiButton;

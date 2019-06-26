@@ -18,18 +18,19 @@ interface Choice {
     onClick: (e: React.MouseEvent) => void;
 }
 
-const Choices: FunctionComponent<Props> = ({ choices, styleOverload = {} }) => {
-    const choicesElts = choices.map((choice, i) => (
-        <button
-            key={i}
-            css={[styles.choice, styleOverload.choice]}
-            onClick={choice.onClick}
-        >
-            {choice.text}
-        </button>
-    ));
-    return <div css={styles.choices}>{choicesElts}</div>;
-};
+const Choices: FunctionComponent<Props> = ({ choices, styleOverload = {} }) => (
+    <div css={styles.choices}>
+        {choices.map((choice, i) => (
+            <button
+                key={i}
+                css={[styles.choice, styleOverload.choice]}
+                onClick={choice.onClick}
+            >
+                {choice.text}
+            </button>
+        ))}
+    </div>
+);
 export default Choices;
 
 const styles = {
@@ -54,15 +55,15 @@ const styles = {
         textAlign: style.choicebtn_txtalign as TextAlignProperty,
         ...styleFrom(style.choicebtn_bgtile),
         ...getBgOrElse('choice_btn_bg', 'rgba(0, 0, 0, 0.75)'),
+        [mediaQuery(style)]: {
+            fontSize: `${style.choicebtn_fsize_v}vw`
+        },
         ':hover': {
             color: style.choicebtn_color_hover,
             ...getBgOrElse('choice_btn_hover', 'rgba(0, 153, 204, 0.75)')
         },
         ':disabled': {
             color: style.disabledbtn_color
-        },
-        [mediaQuery(style)]: {
-            fontSize: `${style.choicebtn_fsize_v}vw`
         }
     })
 };

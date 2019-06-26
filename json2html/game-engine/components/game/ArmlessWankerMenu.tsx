@@ -5,7 +5,7 @@ import { FunctionComponent } from 'react';
 import { style, transl } from '../../context';
 import { mediaQuery } from '../../utils/styles';
 import withStopPropagation from '../../utils/withStopPropagation';
-import Button from '../Button';
+import GuiButton from '../GuiButton';
 import GameMenuBtn from '../menus/gameMenu/GameMenuBtn';
 
 interface BtnProps {
@@ -18,9 +18,9 @@ const AWButton: FunctionComponent<BtnProps> = ({
     disabled,
     children
 }) => (
-    <Button {...{ onClick, disabled }} css={styles.button}>
+    <GuiButton {...{ onClick, disabled }} css={styles.button}>
         {children}
-    </Button>
+    </GuiButton>
 );
 
 export interface ArmlessWankerMenuProps {
@@ -81,12 +81,12 @@ const styles = {
         height: 'auto',
         bottom: 0,
         position: 'absolute',
-        width: '100%',
-        fontSize: `${style.quickbtn_fsize_h}vh`
+        width: '100%'
     }),
 
     button: css({
         margin: '0 1em',
+        fontSize: `${style.quickbtn_fsize_h}vh`,
         [mediaQuery(style)]: {
             fontSize: `${style.quickbtn_fsize_v}vw`
         }

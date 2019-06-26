@@ -17,10 +17,16 @@ export default class Channel {
     ) {
         this.confirmAudio = confirmAudio;
         this.currentlyPlaying = none;
+        this.pending = [];
         this.loop = loop;
         this.volume = volume;
         this.stop();
     }
+
+    toString = (): string =>
+        `Channel(${this.currentlyPlaying}, [${this.pending
+            .map(_ => _.toString())
+            .join(', ')}])`
 
     isAlreadyPlaying = (sound: Sound): boolean =>
         this.currentlyPlaying.exists(_ => _.file === sound.file)

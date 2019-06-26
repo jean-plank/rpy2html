@@ -43,7 +43,6 @@ export default class Menu extends NodeWithChar {
         this._nexts.map(_ => _.filter(_ => _.condition)).getOrElse([])
 
     static decode = (menu: unknown): Either<t.Errors, Menu> =>
-        // TODO: correct menu with caption parsing
         MenuType.decode(menu).map(
             ({ arguments: [what, idNexts] }) =>
                 new Menu(none, what, { idNexts })

@@ -33,10 +33,15 @@ interface Props {
     saves: Array<Option<Save>>;
     emptySaves: () => void;
     loadSave: (save: QuickSave) => void;
+    confirmYesNo: (
+        message: string,
+        actionYes: () => void,
+        actionNo?: () => void
+    ) => void;
 }
 
 const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
-    { startGame, saves, emptySaves, loadSave },
+    { startGame, saves, emptySaves, loadSave, confirmYesNo },
     ref
 ) => {
     useImperativeHandle(ref, () => ({ onKeyUp }));
@@ -100,7 +105,9 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     function showMemory() {
         setOverlay(gameMenuOverlay);
         setSelectedBtn(Btn.Memory);
-        setSubmenu(some(<Memory emptySaves={emptySaves} />));
+        setSubmenu(
+            some(<Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />)
+        );
     }
 
     function showHelp() {

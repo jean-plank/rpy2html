@@ -9,9 +9,14 @@ import MemoryGame from './MemoryGame';
 
 interface Props {
     emptySaves: () => void;
+    confirmYesNo: (
+        message: string,
+        actionYes: () => void,
+        actionNo?: () => void
+    ) => void;
 }
 
-const Memory: FunctionComponent<Props> = ({ emptySaves }) => {
+const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
     const [games, setGames] = useState<StrMap<number>>(allJPGamesStorages);
 
     const gameElts = toArray(games).map(([key, bytes], i) => (
@@ -19,7 +24,7 @@ const Memory: FunctionComponent<Props> = ({ emptySaves }) => {
             key={i}
             storageKey={key}
             bytes={bytes}
-            deleteStorage={deleteStorage(key)}
+            deleteStorage={deleteStorageWithConfirm(key)}
         />
     ));
 
@@ -78,8 +83,14 @@ const Memory: FunctionComponent<Props> = ({ emptySaves }) => {
         };
     }
 
+    function deleteStorageWithConfirm(key: string): () => void {
+        return () => confirmYesNo(transl.confirm.delete, deleteStorage(key));
+    }
+
     function deleteAll() {
-        games.mapWithKey(key => deleteStorage(key)());
+        confirmYesNo(transl.confirm.deleteAll, () =>
+            games.mapWithKey(_ => deleteStorage(_)())
+        );
     }
 };
 export default Memory;

@@ -28,6 +28,8 @@ export interface Translation {
         quit: string; // quit game confirm
         unsaved: string; // any action which will lose unsaved progress
         override: string; // overriding an existing save confirm
+        delete: string; // deleting a game's saves
+        deleteAll: string; // deleting all game's saves
         yes: string;
         no: string;
     };
@@ -67,6 +69,8 @@ const translations: StrMap<Translation> = new StrMap({
             quit: 'Are you sure you want to quit?',
             unsaved: 'Are you sure?<br>Unsaved progress will be lost.',
             override: 'Are you sure you want to override the existing save?',
+            delete: "Are you sure you want to delete this game's saves ?",
+            deleteAll: "Are you sure you want to delete all games' saves ?",
             yes: 'Yes',
             no: 'No'
         },
@@ -107,6 +111,10 @@ const translations: StrMap<Translation> = new StrMap({
                 'Êtes vous sûr ?<br>Toute progression non sauvegardée sera perdue.',
             override:
                 'Êtes vous sûr de vouloir écraser la sauvegarde existante ?',
+            delete:
+                'Êtes vous sûr de vouloir supprimer les sauvegardes pour ce jeu ?',
+            deleteAll:
+                'Êtes vous sûr de vouloir supprimer les sauvegardes de tous les jeux ?',
             yes: 'Oui',
             no: 'Non'
         },

@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/core';
 import { FunctionComponent } from 'react';
 
 import { lang, style, transl } from '../../../context';
-import MenuButton from '../MenuButton';
+import GuiButton from '../../GuiButton';
 
 export interface Props {
     storageKey: string;
@@ -25,9 +25,9 @@ const MemoryGame: FunctionComponent<Props> = ({
             <div css={styles.bytes}>
                 {formatNumber(bytes, lang)} {transl.bytes}
             </div>
-            <MenuButton onClick={deleteStorage} css={styles.btn}>
-                ⨯ {strDel}
-            </MenuButton>
+            <GuiButton onClick={deleteStorage} css={styles.btn}>
+                ✗ {strDel}
+            </GuiButton>
         </div>
     );
 };
@@ -41,27 +41,22 @@ const styles = {
         width: '100%',
         padding: '0 3em',
         display: 'flex',
-        alignItems: 'center',
-
-        '& > div': {
-            display: 'flex',
-            padding: '0.67em 0'
-        }
+        alignItems: 'center'
     }),
 
     key: css({
         flexGrow: 1,
-        color: style.accent_color
+        color: style.accent_color,
+        padding: '0.67em 0'
     }),
 
     bytes: css({
         justifyContent: 'right',
-        padding: '0.67em'
+        padding: '0.67em 0',
+        margin: '0 0.67em'
     }),
 
     btn: css({
-        '& > div': {
-            padding: 0 // !important
-        }
+        padding: '0.67em 0'
     })
 };

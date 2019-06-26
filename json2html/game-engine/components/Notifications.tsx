@@ -14,22 +14,37 @@ export interface Notifiable {
     notify: (message: string) => void;
 }
 
+interface Notification {
+    key: number;
+    message: string;
+}
+
+const duration: number = 2000; // ms
+
 const Notifications: RefForwardingComponent<Notifiable, {}> = (_, ref) => {
-    const [notifs, setNotifs] = useState<JSX.Element[]>([]);
+    const [notifs, setNotifs] = useState<Notification[]>([]);
 
     useImperativeHandle(ref, () => ({
         notify: (message: string) => {
-            const notif = (
-                <div key={Math.random()} css={styles.notification}>
-                    {message}
-                </div>
-            );
-            setNotifs([...notifs, notif]);
-            setTimeout(() => setNotifs(notifs.filter(_ => _ !== notif)), 2000);
+            const key = Date.now();
+            setNotifs(_ => [..._, { key, message }]);
+            setTimeout(removeNotif(key), duration);
         }
     }));
 
-    return <div css={styles.notifications}>{notifs}</div>;
+    return (
+        <div css={styles.notifications}>
+            {notifs.map(({ key, message }) => (
+                <div key={key} css={styles.notification}>
+                    {message}
+                </div>
+            ))}
+        </div>
+    );
+
+    function removeNotif(key: number): () => void {
+        return () => setNotifs(_ => _.filter(_ => _.key !== key));
+    }
 };
 export default forwardRef<Notifiable>(Notifications);
 
@@ -51,34 +66,14 @@ const styles = {
         display: 'inline-block',
         padding: '1em',
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        animation: `${fadeOut()} 1.5s linear forwards`
-        // animation: `${reduce()} 1s linear 2s forwards`
+        animation: `${fadeOut()} ${duration / 1000}s linear forwards`
     })
 };
 
 function fadeOut() {
     return keyframes({
-        from: { opacity: 1 },
-        to: { opacity: 0 }
+        '0%': { opacity: 0.9 },
+        '67%': { opacity: 0.9 },
+        '100%': { opacity: 0 }
     });
 }
-
-// function reduce() {
-//     return keyframes({
-//         '0%': {
-//             opacity: 1,
-//             padding: '1em',
-//             height: '1em'
-//         },
-//         '50%': {
-//             opacity: 0,
-//             padding: '1em',
-//             height: '1em'
-//         },
-//         '100%': {
-//             opacity: 0,
-//             padding: '0 1em',
-//             height: 0
-//         }
-//     });
-// }

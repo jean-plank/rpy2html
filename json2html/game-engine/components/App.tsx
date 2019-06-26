@@ -9,6 +9,7 @@ import {
     FunctionComponent,
     RefObject,
     useEffect,
+    useMemo,
     useReducer,
     useRef,
     useState
@@ -60,7 +61,7 @@ type View =
 
 const App: FunctionComponent = () => {
     const confirmAudioShown = useRef(false);
-    const soundService = new SoundService(confirmAudio);
+    const soundService = useMemo(() => new SoundService(confirmAudio), []);
 
     const viewKeyUpAble: RefObject<KeyUpAble> = createRef();
     const gameAble: RefObject<GameAble> = createRef();
@@ -92,9 +93,11 @@ const App: FunctionComponent = () => {
     return (
         <div tabIndex={0} onKeyUp={onKeyUp} css={styles.container}>
             <Global styles={globalStyles} />
-            <div css={styles.view}>{getView(view)}</div>
-            {<Notifications ref={notifiable} />}
-            {confirm.toNullable()}
+            <div css={styles.view}>
+                {getView(view)}
+                {<Notifications ref={notifiable} />}
+                {confirm.toNullable()}
+            </div>
         </div>
     );
 
@@ -108,6 +111,7 @@ const App: FunctionComponent = () => {
                     saves={saves.slots}
                     emptySaves={emptySaves}
                     loadSave={loadSave}
+                    confirmYesNo={confirmYesNo}
                 />
             );
         }

@@ -41,7 +41,9 @@ export default class SoundService {
             lookup(chanName, sounds)
                 .getOrElse(none)
                 .filter(_ => this.musicIsntAlreadyPlaying(chanName, channel, _))
-                .foldL(channel.stop, channel.play);
+                .foldL(() => {
+                    if (chanName !== 'music') channel.stop();
+                }, channel.play);
         });
     }
 }

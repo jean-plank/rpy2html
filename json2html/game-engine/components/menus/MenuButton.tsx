@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/core';
 import { FunctionComponent } from 'react';
 
 import { style } from '../../context';
-import Button from '../Button';
+import GuiButton from '../GuiButton';
 
 interface BtnProps {
     onClick: (e: React.MouseEvent) => void;
@@ -17,13 +17,13 @@ const MenuButton: FunctionComponent<BtnProps> = ({
     disabled,
     children
 }) => (
-    <Button
+    <GuiButton
         {...{ onClick, disabled }}
         className={selected ? 'selected' : undefined}
         css={buttonStyles}
     >
         {children}
-    </Button>
+    </GuiButton>
 );
 export default MenuButton;
 

@@ -7,9 +7,9 @@ import { style } from '../context';
 import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles';
 import withStopPropagation from '../utils/withStopPropagation';
 import { KeyUpAble } from './App';
-import Button from './Button';
+import GuiButton from './GuiButton';
 
-export interface IButton {
+interface Button {
     text: string;
     onClick?: () => void;
     selected?: boolean;
@@ -19,7 +19,7 @@ export interface IButton {
 interface Props {
     hideConfirm: () => void;
     message: string;
-    buttons: IButton[];
+    buttons: Button[];
     escapeAction?: () => void;
 }
 
@@ -43,8 +43,8 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
     );
 
     function buttonsElts(): JSX.Element[] {
-        return buttons.map((btn: IButton, i: number) => (
-            <Button
+        return buttons.map((btn: Button, i: number) => (
+            <GuiButton
                 key={i}
                 onClick={withStopPropagation(() => {
                     if (btn.onClick !== undefined) btn.onClick();
@@ -52,7 +52,7 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
                 })}
             >
                 {btn.text}
-            </Button>
+            </GuiButton>
         ));
     }
 
