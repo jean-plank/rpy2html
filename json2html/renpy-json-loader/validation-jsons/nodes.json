@@ -73,6 +73,19 @@
           "type": "object",
           "required": ["class_name", "arguments"],
           "properties": {
+            "class_name": { "const": "Pause" },
+            "arguments": {
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
             "class_name": { "const": "Play" },
             "arguments": {
               "type": "array",
@@ -139,6 +152,19 @@
           "required": ["class_name", "arguments"],
           "properties": {
             "class_name": { "const": "Show" },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["class_name", "arguments"],
+          "properties": {
+            "class_name": { "const": "ShowWindow" },
             "arguments": {
               "type": "array",
               "minItems": 1,

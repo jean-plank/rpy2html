@@ -10,6 +10,7 @@ import MenuItem from '../nodes/MenuItem';
 export default class GameProps {
     sceneImg: Option<Image>;
     charImgs: Image[];
+    showWindow: boolean;
     textboxHide: boolean;
     textboxChar: Option<Char>;
     textboxText: string;
@@ -20,6 +21,7 @@ export default class GameProps {
     static empty: GameProps = {
         sceneImg: none,
         charImgs: [],
+        showWindow: true,
         textboxHide: false,
         textboxChar: none,
         textboxText: '',

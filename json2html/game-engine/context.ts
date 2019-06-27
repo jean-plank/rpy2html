@@ -14,12 +14,14 @@ import If from './nodes/If';
 import IfBlock from './nodes/IfBlock';
 import Menu from './nodes/Menu';
 import MenuItem from './nodes/MenuItem';
+import Pause from './nodes/Pause';
 import Play from './nodes/Play';
 import PlayVideo from './nodes/PlayVideo';
 import PyExpr from './nodes/PyExpr';
 import Say from './nodes/Say';
 import Scene from './nodes/Scene';
 import Show from './nodes/Show';
+import ShowWindow from './nodes/ShowWindow';
 import Stop from './nodes/Stop';
 import translations from './translations';
 
@@ -62,17 +64,25 @@ function parseNode(rawNode: RawNode): AstNode {
         .alt(IfBlock.decode(rawNode))
         .alt(Menu.decode(rawNode))
         .alt(MenuItem.decode(rawNode))
+        .alt(Pause.decode(rawNode))
         .alt(Play.decode(rawNode))
         .alt(PlayVideo.decode(rawNode))
         .alt(PyExpr.decode(rawNode))
         .alt(Say.decode(rawNode))
         .alt(Scene.decode(rawNode))
         .alt(Show.decode(rawNode))
+        .alt(ShowWindow.decode(rawNode))
         .alt(Stop.decode(rawNode))
         .fold(
             errors => {
-                console.error(errors);
-                throw EvalError("Couldn't parse nodes");
+                console.error(
+                    "Couldn't parse node:",
+                    '\nrawNode =',
+                    rawNode,
+                    '\nerrots =',
+                    errors
+                );
+                throw new Error("Couldn't parse nodes");
             },
             _ => _
         );
