@@ -50,17 +50,7 @@ export default abstract class AstNode {
         this.id = id;
     }
 
-    // load() {
-    //     if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55');
-    // }
-
     abstract reduce(gameProps: GameProps): GameProps;
-    // reduce(_gameProps: GameProps): Partial<GameProps> {
-    //     if (this.stopExecution) {
-    //         this._nexts.map(_ => _.forEach(_ => _.loadBlock()));
-    //     }
-    //     return {};
-    // }
 
     nexts(): AstNode[] {
         return this._nexts.getOrElse([]);
@@ -71,7 +61,10 @@ export default abstract class AstNode {
      * node.
      */
     loadBlock() {
-        if (this instanceof NodeWithMedia) this.load();
+        if (this instanceof NodeWithMedia) {
+            if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55');
+            this.load();
+        }
         if (!this.stopExecution) this.nexts().forEach(_ => _.loadBlock());
     }
 

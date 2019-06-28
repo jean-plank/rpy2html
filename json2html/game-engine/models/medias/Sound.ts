@@ -25,11 +25,8 @@ export default class Sound extends Media {
 
     load = () => this.elt();
 
-    hasSameName = (elt: HTMLAudioElement): boolean => {
-        const res = this.name === elt.getAttribute('name');
-        console.log('hasSameName =', res);
-        return res;
-    }
+    hasSameName = (elt: HTMLAudioElement): boolean =>
+        this.name === elt.getAttribute('name')
 
     static play = (elt: HTMLAudioElement): Promise<void> => elt.play();
 
