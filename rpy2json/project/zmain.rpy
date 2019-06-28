@@ -2,9 +2,10 @@
 
 init python:
     import json
+    import re
     from time import time
     from sys import argv
-    from os import path
+    from os import path, listdir
 
     from nodes_sounds_videos import parse as parse_nodes_sounds_videos
     from images import parse as parse_images
@@ -21,27 +22,41 @@ init python:
     # nodes
     res = parse_nodes_sounds_videos(renpy.game.script.namemap, renpy.ast, config)
 
-    # correct sound files names (it is easier to do it that uglier way)
-    def correct_media(sounds, key, sound):
-        if sound != None:
-            correct = path.join(GAME_BASE_DIR, sound)
+
+    # correct media files names (it is easier to do it that uglier way)
+    MEDIAS = [f for f in listdir(GAME_BASE_DIR) if path.isfile(path.join(GAME_BASE_DIR, f))]
+
+    def correct_media(medias, key, media, media_type):
+        if media != None:
+            correct = path.join(GAME_BASE_DIR, media)
             if path.isfile(correct):
-                sounds[key] = correct
-                return
+                medias[key] = correct
+
             else:
-                var_name = correct
+                res = corrected(media)
+                if res != None:
+                    medias[key] = path.join(GAME_BASE_DIR, res)
+                else:
+                    print('[WARNING] couldn\'t import file {}'.format(correct))
+
         else:
-            var_name = key
-        print('[WARNING] couldn\'t import %s' % var_name)
+            print('[WARNING] couldn\'t import {} with name {}'.format(media_type, key))
+
+    def corrected(media_name):
+        for media in MEDIAS:
+            res = re.match(media_name, media, re.IGNORECASE)
+            if res != None:
+                return res.group(0)
+
 
     sounds = {}
     for key, value in res['sounds'].iteritems():
-        correct_media(sounds, key, value)
+        correct_media(sounds, key, value, 'sound')
     res['sounds'] = sounds
 
     videos = {}
     for key, value in res['videos'].iteritems():
-        correct_media(videos, key, value)
+        correct_media(videos, key, value, 'video')
     res['videos'] = videos
 
     # add images and correct them

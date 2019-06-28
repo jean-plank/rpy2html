@@ -1,4 +1,5 @@
-from os import path
+import re
+from os import path, listdir
 
 
 def parse(GAME_BASE_DIR,
@@ -59,18 +60,36 @@ def parse(GAME_BASE_DIR,
                 return res
 
 
+    IMAGES = listdir(path.join(GAME_BASE_DIR, 'images'))
+    EXTENSIONS = ['jpg', 'png', 'jpeg', 'ico']
+
     def add_file_if_found(res, img_name):
-        for ext in ['png', 'jpg', 'jpeg', 'ico']:
+        for ext in EXTENSIONS:
             img_file = path.join(GAME_BASE_DIR, 'images', '%s.%s' % (img_name, ext))
             if path.isfile(img_file):
                 res[img_name] = img_file
                 return
+
+        for ext in EXTENSIONS:
+            img_file = path.join(GAME_BASE_DIR, 'images', '%s.%s' % (img_name, ext))
+            corrected = corrected_img(img_file)
+            if corrected != None:
+                res[img_name] = path.join(GAME_BASE_DIR, 'images', corrected)
+                return
+
         if not img_name in [
             'black',
             'config.gl_test_image',
             '"#000"'
         ]:
-            print('[WARNING] couldn\'t import %s' % img_name)
+            print('[WARNING] couldn\'t import image {}'.format(img_name))
+
+    def corrected_img(img_name):
+        for image in IMAGES:
+            res = re.match(img_name, image, re.IGNORECASE)
+            if res != None:
+                return res.group(0)
+
 
     # body
     res = {}
