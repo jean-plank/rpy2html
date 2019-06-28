@@ -25,7 +25,11 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick }) => {
         )
         .bindL('currentState', ({ states }) => last(states))
         .return(({ currentState: [gameProps] }) => (
-            <Game gameProps={gameProps} styleOverload={styles.game} />
+            <Game
+                gameProps={gameProps}
+                videoAutoPlay={false}
+                styleOverload={styles.game}
+            />
         ))
         .getOrElse(<div css={styles.emptySlot} />);
 

@@ -5,16 +5,14 @@ import GameProps from '../gameHistory/GameProps';
 import NodeWithImage from './NodeWithImage';
 
 export default class Show extends NodeWithImage {
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
-        return this.media
+    reduce = (gameProps: GameProps): GameProps =>
+        this.media
             .filter(_ => !gameProps.charImgs.includes(_))
-            .map<Partial<GameProps>>(_ => ({
-                ...res,
+            .map(_ => ({
+                ...gameProps,
                 charImgs: [...gameProps.charImgs, _]
             }))
-            .getOrElse(res);
-    }
+            .getOrElse(gameProps)
 
     static decode = (show: unknown): Either<t.Errors, Show> =>
         ShowType.decode(show).map(

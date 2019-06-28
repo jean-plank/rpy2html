@@ -1,33 +1,46 @@
-import { some } from 'fp-ts/lib/Option';
-
 import Media from './Media';
 
-export default class Sound extends Media<HTMLAudioElement> {
-    load = () => {
-        if (!this.isLoaded()) {
-            const elt = document.createElement('audio');
-            elt.setAttribute('src', this.file);
-            elt.setAttribute('preload', 'auto');
-            this.elt = some(elt);
-        }
+interface Args {
+    name: string;
+    file: string;
+}
+
+export default class Sound extends Media {
+    name: string;
+
+    constructor({ name, file }: Args) {
+        super(file);
+        this.name = name;
     }
 
-    play = (volume?: number): Promise<void> => {
-        const elt = this.getElt();
+    elt = (volume?: number, onEnded?: () => void): HTMLAudioElement => {
+        const elt = document.createElement('audio');
+        elt.src = this.file;
+        elt.setAttribute('name', this.name);
+        elt.preload = 'auto';
         if (volume !== undefined) elt.volume = volume;
-        return elt.play();
+        if (onEnded !== undefined) elt.onended = onEnded;
+        return elt;
     }
 
-    stop = () => {
-        this.elt.map(elt => {
-            elt.pause();
-            elt.currentTime = 0;
-        });
+    load = () => this.elt();
+
+    hasSameName = (elt: HTMLAudioElement): boolean => {
+        const res = this.name === elt.getAttribute('name');
+        console.log('hasSameName =', res);
+        return res;
     }
 
-    pause = () => this.elt.map(_ => _.pause());
+    static play = (elt: HTMLAudioElement): Promise<void> => elt.play();
 
-    onEnded = (f: () => void) => {
-        this.elt.map(_ => (_.onended = f));
+    static stop = (elt: HTMLAudioElement) => {
+        elt.pause();
+        elt.currentTime = 0;
+    }
+
+    static pause = (elt: HTMLAudioElement) => elt.pause();
+
+    static onEnded = (f: () => void) => (elt: HTMLAudioElement) => {
+        elt.onended = f;
     }
 }

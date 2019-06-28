@@ -4,9 +4,10 @@ import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 
 import GameProps from '../gameHistory/GameProps';
 import Char from '../models/Char';
-import Image from '../models/Image';
+import Image from '../models/medias/Image';
 import Sound from '../models/medias/Sound';
 import Video from '../models/medias/Video';
+import NodeWithMedia from './NodeWithMedia';
 
 interface ConstructorArgs {
     idNexts?: string[];
@@ -49,16 +50,17 @@ export default abstract class AstNode {
         this.id = id;
     }
 
-    load() {
-        if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55');
-    }
+    // load() {
+    //     if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55');
+    // }
 
-    reduce(_gameProps: GameProps): Partial<GameProps> {
-        if (this.stopExecution) {
-            this._nexts.map(_ => _.forEach(_ => _.loadBlock()));
-        }
-        return {};
-    }
+    abstract reduce(gameProps: GameProps): GameProps;
+    // reduce(_gameProps: GameProps): Partial<GameProps> {
+    //     if (this.stopExecution) {
+    //         this._nexts.map(_ => _.forEach(_ => _.loadBlock()));
+    //     }
+    //     return {};
+    // }
 
     nexts(): AstNode[] {
         return this._nexts.getOrElse([]);
@@ -69,10 +71,8 @@ export default abstract class AstNode {
      * node.
      */
     loadBlock() {
-        this.load();
-        if (!this.stopExecution) {
-            this._nexts.map(_ => _.forEach(_ => _.loadBlock()));
-        }
+        if (this instanceof NodeWithMedia) this.load();
+        if (!this.stopExecution) this.nexts().forEach(_ => _.loadBlock());
     }
 
     followingBlock = (): AstNode[] => this.followingBlockRec([]);

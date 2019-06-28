@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { css, jsx, SerializedStyles } from '@emotion/core';
-import { isEmpty } from 'fp-ts/lib/Array';
+import { isEmpty, last } from 'fp-ts/lib/Array';
 import { fromNullable, Option } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import {
@@ -26,6 +26,7 @@ import Textbox from './Textbox';
 
 interface Props {
     gameProps: GameProps;
+    videoAutoPlay?: boolean;
     armlessWankerMenuProps?: ExtendedArmlessWankerProps;
     styleOverload?: {
         container?: SerializedStyles;
@@ -45,7 +46,12 @@ type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
 };
 
 const Game: RefForwardingComponent<GameAble, Props> = (
-    { gameProps, armlessWankerMenuProps, styleOverload = {} },
+    {
+        gameProps,
+        videoAutoPlay = true,
+        armlessWankerMenuProps,
+        styleOverload = {}
+    },
     ref
 ) => {
     useImperativeHandle(ref, () => ({
@@ -76,7 +82,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
                 css={[gameStyles, styleOverload.container]}
                 {...{ onClick, onWheel }}
             >
-                <Cutscene video={video} />
+                <Cutscene video={video} autoPlay={videoAutoPlay} />
             </div>
         );
     }
@@ -167,7 +173,12 @@ const Game: RefForwardingComponent<GameAble, Props> = (
         args.map(({ currentNode, showMainMenu, addBlock }) =>
             currentNode.exists(_ => isEmpty(_.nexts()))
                 ? showMainMenu()
-                : addBlock(block)
+                : (() => {
+                      last(block).map(_ =>
+                          _.nexts().forEach(_ => _.loadBlock())
+                      );
+                      addBlock(block);
+                  })()
         );
     }
 

@@ -1,39 +1,21 @@
 /** @jsx jsx */
-import { css, CSSObject, jsx } from '@emotion/core';
+import { css } from '@emotion/core';
 import { FunctionComponent } from 'react';
 
 import Video from '../../models/medias/Video';
 
 export interface Props {
     video: Video;
-    paused?: boolean;
+    autoPlay: boolean;
 }
 
-const Cutscene: FunctionComponent<Props> = ({ video, paused = false }) => {
-    const setVideo = (elt: HTMLDivElement | null) => {
-        if (elt !== null) {
-            elt.appendChild(video.getElt());
-            if (!paused) video.play();
-        } else video.pause();
-    };
-
-    return <div ref={setVideo} css={cutsceneStyles} />;
-};
+const Cutscene: FunctionComponent<Props> = ({ video, autoPlay }) =>
+    video.elt({ autoPlay, css: videoStyles });
 export default Cutscene;
 
-const cutsceneStyles = css({
-    ...common(),
-
-    '& > video': {
-        ...common(),
-        objectFit: 'contain'
-    }
+const videoStyles = css({
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain'
 });
-
-function common(): CSSObject {
-    return {
-        position: 'absolute',
-        width: '100%',
-        height: '100%'
-    };
-}

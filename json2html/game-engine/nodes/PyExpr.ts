@@ -19,14 +19,13 @@ export default class PyExpr extends AstNode {
 
     toString = (): string => `PyExpr("${this.code}")`;
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
+    reduce = (gameProps: GameProps): GameProps => {
         try {
             eval(this.code);
         } catch (e) {
             console.error('PyExpr evaluation error:', e);
         }
-        return res;
+        return gameProps;
     }
 
     static decode = (pyExpr: unknown): Either<t.Errors, PyExpr> =>

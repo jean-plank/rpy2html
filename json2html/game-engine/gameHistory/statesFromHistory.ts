@@ -45,10 +45,7 @@ const statesFromHistRec = (
 
     function addNode(currentNode: AstNode): Either<string, GameState[]> {
         const [, ...newHistory] = history;
-        const newProps: GameProps = {
-            ...currentProps,
-            ...currentNode.reduce(currentProps)
-        };
+        const newProps: GameProps = currentNode.reduce(currentProps);
         const newBlock: AstNode[] = [...currentBlock, currentNode];
 
         if (currentNode.stopExecution) {

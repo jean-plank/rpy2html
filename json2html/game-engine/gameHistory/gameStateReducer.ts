@@ -17,7 +17,7 @@ const gameStateReducer: Reducer<GameState, GameAction> = (
 ): GameState => {
     const cleanedProps = GameProps.cleaned(prevProps);
     const newProps = block.reduce<GameProps>(
-        (props, node) => ({ ...props, ...node.reduce(props) }),
+        (props, node) => node.reduce(props),
         cleanedProps
     );
     return [newProps, block];

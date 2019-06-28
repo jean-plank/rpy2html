@@ -6,8 +6,8 @@ import GameProps from '../gameHistory/GameProps';
 import NodeWithImage from './NodeWithImage';
 
 export default class Scene extends NodeWithImage {
-    reduce = (gameProps: GameProps): Partial<GameProps> => ({
-        ...super.reduce(gameProps),
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
         sceneImg: this.media,
         charImgs: [],
         textboxChar: none,

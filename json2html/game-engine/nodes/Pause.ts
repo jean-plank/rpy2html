@@ -15,8 +15,8 @@ export default class Pause extends AstNode {
 
     toString = (): string => `Pause()`;
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => ({
-        ...super.reduce(gameProps),
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
         textboxHide: !gameProps.showWindow
     })
 

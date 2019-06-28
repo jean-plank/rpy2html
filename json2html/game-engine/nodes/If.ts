@@ -1,4 +1,5 @@
 import { Either } from 'fp-ts/lib/Either';
+import { identity } from 'fp-ts/lib/function';
 import { Option } from 'fp-ts/lib/Option';
 import * as t from 'io-ts';
 
@@ -9,6 +10,8 @@ export default class If extends AstNode {
     protected _nexts: Option<IfBlock[]>;
 
     toString = (): string => `If()`;
+
+    reduce = identity;
 
     nexts = (): IfBlock[] =>
         this._nexts

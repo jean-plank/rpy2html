@@ -18,9 +18,9 @@ export default class PlayVideo extends NodeWithMedia<Video> {
         });
     }
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => ({
-        ...super.reduce(gameProps),
-        video: this.media.map(_ => _.clone())
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
+        video: this.media
     })
 
     static decode = (playVideo: unknown): Either<t.Errors, PlayVideo> =>

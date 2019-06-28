@@ -20,13 +20,10 @@ export default class Stop extends AstNode {
 
     toString = (): string => `Stop("${this.chanName}")`;
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
-        return {
-            ...res,
-            sounds: insert(this.chanName, none, gameProps.sounds)
-        };
-    }
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
+        sounds: insert(this.chanName, none, gameProps.sounds)
+    })
 
     static decode = (hide: unknown): Either<t.Errors, Stop> =>
         StopType.decode(hide).map(

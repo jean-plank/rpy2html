@@ -1,19 +1,19 @@
-import { none, Option } from 'fp-ts/lib/Option';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
+import { none, Option, some } from 'fp-ts/lib/Option';
+import { insert, lookup, StrMap } from 'fp-ts/lib/StrMap';
 
 import { sounds } from './context';
 import Channel from './models/Channel';
 import Sound from './models/medias/Sound';
 
 export default class SoundService {
+    private confirmAudio: (okAction: () => void) => void;
     private channels: StrMap<Channel>;
     private mainMenuMusic: Option<Sound>;
 
     constructor(confirmAudio: (okAction: () => void) => void) {
+        this.confirmAudio = confirmAudio;
         this.channels = new StrMap({
-            music: new Channel(confirmAudio, true, 0.5),
-            sound: new Channel(confirmAudio),
-            voice: new Channel(confirmAudio)
+            music: new Channel(confirmAudio, true, 0.5)
         });
         this.mainMenuMusic = lookup('main_menu_music', sounds);
         this.mainMenuMusic.map(_ => _.load());
@@ -26,24 +26,37 @@ export default class SoundService {
         );
     }
 
+    stopChannels = () => this.channels.map(_ => _.stop());
+
     pauseChannels = () => this.channels.map(_ => _.pause());
 
     resumeChannels = () => this.channels.map(_ => _.resume());
 
-    private musicIsntAlreadyPlaying = (
-        chanName: string,
-        channel: Channel,
-        sound: Sound
-    ): boolean => !(chanName === 'music' && channel.isAlreadyPlaying(sound))
+    applyProps = (sounds: StrMap<Option<Sound>>) =>
+        sounds.mapWithKey((chanName, sound) =>
+            lookup(chanName, this.channels)
+                .orElse(() =>
+                    sound.isSome() ? some(this.newChannel(chanName)) : none
+                )
+                .map(channel =>
+                    sound.foldL(
+                        channel.stop,
+                        this.playIfNotMusicAndAlready(chanName, channel)
+                    )
+                )
+        )
 
-    applyProps = (sounds: StrMap<Option<Sound>>) => {
-        this.channels.mapWithKey((chanName, channel) => {
-            lookup(chanName, sounds)
-                .getOrElse(none)
-                .filter(_ => this.musicIsntAlreadyPlaying(chanName, channel, _))
-                .foldL(() => {
-                    if (chanName !== 'music') channel.stop();
-                }, channel.play);
-        });
+    private newChannel = (chanName: string): Channel => {
+        const channel = new Channel(this.confirmAudio);
+        this.channels = insert(chanName, channel, this.channels);
+        return channel;
+    }
+
+    private playIfNotMusicAndAlready = (chanName: string, channel: Channel) => (
+        sound: Sound
+    ): void => {
+        if (!(chanName === 'music' && channel.isAlreadyPlaying(sound))) {
+            channel.play(sound);
+        }
     }
 }

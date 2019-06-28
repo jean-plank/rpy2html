@@ -4,10 +4,9 @@ import * as t from 'io-ts';
 
 import RenpyJson, { RawNode } from '../renpy-json-loader/RenpyJson';
 import Char from './models/Char';
-import Image from './models/Image';
+import Image from './models/medias/Image';
 import Sound from './models/medias/Sound';
 import Video from './models/medias/Video';
-import Obj from './models/Obj';
 import AstNode from './nodes/AstNode';
 import Hide from './nodes/Hide';
 import If from './nodes/If';
@@ -31,11 +30,23 @@ export const nbSlots = 6;
 export const storagePrefix = 'jpGame-';
 export const storageKey = storagePrefix + json.game_name + ` (${json.lang})`;
 
-export const nodes = mapColl(json.nodes, parseNode);
-export const chars = mapColl(json.characters, Char.fromRawChar);
-export const sounds = mapColl(json.sounds, _ => new Sound(_));
-export const videos = mapColl(json.videos, _ => new Video(_));
-export const images = mapColl(json.images, _ => new Image(_));
+export const nodes: StrMap<AstNode> = new StrMap(json.nodes).map(parseNode);
+
+export const chars: StrMap<Char> = new StrMap(json.characters).map(
+    Char.fromRawChar
+);
+
+export const sounds: StrMap<Sound> = new StrMap(json.sounds).mapWithKey(
+    (name, file) => new Sound({ name, file })
+);
+
+export const videos: StrMap<Video> = new StrMap(json.videos).map(
+    _ => new Video(_)
+);
+
+export const images: StrMap<Image> = new StrMap(json.images).mapWithKey(
+    (name, file) => new Image({ name, file })
+);
 
 export const style = json.style;
 export const fonts = new StrMap(json.fonts);
@@ -48,15 +59,6 @@ export const firstNode = lookup('0', nodes).getOrElseL(() => {
     throw EvalError('A node with id 0 is needed to start the story.');
 });
 export const gameName = json.game_name;
-
-function mapColl<A, B>(coll: Obj<A>, f: (elt: A) => B): StrMap<B> {
-    return new StrMap(
-        Object.entries(coll).reduce(
-            (acc, [key, val]) => ({ ...acc, [key]: f(val) }),
-            {}
-        )
-    );
-}
 
 function parseNode(rawNode: RawNode): AstNode {
     return (Hide.decode(rawNode) as Either<t.Errors, AstNode>)

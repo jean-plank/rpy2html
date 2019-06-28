@@ -5,15 +5,13 @@ import GameProps from '../gameHistory/GameProps';
 import NodeWithImage from './NodeWithImage';
 
 export default class Hide extends NodeWithImage {
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
-        return this.media
-            .map<Partial<GameProps>>(image => ({
-                ...res,
+    reduce = (gameProps: GameProps): GameProps =>
+        this.media
+            .map(image => ({
+                ...gameProps,
                 charImgs: gameProps.charImgs.filter(_ => _ !== image)
             }))
-            .getOrElse(res);
-    }
+            .getOrElse(gameProps)
 
     static decode = (hide: unknown): Either<t.Errors, Hide> =>
         HideType.decode(hide).map(

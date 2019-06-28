@@ -1,8 +1,8 @@
 import { Either } from 'fp-ts/lib/Either';
+import { identity } from 'fp-ts/lib/function';
 import * as t from 'io-ts';
 
 import convertToJs from '../utils/convertToJs';
-
 import AstNode from './AstNode';
 
 interface Args {
@@ -18,6 +18,8 @@ export default class IfBlock extends AstNode {
     }
 
     toString = (): string => `IfBlock("${this.rawCondition}")`;
+
+    reduce = identity;
 
     condition = (): boolean => eval(this.rawCondition) === true;
 

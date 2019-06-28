@@ -18,8 +18,8 @@ export default class ShowWindow extends AstNode {
 
     toString = (): string => `ShowWindow(${this.show})`;
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => ({
-        ...super.reduce(gameProps),
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
         showWindow: this.show
     })
 

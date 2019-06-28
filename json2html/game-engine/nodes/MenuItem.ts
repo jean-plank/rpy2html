@@ -1,8 +1,8 @@
 import { Either } from 'fp-ts/lib/Either';
+import { identity } from 'fp-ts/lib/function';
 import * as t from 'io-ts';
 
 import convertToJs from '../utils/convertToJs';
-
 import AstNode from './AstNode';
 
 interface Args {
@@ -21,6 +21,8 @@ export default class MenuItem extends AstNode {
     }
 
     toString = (): string => `MenuItem("${this.text}")`;
+
+    reduce = identity;
 
     static decode = (menuItem: unknown): Either<t.Errors, MenuItem> =>
         MenuItemType.decode(menuItem).map(

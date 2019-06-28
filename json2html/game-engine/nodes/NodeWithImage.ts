@@ -1,6 +1,6 @@
 import { lookup } from 'fp-ts/lib/StrMap';
 
-import Image from '../models/Image';
+import Image from '../models/medias/Image';
 import NodeWithMedia from './NodeWithMedia';
 
 interface Args {
@@ -8,7 +8,7 @@ interface Args {
     stopExecution?: boolean;
 }
 
-export default class NodeWithImage extends NodeWithMedia<Image> {
+export default abstract class NodeWithImage extends NodeWithMedia<Image> {
     constructor(
         imgName: string,
         { idNexts = [], stopExecution = false }: Args = {}

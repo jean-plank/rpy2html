@@ -21,23 +21,19 @@ export default class Menu extends NodeWithChar {
         return `Menu(${args})`;
     }
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
-        const choices: MenuItem[] = this.nexts();
-        if (this.what === '') {
-            return {
-                ...res,
-                textboxHide: true,
-                choices
-            };
-        }
-        return {
-            ...res,
-            textboxChar: this.who,
-            textboxText: this.what,
-            choices
-        };
-    }
+    reduce = (gameProps: GameProps): GameProps =>
+        this.what === ''
+            ? {
+                  ...gameProps,
+                  textboxHide: true,
+                  choices: this.nexts()
+              }
+            : {
+                  ...gameProps,
+                  textboxChar: this.who,
+                  textboxText: this.what,
+                  choices: this.nexts()
+              }
 
     nexts = (): MenuItem[] =>
         this._nexts.map(_ => _.filter(_ => _.condition)).getOrElse([])

@@ -17,8 +17,8 @@ export default class Say extends NodeWithChar {
         return `Say(${args})`;
     }
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => ({
-        ...super.reduce(gameProps),
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
         textboxChar: this.who,
         textboxText: this.what
     })

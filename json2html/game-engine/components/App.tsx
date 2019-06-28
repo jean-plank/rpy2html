@@ -232,6 +232,7 @@ const App: FunctionComponent = () => {
     function loadSave(save: QuickSave) {
         loadAction(firstNode, save)
             .map(_ => {
+                soundService.stopChannels();
                 dispatchGameHistoryAction(_);
                 showGame();
             })
