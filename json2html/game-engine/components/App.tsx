@@ -32,6 +32,7 @@ import gameHistoryReducer, {
 } from '../gameHistory/gameHistoryReducer';
 import Font from '../models/Font';
 import AstNode from '../nodes/AstNode';
+import Menu from '../nodes/Menu';
 import SoundService from '../SoundService';
 import QuickSave from '../storage/QuickSave';
 import Saves from '../storage/Saves';
@@ -127,11 +128,12 @@ const App: FunctionComponent = () => {
                             showGameMenu,
                             undo,
                             disableUndo: isEmpty(gameState.past),
+                            skip,
                             quickSave,
                             quickLoad,
                             disableQuickLoad: saves.quickSave.isNone(),
                             soundService,
-                            currentNode: currentNode(),
+                            currentNodeL,
                             showMainMenu,
                             addBlock,
                             redo,
@@ -178,10 +180,7 @@ const App: FunctionComponent = () => {
 
     function startGame() {
         dispatchGameHistoryAction({ type: 'EMPTY' });
-        dispatchGameHistoryAction({
-            type: 'ADD_BLOCK',
-            block: [firstNode, ...firstNode.followingBlock()]
-        });
+        addBlock([firstNode, ...firstNode.followingBlock().getOrElse([])]);
         showGame();
     }
 
@@ -208,11 +207,39 @@ const App: FunctionComponent = () => {
             fromNullable(gameAble.current).map(_ => _.execThenExecNext(node));
     }
 
+    function skip() {
+        currentNodeL().map(currentNode => {
+            if (!(currentNode instanceof Menu)) {
+                skipFromNode(currentNode)
+                    .map<void>(_ => _.map(addBlock))
+                    .getOrElseL(showMainMenu);
+            }
+        });
+
+        function skipFromNode(node: AstNode): Option<AstNode[][]> {
+            return node
+                .followingBlock()
+                .chain(block => last(block).map(skipRec([block])));
+        }
+
+        function skipRec(acc: AstNode[][]): (node: AstNode) => AstNode[][] {
+            return node => {
+                if (node instanceof Menu) return acc;
+                return node.followingBlock().fold<AstNode[][]>(acc, block => {
+                    const newAcc = [...acc, block];
+                    return last(block)
+                        .map(skipRec(newAcc))
+                        .getOrElse(newAcc);
+                });
+            };
+        }
+    }
+
     function addBlock(block: AstNode[]) {
         dispatchGameHistoryAction({ type: 'ADD_BLOCK', block });
     }
 
-    function currentNode(): Option<AstNode> {
+    function currentNodeL(): Option<AstNode> {
         return Do(option)
             .bind('present', gameState.present)
             .bindL('currentNode', ({ present: [, block] }) => last(block))

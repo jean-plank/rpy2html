@@ -17,6 +17,7 @@ export interface Translation {
         mainMenu: string;
         // armless wanker menu
         back: string;
+        skip: string;
         qSave: string;
         qLoad: string;
         saved: string;
@@ -59,6 +60,7 @@ const translations: StrMap<Translation> = new StrMap({
             save: 'Save',
             mainMenu: 'Main Menu',
             back: 'Back',
+            skip: 'Skip',
             qSave: 'Quick save',
             qLoad: 'Quick load',
             saved: 'Saved!'
@@ -99,6 +101,7 @@ const translations: StrMap<Translation> = new StrMap({
             save: 'Sauvegarder',
             mainMenu: 'Menu Principal',
             back: 'Retour',
+            skip: 'Passer',
             qSave: 'Sauvegarde rapide',
             qLoad: 'Chargement rapide',
             saved: 'Sauvegardé !'

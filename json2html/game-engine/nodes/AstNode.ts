@@ -1,4 +1,4 @@
-import { mapOption } from 'fp-ts/lib/Array';
+import { isEmpty, mapOption } from 'fp-ts/lib/Array';
 import { none, Option, some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 
@@ -68,9 +68,12 @@ export default abstract class AstNode {
         if (!this.stopExecution) this.nexts().forEach(_ => _.loadBlock());
     }
 
-    followingBlock = (): AstNode[] => this.followingBlockRec([]);
+    followingBlock(): Option<AstNode[]> {
+        if (isEmpty(this.nexts())) return none;
+        return some(this.followingBlockRec([]));
+    }
 
-    private followingBlockRec = (acc: AstNode[]): AstNode[] => {
+    private followingBlockRec(acc: AstNode[]): AstNode[] {
         const nexts = this.nexts();
         if (nexts.length === 0) return acc;
         if (nexts.length !== 1) {

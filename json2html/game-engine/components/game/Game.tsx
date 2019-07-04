@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { css, jsx, SerializedStyles } from '@emotion/core';
-import { isEmpty, last } from 'fp-ts/lib/Array';
-import { fromNullable, Option } from 'fp-ts/lib/Option';
+import { last } from 'fp-ts/lib/Array';
+import { fromNullable, Option, some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import {
     forwardRef,
@@ -38,7 +38,7 @@ interface Props {
 
 type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
     soundService: SoundService;
-    currentNode: Option<AstNode>;
+    currentNodeL: () => Option<AstNode>;
     showMainMenu: () => void;
     addBlock: (block: AstNode[]) => void;
     redo: () => void;
@@ -158,27 +158,23 @@ const Game: RefForwardingComponent<GameAble, Props> = (
     }
 
     function execThenExecNext(node: AstNode) {
-        execute([node, ...node.followingBlock()]);
+        execute(some([node, ...node.followingBlock().getOrElse([])]));
     }
 
     function execNextIfNotMenu() {
-        args.map(({ currentNode }) =>
-            currentNode.map(node => {
+        args.map(({ currentNodeL }) =>
+            currentNodeL().map(node => {
                 if (!(node instanceof Menu)) execute(node.followingBlock());
             })
         );
     }
 
-    function execute(block: AstNode[]) {
-        args.map(({ currentNode, showMainMenu, addBlock }) =>
-            currentNode.exists(_ => isEmpty(_.nexts()))
-                ? showMainMenu()
-                : (() => {
-                      last(block).map(_ =>
-                          _.nexts().forEach(_ => _.loadBlock())
-                      );
-                      addBlock(block);
-                  })()
+    function execute(maybeBlock: Option<AstNode[]>) {
+        args.map(({ showMainMenu, addBlock }) =>
+            maybeBlock.foldL(showMainMenu, block => {
+                last(block).map(_ => _.nexts().forEach(_ => _.loadBlock()));
+                addBlock(block);
+            })
         );
     }
 

@@ -27,6 +27,7 @@ export interface ArmlessWankerMenuProps {
     showGameMenu: (btn?: GameMenuBtn) => void;
     undo: () => void;
     disableUndo: boolean;
+    skip: () => void;
     quickSave: () => void;
     quickLoad: () => void;
     disableQuickLoad: boolean;
@@ -34,8 +35,9 @@ export interface ArmlessWankerMenuProps {
 
 const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
     showGameMenu,
-    disableUndo,
     undo,
+    disableUndo,
+    skip,
     quickSave,
     quickLoad,
     disableQuickLoad
@@ -50,6 +52,9 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
             </AWButton>
             <AWButton onClick={showGameMenuWSP('HISTORY')}>
                 {transl.menu.history}
+            </AWButton>
+            <AWButton onClick={withStopPropagation(skip)}>
+                {transl.menu.skip}
             </AWButton>
             <AWButton onClick={showGameMenuWSP('SAVE')}>
                 {transl.menu.save}
