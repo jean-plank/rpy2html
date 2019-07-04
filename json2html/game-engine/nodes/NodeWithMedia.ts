@@ -3,25 +3,16 @@ import { none, Option } from 'fp-ts/lib/Option';
 import Media from '../models/medias/Media';
 import AstNode, { AppData, InitArgs } from './AstNode';
 
-interface Args {
-    idNexts?: string[];
-    stopExecution?: boolean;
-}
-
 export default abstract class NodeWithMedia<T extends Media> extends AstNode {
-    protected mediaName: string;
     protected media: Option<T> = none;
 
-    private fromData: (data: AppData, mediaName: string) => Option<T>;
-
     constructor(
-        fromData: (data: AppData, mediaName: string) => Option<T>,
-        mediaName: string,
-        { idNexts = [], stopExecution = false }: Args = {}
+        private fromData: (data: AppData, mediaName: string) => Option<T>,
+        public mediaName: string,
+        idNexts: string[],
+        stopExecution = false
     ) {
-        super({ idNexts, stopExecution });
-        this.fromData = fromData;
-        this.mediaName = mediaName;
+        super(idNexts, stopExecution);
     }
 
     toString(): string {

@@ -4,13 +4,9 @@ import * as t from 'io-ts';
 import GameProps from '../gameHistory/GameProps';
 import AstNode from './AstNode';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default class Pause extends AstNode {
-    constructor({ idNexts = [] }: Args = {}) {
-        super({ idNexts, stopExecution: true });
+    constructor(idNexts: string[]) {
+        super(idNexts, true);
     }
 
     toString = (): string => `Pause()`;
@@ -22,7 +18,7 @@ export default class Pause extends AstNode {
 
     static decode = (pause: unknown): Either<t.Errors, Pause> =>
         PauseType.decode(pause).map(
-            ({ arguments: [idNexts] }) => new Pause({ idNexts })
+            ({ arguments: [idNexts] }) => new Pause(idNexts)
         )
 }
 

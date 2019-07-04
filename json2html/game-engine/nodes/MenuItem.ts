@@ -5,18 +5,11 @@ import * as t from 'io-ts';
 import convertToJs from '../utils/convertToJs';
 import AstNode from './AstNode';
 
-interface Args {
-    condition?: string;
-    idNexts?: string[];
-}
-
 export default class MenuItem extends AstNode {
-    text: string;
     condition: boolean;
 
-    constructor(text: string, condition: string, { idNexts = [] }: Args = {}) {
-        super({ idNexts });
-        this.text = text;
+    constructor(public text: string, condition: string, idNexts: string[]) {
+        super(idNexts);
         this.condition = eval(convertToJs(condition)) === true;
     }
 
@@ -27,7 +20,7 @@ export default class MenuItem extends AstNode {
     static decode = (menuItem: unknown): Either<t.Errors, MenuItem> =>
         MenuItemType.decode(menuItem).map(
             ({ arguments: [imgName, condition, idNexts] }) =>
-                new MenuItem(imgName, condition, { idNexts })
+                new MenuItem(imgName, condition, idNexts)
         )
 }
 

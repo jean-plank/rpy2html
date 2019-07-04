@@ -16,8 +16,7 @@ export default class Show extends NodeWithImage {
 
     static decode = (show: unknown): Either<t.Errors, Show> =>
         ShowType.decode(show).map(
-            ({ arguments: [imgName, idNexts] }) =>
-                new Show(imgName, { idNexts })
+            ({ arguments: [imgName, idNexts] }) => new Show(imgName, idNexts)
         )
 }
 

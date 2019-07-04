@@ -37,7 +37,7 @@ export const chars: StrMap<Char> = new StrMap(json.characters).map(
 );
 
 export const sounds: StrMap<Sound> = new StrMap(json.sounds).mapWithKey(
-    (name, file) => new Sound({ name, file })
+    (name, file) => new Sound(name, file)
 );
 
 export const videos: StrMap<Video> = new StrMap(json.videos).map(
@@ -45,7 +45,7 @@ export const videos: StrMap<Video> = new StrMap(json.videos).map(
 );
 
 export const images: StrMap<Image> = new StrMap(json.images).mapWithKey(
-    (name, file) => new Image({ name, file })
+    (name, file) => new Image(name, file)
 );
 
 export const style = json.style;
@@ -81,7 +81,7 @@ function parseNode(rawNode: RawNode): AstNode {
                     "Couldn't parse node:",
                     '\nrawNode =',
                     rawNode,
-                    '\nerrots =',
+                    '\nerrors =',
                     errors
                 );
                 throw new Error("Couldn't parse nodes");

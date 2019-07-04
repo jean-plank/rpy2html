@@ -5,15 +5,11 @@ import GameProps from '../gameHistory/GameProps';
 import convertToJs from '../utils/convertToJs';
 import AstNode from './AstNode';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default class PyExpr extends AstNode {
     private code: string;
 
-    constructor(code: string, { idNexts = [] }: Args = {}) {
-        super({ idNexts });
+    constructor(code: string, idNexts: string[]) {
+        super(idNexts);
         this.code = convertToJs(code);
     }
 
@@ -30,7 +26,7 @@ export default class PyExpr extends AstNode {
 
     static decode = (pyExpr: unknown): Either<t.Errors, PyExpr> =>
         PyExprType.decode(pyExpr).map(
-            ({ arguments: [code, idNexts] }) => new PyExpr(code, { idNexts })
+            ({ arguments: [code, idNexts] }) => new PyExpr(code, idNexts)
         )
 }
 

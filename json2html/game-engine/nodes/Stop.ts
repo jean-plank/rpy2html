@@ -6,16 +6,9 @@ import * as t from 'io-ts';
 import GameProps from '../gameHistory/GameProps';
 import AstNode from './AstNode';
 
-interface Arg {
-    idNexts?: string[];
-}
-
 export default class Stop extends AstNode {
-    private chanName: string;
-
-    constructor(chanName: string, { idNexts = [] }: Arg = {}) {
-        super({ idNexts });
-        this.chanName = chanName;
+    constructor(private chanName: string, idNexts: string[]) {
+        super(idNexts);
     }
 
     toString = (): string => `Stop("${this.chanName}")`;
@@ -27,8 +20,7 @@ export default class Stop extends AstNode {
 
     static decode = (hide: unknown): Either<t.Errors, Stop> =>
         StopType.decode(hide).map(
-            ({ arguments: [chanName, idNexts] }) =>
-                new Stop(chanName, { idNexts })
+            ({ arguments: [chanName, idNexts] }) => new Stop(chanName, idNexts)
         )
 }
 

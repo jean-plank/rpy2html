@@ -6,17 +6,14 @@ import Channel from './models/Channel';
 import Sound from './models/medias/Sound';
 
 export default class SoundService {
-    private confirmAudio: (okAction: () => void) => void;
     private channels: StrMap<Channel>;
     private mainMenuMusic: Option<Sound>;
 
-    constructor(confirmAudio: (okAction: () => void) => void) {
-        this.confirmAudio = confirmAudio;
+    constructor(private confirmAudio: (okAction: () => void) => void) {
         this.channels = new StrMap({
             music: new Channel(confirmAudio, true, 0.5)
         });
         this.mainMenuMusic = lookup('main_menu_music', sounds);
-        this.mainMenuMusic.map(_ => _.load());
     }
 
     playMainMenuMusic = () => {

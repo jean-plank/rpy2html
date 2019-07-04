@@ -19,7 +19,7 @@ export default class If extends AstNode {
             .fold([], _ => [_])
 
     static decode = (i: unknown): Either<t.Errors, If> =>
-        IfType.decode(i).map(({ arguments: [idNexts] }) => new If({ idNexts }))
+        IfType.decode(i).map(({ arguments: [idNexts] }) => new If(idNexts))
 }
 
 const IfType = t.exact(

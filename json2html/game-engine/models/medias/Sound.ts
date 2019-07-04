@@ -1,16 +1,8 @@
 import Media from './Media';
 
-interface Args {
-    name: string;
-    file: string;
-}
-
 export default class Sound extends Media {
-    name: string;
-
-    constructor({ name, file }: Args) {
+    constructor(public name: string, file: string) {
         super(file);
-        this.name = name;
     }
 
     elt = (volume?: number, onEnded?: () => void): HTMLAudioElement => {

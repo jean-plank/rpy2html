@@ -9,11 +9,6 @@ import Sound from '../models/medias/Sound';
 import Video from '../models/medias/Video';
 import NodeWithMedia from './NodeWithMedia';
 
-interface ConstructorArgs {
-    idNexts?: string[];
-    stopExecution?: boolean;
-}
-
 export interface InitArgs {
     id: string;
     data: AppData;
@@ -29,18 +24,16 @@ export interface AppData {
 }
 
 export default abstract class AstNode {
-    stopExecution: boolean;
     id: string;
 
     protected _nexts: Option<AstNode[]> = none;
     protected execThenExecNext: (node: AstNode) => () => void = () => () => {};
-    private idNexts: string[];
 
-    constructor({ idNexts = [], stopExecution = false }: ConstructorArgs) {
-        // _nexts will be set in init when all nodes are created
-        this.idNexts = idNexts;
-        this.stopExecution = stopExecution;
-    }
+    // _nexts will be set in init when all nodes are created
+    constructor(
+        private idNexts: string[],
+        public stopExecution: boolean = false
+    ) {}
 
     abstract toString(): string;
 

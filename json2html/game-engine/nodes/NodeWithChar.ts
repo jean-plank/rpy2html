@@ -5,25 +5,15 @@ import AstNode, { InitArgs } from './AstNode';
 
 import Char from '../models/Char';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default abstract class NodeWithChar extends AstNode {
-    who: Option<Char>;
-    what: string;
-
-    private whosName: Option<string>;
+    who: Option<Char> = none;
 
     constructor(
-        whosName: Option<string>,
-        what: string,
-        { idNexts = [] }: Args = {}
+        private whosName: Option<string>,
+        public what: string,
+        idNexts: string[]
     ) {
-        super({ idNexts, stopExecution: true });
-        this.who = none;
-        this.what = what;
-        this.whosName = whosName;
+        super(idNexts, true);
     }
 
     init({ id, data, execThenExecNext }: InitArgs) {

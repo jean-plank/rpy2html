@@ -26,7 +26,7 @@ export default class Say extends NodeWithChar {
     static decode = (say: unknown): Either<t.Errors, Say> =>
         SayType.decode(say).map(
             ({ arguments: [whosName, what, idNexts] }) =>
-                new Say(fromNullable(whosName), what, { idNexts })
+                new Say(fromNullable(whosName), what, idNexts)
         )
 }
 

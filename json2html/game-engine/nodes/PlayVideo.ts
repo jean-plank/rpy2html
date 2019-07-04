@@ -6,16 +6,14 @@ import GameProps from '../gameHistory/GameProps';
 import Video from '../models/medias/Video';
 import NodeWithMedia from './NodeWithMedia';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default class PlayVideo extends NodeWithMedia<Video> {
-    constructor(vidName: string, { idNexts = [] }: Args = {}) {
-        super((data, vidName) => lookup(vidName, data.videos), vidName, {
+    constructor(vidName: string, idNexts: string[]) {
+        super(
+            (data, vidName) => lookup(vidName, data.videos),
+            vidName,
             idNexts,
-            stopExecution: true
-        });
+            true
+        );
     }
 
     reduce = (gameProps: GameProps): GameProps => ({
@@ -26,7 +24,7 @@ export default class PlayVideo extends NodeWithMedia<Video> {
     static decode = (playVideo: unknown): Either<t.Errors, PlayVideo> =>
         PlayVideoType.decode(playVideo).map(
             ({ arguments: [vidName, idNexts] }) =>
-                new PlayVideo(vidName, { idNexts })
+                new PlayVideo(vidName, idNexts)
         )
 }
 

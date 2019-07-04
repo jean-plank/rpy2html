@@ -4,16 +4,9 @@ import * as t from 'io-ts';
 import GameProps from '../gameHistory/GameProps';
 import AstNode from './AstNode';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default class ShowWindow extends AstNode {
-    private show: boolean;
-
-    constructor(show: boolean, { idNexts = [] }: Args = {}) {
-        super({ idNexts });
-        this.show = show;
+    constructor(private show: boolean, idNexts: string[]) {
+        super(idNexts);
     }
 
     toString = (): string => `ShowWindow(${this.show})`;
@@ -25,8 +18,7 @@ export default class ShowWindow extends AstNode {
 
     static decode = (showWindow: unknown): Either<t.Errors, ShowWindow> =>
         ShowWindowType.decode(showWindow).map(
-            ({ arguments: [show, idNexts] }) =>
-                new ShowWindow(show, { idNexts })
+            ({ arguments: [show, idNexts] }) => new ShowWindow(show, idNexts)
         )
 }
 

@@ -4,24 +4,14 @@ import { none, Option, some } from 'fp-ts/lib/Option';
 import Sound from './medias/Sound';
 
 export default class Channel {
-    private confirmAudio: (okAction: () => void) => void;
-    private currentlyPlaying: Option<HTMLAudioElement>;
-    private pending: Sound[];
-    private loop: boolean;
-    private volume: number;
+    private currentlyPlaying: Option<HTMLAudioElement> = none;
+    private pending: Sound[] = [];
 
     constructor(
-        confirmAudio: (okAction: () => void) => void,
-        loop = false,
-        volume = 0.7
-    ) {
-        this.confirmAudio = confirmAudio;
-        this.currentlyPlaying = none;
-        this.pending = [];
-        this.loop = loop;
-        this.volume = volume;
-        this.stop();
-    }
+        private confirmAudio: (okAction: () => void) => void,
+        private loop = false,
+        private volume = 0.7
+    ) {}
 
     toString = (): string =>
         `Channel(${this.currentlyPlaying}, [${this.pending

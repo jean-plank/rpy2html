@@ -5,15 +5,11 @@ import * as t from 'io-ts';
 import convertToJs from '../utils/convertToJs';
 import AstNode from './AstNode';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default class IfBlock extends AstNode {
     private rawCondition: string;
 
-    constructor(condition: string, { idNexts = [] }: Args = {}) {
-        super({ idNexts });
+    constructor(condition: string, idNexts: string[]) {
+        super(idNexts);
         this.rawCondition = convertToJs(condition);
     }
 
@@ -26,7 +22,7 @@ export default class IfBlock extends AstNode {
     static decode = (ifBlock: unknown): Either<t.Errors, IfBlock> =>
         IfBlockType.decode(ifBlock).map(
             ({ arguments: [condition, idNexts] }) =>
-                new IfBlock(condition, { idNexts })
+                new IfBlock(condition, idNexts)
         )
 }
 

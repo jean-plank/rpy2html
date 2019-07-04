@@ -2,25 +2,17 @@
 import { jsx, SerializedStyles } from '@emotion/core';
 import Media from './Media';
 
-interface ImgArgs {
-    name: string;
-    file: string;
-}
-
-interface EltArgs {
+interface Args {
     key?: string | number;
     css?: SerializedStyles;
 }
 
 export default class Image extends Media {
-    name: string;
-
-    constructor({ name, file }: ImgArgs) {
+    constructor(public name: string, file: string) {
         super(file);
-        this.name = name;
     }
 
-    elt = ({ key, css }: EltArgs = {}): JSX.Element => (
+    elt = ({ key, css }: Args = {}): JSX.Element => (
         <img key={key} css={css} src={this.file} />
     )
 

@@ -6,22 +6,13 @@ import GameProps from '../gameHistory/GameProps';
 import Sound from '../models/medias/Sound';
 import NodeWithMedia from './NodeWithMedia';
 
-interface Args {
-    idNexts?: string[];
-}
-
 export default class Play extends NodeWithMedia<Sound> {
-    private chanName: string;
-
-    constructor(
-        chanName: string,
-        sndName: string,
-        { idNexts = [] }: Args = {}
-    ) {
-        super((data, sndName) => lookup(sndName, data.sounds), sndName, {
+    constructor(private chanName: string, sndName: string, idNexts: string[]) {
+        super(
+            (data, sndName) => lookup(sndName, data.sounds),
+            sndName,
             idNexts
-        });
-        this.chanName = chanName;
+        );
     }
 
     toString = (): string => `Play("${this.chanName}", "${this.mediaName}")`;
@@ -34,7 +25,7 @@ export default class Play extends NodeWithMedia<Sound> {
     static decode = (play: unknown): Either<t.Errors, Play> =>
         PlayType.decode(play).map(
             ({ arguments: [chanName, sndName, idNexts] }) =>
-                new Play(chanName, sndName, { idNexts })
+                new Play(chanName, sndName, idNexts)
         )
 }
 

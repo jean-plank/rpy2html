@@ -40,8 +40,7 @@ export default class Menu extends NodeWithChar {
 
     static decode = (menu: unknown): Either<t.Errors, Menu> =>
         MenuType.decode(menu).map(
-            ({ arguments: [what, idNexts] }) =>
-                new Menu(none, what, { idNexts })
+            ({ arguments: [what, idNexts] }) => new Menu(none, what, idNexts)
         )
 }
 

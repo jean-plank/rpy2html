@@ -16,8 +16,7 @@ export default class Scene extends NodeWithImage {
 
     static decode = (scene: unknown): Either<t.Errors, Scene> =>
         SceneType.decode(scene).map(
-            ({ arguments: [imgName, idNexts] }) =>
-                new Scene(imgName, { idNexts })
+            ({ arguments: [imgName, idNexts] }) => new Scene(imgName, idNexts)
         )
 }
 

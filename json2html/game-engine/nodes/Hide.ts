@@ -15,8 +15,7 @@ export default class Hide extends NodeWithImage {
 
     static decode = (hide: unknown): Either<t.Errors, Hide> =>
         HideType.decode(hide).map(
-            ({ arguments: [imgName, idNexts] }) =>
-                new Hide(imgName, { idNexts })
+            ({ arguments: [imgName, idNexts] }) => new Hide(imgName, idNexts)
         )
 }
 
