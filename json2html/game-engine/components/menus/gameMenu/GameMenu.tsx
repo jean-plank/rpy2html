@@ -25,6 +25,7 @@ interface Props {
     history: AstNode[];
     saves: Array<Option<Save>>;
     loadSave: (save: QuickSave) => void;
+    deleteSave: (slot: number) => void;
     hideGameMenu: () => void;
     showMainMenu: () => void;
     save: (slot: number) => void;
@@ -41,6 +42,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
         history,
         saves,
         loadSave,
+        deleteSave,
         hideGameMenu,
         showMainMenu,
         save,
@@ -139,18 +141,30 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     }
 
     function getSave(): JSX.Element {
-        return <SaveSlots saves={saves} onClick={onClick} />;
+        return (
+            <SaveSlots
+                saves={saves}
+                onClick={onClick}
+                deleteSave={deleteSave}
+            />
+        );
 
-        function onClick(iSlot: number, existingSave: Option<Save>) {
+        function onClick(slot: number, existingSave: Option<Save>) {
             existingSave.foldL(
-                () => save(iSlot),
-                _ => confirmYesNo(transl.confirm.override, () => save(iSlot))
+                () => save(slot),
+                _ => confirmYesNo(transl.confirm.override, () => save(slot))
             );
         }
     }
 
     function getLoad(): JSX.Element {
-        return <SaveSlots saves={saves} onClick={onClick} />;
+        return (
+            <SaveSlots
+                saves={saves}
+                onClick={onClick}
+                deleteSave={deleteSave}
+            />
+        );
 
         function onClick(_: number, save: Option<Save>) {
             save.map(_ =>

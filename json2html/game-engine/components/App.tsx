@@ -111,6 +111,7 @@ const App: FunctionComponent = () => {
                     saves={saves.slots}
                     emptySaves={emptySaves}
                     loadSave={loadSave}
+                    deleteSave={deleteSave}
                     confirmYesNo={confirmYesNo}
                 />
             );
@@ -147,6 +148,7 @@ const App: FunctionComponent = () => {
                     history={historyFromState(gameState)}
                     saves={saves.slots}
                     loadSave={loadSave}
+                    deleteSave={deleteSave}
                     hideGameMenu={hideGameMenu}
                     showMainMenu={showMainMenu}
                     save={save}
@@ -227,6 +229,13 @@ const App: FunctionComponent = () => {
 
     function emptySaves() {
         dispatchSavesAction('EMPTY');
+    }
+
+    function deleteSave(slot: number) {
+        console.warn(
+            `Save slot ${slot} was deleted because it couldn't be restored.`
+        );
+        dispatchSavesAction({ type: 'DELETE', slot });
     }
 
     function loadSave(save: QuickSave) {

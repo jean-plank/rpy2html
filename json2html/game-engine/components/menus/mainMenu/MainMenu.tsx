@@ -33,6 +33,7 @@ interface Props {
     saves: Array<Option<Save>>;
     emptySaves: () => void;
     loadSave: (save: QuickSave) => void;
+    deleteSave: (slot: number) => void;
     confirmYesNo: (
         message: string,
         actionYes: () => void,
@@ -41,7 +42,7 @@ interface Props {
 }
 
 const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
-    { startGame, saves, emptySaves, loadSave, confirmYesNo },
+    { startGame, saves, emptySaves, loadSave, deleteSave, confirmYesNo },
     ref
 ) => {
     useImperativeHandle(ref, () => ({ onKeyUp }));
@@ -95,7 +96,15 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     function showLoad() {
         setOverlay(gameMenuOverlay);
         setSelectedBtn(Btn.Load);
-        setSubmenu(some(<SaveSlots {...{ saves, onClick }} />));
+        setSubmenu(
+            some(
+                <SaveSlots
+                    saves={saves}
+                    onClick={onClick}
+                    deleteSave={deleteSave}
+                />
+            )
+        );
 
         function onClick(_: number, save: Option<Save>) {
             save.map(loadSave);

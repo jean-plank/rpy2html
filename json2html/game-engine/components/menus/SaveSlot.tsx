@@ -3,7 +3,7 @@ import { css, CSSObject, jsx } from '@emotion/core';
 import { TextAlignProperty } from 'csstype';
 import { Do } from 'fp-ts-contrib/lib/Do';
 import { last } from 'fp-ts/lib/Array';
-import { fromEither, Option, option } from 'fp-ts/lib/Option';
+import { none, Option, option, some } from 'fp-ts/lib/Option';
 import { FunctionComponent } from 'react';
 
 import { firstNode, style, transl } from '../../context';
@@ -15,30 +15,37 @@ import Game from '../game/Game';
 interface Props {
     save: Option<Save>;
     onClick: (e: React.MouseEvent) => void;
+    deleteSave: () => void;
 }
 
-const SaveSlot: FunctionComponent<Props> = ({ save, onClick }) => {
-    const gameRect: JSX.Element = Do(option)
+const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
+    const [gameRect, label]: [JSX.Element, string] = Do(option)
         .bind('save', save)
         .bindL('states', ({ save }) =>
-            fromEither(statesFromHistory(firstNode, save.history))
+            statesFromHistory(firstNode, save.history).fold(_ => {
+                deleteSave();
+                return none;
+            }, some)
         )
         .bindL('currentState', ({ states }) => last(states))
-        .return(({ currentState: [gameProps] }) => (
-            <Game
-                gameProps={gameProps}
-                videoAutoPlay={false}
-                styleOverload={styles.game}
-            />
-        ))
-        .getOrElse(<div css={styles.emptySlot} />);
+        .return<[JSX.Element, string]>(
+            ({ currentState: [gameProps], save: { date } }) => [
+                // tslint:disable-next-line: jsx-key
+                <Game
+                    gameProps={gameProps}
+                    videoAutoPlay={false}
+                    styleOverload={styles.game}
+                />,
+                date
+            ]
+        )
+        // tslint:disable-next-line: jsx-key
+        .getOrElse([<div css={styles.emptySlot} />, transl.emptySlot]);
 
     return (
         <div css={styles.saveSlot} onClick={onClick}>
             {gameRect}
-            <div css={styles.text}>
-                {save.map(_ => _.date).getOrElse(transl.emptySlot)}
-            </div>
+            <div css={styles.text}>{label}</div>
         </div>
     );
 };

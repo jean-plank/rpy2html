@@ -1,5 +1,5 @@
 import { updateAt } from 'fp-ts/lib/Array';
-import { some } from 'fp-ts/lib/Option';
+import { none, Option, some } from 'fp-ts/lib/Option';
 import { Reducer } from 'react';
 
 import { lang } from '../context';
@@ -19,7 +19,12 @@ interface SaveAction {
     slot: number;
 }
 
-export type SavesAction = QuickSaveAction | SaveAction | 'EMPTY';
+interface DeleteAction {
+    type: 'DELETE';
+    slot: number;
+}
+
+export type SavesAction = QuickSaveAction | SaveAction | DeleteAction | 'EMPTY';
 
 const savesReducer: Reducer<Saves, SavesAction> = (prevState, action) => {
     if (action === 'EMPTY') return Saves.empty;
@@ -42,22 +47,33 @@ const savesReducer: Reducer<Saves, SavesAction> = (prevState, action) => {
             hour: 'numeric',
             minute: 'numeric'
         });
-        return updateAt(
+        return updateSlot(
+            prevState,
             action.slot,
-            some(Save.fromNodes(action.history, date)),
-            prevState.slots
-        )
-            .map(slots => {
-                const newState = {
-                    ...prevState,
-                    slots
-                };
-                Saves.store(newState);
-                return newState;
-            })
-            .getOrElse(prevState);
+            some(Save.fromNodes(action.history, date))
+        );
+    }
+
+    if (action.type === 'DELETE') {
+        return updateSlot(prevState, action.slot, none);
     }
 
     return prevState;
 };
 export default savesReducer;
+
+const updateSlot = (
+    prevState: Saves,
+    slot: number,
+    newValue: Option<Save>
+): Saves =>
+    updateAt(slot, newValue, prevState.slots)
+        .map(slots => {
+            const newState = {
+                ...prevState,
+                slots
+            };
+            Saves.store(newState);
+            return newState;
+        })
+        .getOrElse(prevState);
