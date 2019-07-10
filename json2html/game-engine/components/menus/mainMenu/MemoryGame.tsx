@@ -53,10 +53,12 @@ const styles = {
     bytes: css({
         justifyContent: 'right',
         padding: '0.67em 0',
-        margin: '0 0.67em'
+        margin: '0 0.67em',
+        flexShrink: 0
     }),
 
     btn: css({
-        padding: '0.67em 0'
+        padding: '0.67em 0',
+        flexShrink: 0
     })
 };
