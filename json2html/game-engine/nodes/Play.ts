@@ -17,10 +17,18 @@ export default class Play extends NodeWithMedia<Sound> {
 
     toString = (): string => `Play("${this.chanName}", "${this.mediaName}")`;
 
-    reduce = (gameProps: GameProps): GameProps => ({
-        ...gameProps,
-        sounds: insert(this.chanName, this.media, gameProps.sounds)
-    })
+    reduce = (gameProps: GameProps): GameProps =>
+        this.chanName === 'audio'
+            ? this.media
+                  .map(audio => ({
+                      ...gameProps,
+                      audios: [...gameProps.audios, audio]
+                  }))
+                  .getOrElse(gameProps)
+            : {
+                  ...gameProps,
+                  sounds: insert(this.chanName, this.media, gameProps.sounds)
+              }
 
     static decode = (play: unknown): Either<t.Errors, Play> =>
         PlayType.decode(play).map(

@@ -17,6 +17,7 @@ export default class GameProps {
     choices: MenuItem[];
     video: Option<Video>;
     sounds: StrMap<Option<Sound>>; // key chanName
+    audios: Sound[];
 
     static empty: GameProps = {
         sceneImg: none,
@@ -27,7 +28,8 @@ export default class GameProps {
         textboxText: '',
         choices: [],
         video: none,
-        sounds: new StrMap({})
+        sounds: new StrMap({}),
+        audios: []
     };
 
     static cleaned = (props: GameProps): GameProps => ({
@@ -37,7 +39,8 @@ export default class GameProps {
         video: none,
         sounds: props.sounds.mapWithKey((chanName, sound) =>
             chanName === 'music' ? sound : none
-        )
+        ),
+        audios: []
     })
 
     static toJSON = (props: GameProps): object =>

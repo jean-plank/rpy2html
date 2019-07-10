@@ -29,7 +29,7 @@ export default class SoundService {
 
     resumeChannels = () => this.channels.map(_ => _.resume());
 
-    applyProps = (sounds: StrMap<Option<Sound>>) =>
+    applySounds = (sounds: StrMap<Option<Sound>>) =>
         sounds.mapWithKey((chanName, sound) =>
             lookup(chanName, this.channels)
                 .orElse(() =>
@@ -56,4 +56,6 @@ export default class SoundService {
             channel.play(sound);
         }
     }
+
+    applyAudios = (audios: Sound[]) => audios.map(_ => Sound.play(_.elt()));
 }

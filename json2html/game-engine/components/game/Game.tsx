@@ -68,9 +68,14 @@ const Game: RefForwardingComponent<GameAble, Props> = (
             )
         );
     }, [gameProps.video]);
+
     useEffect(() => {
-        args.map(_ => _.soundService.applyProps(gameProps.sounds));
+        args.map(_ => _.soundService.applySounds(gameProps.sounds));
     }, [gameProps.sounds]);
+
+    useEffect(() => {
+        args.map(_ => _.soundService.applyAudios(gameProps.audios));
+    }, [gameProps.audios]);
 
     return gameProps.video
         .map(_ => cutsceneLayout(_))
