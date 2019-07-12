@@ -1,26 +1,28 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
+import { css, jsx, SerializedStyles } from '@emotion/core';
 import { FunctionComponent } from 'react';
 
 import { style } from '../../context';
 import GuiButton from '../GuiButton';
 
-interface BtnProps {
+export interface BtnProps {
     onClick: (e: React.MouseEvent) => void;
     selected?: boolean;
     disabled?: boolean;
+    styles?: SerializedStyles;
 }
 
 const MenuButton: FunctionComponent<BtnProps> = ({
     onClick,
     selected = false,
     disabled,
+    styles: stylesOverride,
     children
 }) => (
     <GuiButton
         {...{ onClick, disabled }}
         className={selected ? 'selected' : undefined}
-        css={buttonStyles}
+        css={[buttonStyles, stylesOverride]}
     >
         {children}
     </GuiButton>

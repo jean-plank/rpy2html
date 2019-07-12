@@ -12,7 +12,7 @@ import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles';
 interface Props {
     hide: boolean;
     char: Option<Char>;
-    styleOverload?: {
+    styles?: {
         namebox?: SerializedStyles;
         dialog?: SerializedStyles;
     };
@@ -21,7 +21,7 @@ interface Props {
 const Textbox: FunctionComponent<Props> = ({
     hide,
     char,
-    styleOverload = {},
+    styles: stylesOverride = {},
     children
 }) => {
     const textboxStyle = hide ? { display: 'none' } : {};
@@ -33,12 +33,12 @@ const Textbox: FunctionComponent<Props> = ({
     return (
         <div css={styles.textbox} style={textboxStyle}>
             <div
-                css={[styles.namebox, styleOverload.namebox]}
+                css={[styles.namebox, stylesOverride.namebox]}
                 style={charStyle}
             >
                 {charName}
             </div>
-            <div css={[styles.dialog, styleOverload.dialog]}>{children}</div>
+            <div css={[styles.dialog, stylesOverride.dialog]}>{children}</div>
         </div>
     );
 };

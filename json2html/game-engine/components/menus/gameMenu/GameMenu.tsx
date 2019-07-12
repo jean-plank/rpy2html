@@ -17,8 +17,9 @@ import { KeyUpAble } from '../../App';
 import Help from '../Help';
 import MenuButton from '../MenuButton';
 import menuStyles, { gameMenuOverlay } from '../menuStyles';
+import Preferences from '../Preferences';
 import SaveSlots from '../SaveSlots';
-import GameMenuBtn from './GameMenuBtn';
+import GameMenuBtn, { gameMenuBtnLabel } from './GameMenuBtn';
 import History from './History';
 
 interface Props {
@@ -57,87 +58,53 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
         propsSelectedBtn
     );
 
+    const btns: Array<[GameMenuBtn, (e: React.MouseEvent) => void]> = [
+        ['RESUME', hideGameMenu],
+        ['HISTORY', selectBtn('HISTORY')],
+        ['SAVE', selectBtn('SAVE')],
+        ['LOAD', selectBtn('LOAD')],
+        ['PREFS', selectBtn('PREFS')],
+        ['MAIN_MENU', confirmMainMenu],
+        ['HELP', selectBtn('HELP')]
+    ];
+
     return (
         <div css={menuStyles.menu}>
             <div className={gameMenuOverlay} />
-            <div css={menuStyles.menuBar}>
-                <MenuButton onClick={hideGameMenu}>
-                    {transl.menu.resume}
-                </MenuButton>
-                <MenuButton
-                    onClick={selectBtn('HISTORY')}
-                    selected={isSelected('HISTORY')}
-                >
-                    {transl.menu.history}
-                </MenuButton>
-                <MenuButton
-                    onClick={selectBtn('SAVE')}
-                    selected={isSelected('SAVE')}
-                >
-                    {transl.menu.save}
-                </MenuButton>
-                <MenuButton
-                    onClick={selectBtn('LOAD')}
-                    selected={isSelected('LOAD')}
-                >
-                    {transl.menu.load}
-                </MenuButton>
-                <MenuButton
-                    onClick={confirmMainMenu}
-                    selected={isSelected('MAIN_MENU')}
-                >
-                    {transl.menu.mainMenu}
-                </MenuButton>
-                <MenuButton
-                    onClick={selectBtn('HELP')}
-                    selected={isSelected('HELP')}
-                >
-                    {transl.menu.help}
-                </MenuButton>
+            <div css={menuStyles.menuBar}>{btns.map(menuBtn)}</div>
+            <div css={menuStyles.submenuTitle}>
+                {gameMenuBtnLabel(selectedBtn)}
             </div>
-            <div css={menuStyles.submenuTitle}>{submenuTitle()}</div>
             <div css={menuStyles.submenu}>{getSubmenu().toNullable()}</div>
         </div>
     );
 
-    function isSelected(btn: GameMenuBtn): boolean {
-        return selectedBtn === btn;
+    function menuBtn(
+        [btn, onClick]: [GameMenuBtn, (e: React.MouseEvent) => void],
+        key: number
+    ): JSX.Element {
+        return (
+            <MenuButton
+                key={key}
+                onClick={onClick}
+                selected={selectedBtn === btn}
+            >
+                {gameMenuBtnLabel(btn)}
+            </MenuButton>
+        );
     }
 
     function selectBtn(btn: GameMenuBtn): () => void {
         return () => setSelectedBtn(btn);
     }
 
-    function submenuTitle(): string {
-        switch (selectedBtn) {
-            case 'HISTORY':
-                return transl.menu.history;
-            case 'SAVE':
-                return transl.menu.save;
-            case 'LOAD':
-                return transl.menu.load;
-            case 'MAIN_MENU':
-                return transl.menu.mainMenu;
-            case 'HELP':
-                return transl.menu.help;
-            case 'NONE':
-                return '';
-        }
-    }
-
     function getSubmenu(): Option<JSX.Element> {
-        switch (selectedBtn) {
-            case 'HISTORY':
-                return some(<History nodes={history} />);
-            case 'SAVE':
-                return some(getSave());
-            case 'LOAD':
-                return some(getLoad());
-            case 'HELP':
-                return some(<Help />);
-            default:
-                return none;
-        }
+        if (selectedBtn === 'HISTORY') return some(<History nodes={history} />);
+        if (selectedBtn === 'SAVE') return some(getSave());
+        if (selectedBtn === 'LOAD') return some(getLoad());
+        if (selectedBtn === 'PREFS') return some(<Preferences />);
+        if (selectedBtn === 'HELP') return some(<Help />);
+        return none;
     }
 
     function getSave(): JSX.Element {

@@ -34,7 +34,7 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
                 <Game
                     gameProps={gameProps}
                     videoAutoPlay={false}
-                    styleOverload={styles.game}
+                    styles={styles.game}
                 />,
                 date
             ]

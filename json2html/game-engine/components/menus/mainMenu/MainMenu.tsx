@@ -18,15 +18,27 @@ import { KeyUpAble } from '../../App';
 import Help from '../Help';
 import MenuButton from '../MenuButton';
 import menuStyles, { gameMenuOverlay, mainMenuOverlay } from '../menuStyles';
+import Preferences from '../Preferences';
 import SaveSlots from '../SaveSlots';
 import Memory from './Memory';
 
 enum Btn {
     None,
+    Start,
     Load,
+    Prefs,
     Memory,
     Help
 }
+
+const btnLabel = (btn: Btn): string => {
+    if (btn === Btn.Start) return transl.menu.start;
+    if (btn === Btn.Load) return transl.menu.load;
+    if (btn === Btn.Prefs) return transl.menu.prefs;
+    if (btn === Btn.Memory) return transl.menu.memory;
+    if (btn === Btn.Help) return transl.menu.help;
+    return '';
+};
 
 interface Props {
     startGame: () => void;
@@ -51,46 +63,36 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     const [selectedBtn, setSelectedBtn] = useState<Btn>(Btn.None);
     const [submenu, setSubmenu] = useState<Option<JSX.Element>>(none);
 
+    const btns: Array<[Btn, (e: React.MouseEvent) => void]> = [
+        [Btn.Start, startGame],
+        [Btn.Load, showLoad],
+        [Btn.Prefs, showPrefs],
+        [Btn.Memory, showMemory],
+        [Btn.Help, showHelp]
+    ];
+
     return (
         <div css={[menuStyles.menu, mainMenuStyles]}>
             <div className={overlayClassName} />
-            <div css={menuStyles.menuBar}>
-                <MenuButton onClick={startGame}>{transl.menu.start}</MenuButton>
-                <MenuButton
-                    onClick={showLoad}
-                    selected={selectedBtn === Btn.Load}
-                >
-                    {transl.menu.load}
-                </MenuButton>
-                <MenuButton
-                    onClick={showMemory}
-                    selected={selectedBtn === Btn.Memory}
-                >
-                    {transl.menu.memory}
-                </MenuButton>
-                <MenuButton
-                    onClick={showHelp}
-                    selected={selectedBtn === Btn.Help}
-                >
-                    {transl.menu.help}
-                </MenuButton>
-            </div>
-            <div css={menuStyles.submenuTitle}>{submenuTitle()}</div>
+            <div css={menuStyles.menuBar}>{btns.map(menuBtn)}</div>
+            <div css={menuStyles.submenuTitle}>{btnLabel(selectedBtn)}</div>
             <div css={menuStyles.submenu}>{submenu.toNullable()}</div>
         </div>
     );
 
-    function submenuTitle(): string {
-        switch (selectedBtn) {
-            case Btn.Load:
-                return transl.menu.load;
-            case Btn.Memory:
-                return transl.menu.memory;
-            case Btn.Help:
-                return transl.menu.help;
-            case Btn.None:
-                return '';
-        }
+    function menuBtn(
+        [btn, onClick]: [Btn, (e: React.MouseEvent) => void],
+        key: number
+    ): JSX.Element {
+        return (
+            <MenuButton
+                key={key}
+                onClick={onClick}
+                selected={selectedBtn === btn}
+            >
+                {btnLabel(btn)}
+            </MenuButton>
+        );
     }
 
     function showLoad() {
@@ -109,6 +111,12 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
         function onClick(_: number, save: Option<Save>) {
             save.map(loadSave);
         }
+    }
+
+    function showPrefs() {
+        setOverlay(gameMenuOverlay);
+        setSelectedBtn(Btn.Prefs);
+        setSubmenu(some(<Preferences />));
     }
 
     function showMemory() {
@@ -142,6 +150,5 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
 export default forwardRef<KeyUpAble, Props>(MainMenu);
 
 const mainMenuStyles = css({
-    fontSize: 'inherit',
     ...getBgOrElse('main_menu_bg', '#5f777f')
 });

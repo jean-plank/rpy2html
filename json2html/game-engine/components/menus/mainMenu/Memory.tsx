@@ -37,7 +37,9 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
                 }}
             />
             <div css={styles.games}>
-                <div>{gameElts.length > 0 ? gameElts : transl.noGamesYet}</div>
+                <div>
+                    {gameElts.length > 0 ? gameElts : transl.memory.noGamesYet}
+                </div>
             </div>
             {gameElts.length > 0 ? footer() : null}
         </div>

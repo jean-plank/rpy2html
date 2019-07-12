@@ -28,7 +28,7 @@ interface Props {
     gameProps: GameProps;
     videoAutoPlay?: boolean;
     armlessWankerMenuProps?: ExtendedArmlessWankerProps;
-    styleOverload?: {
+    styles?: {
         container?: SerializedStyles;
         namebox?: SerializedStyles;
         dialog?: SerializedStyles;
@@ -50,7 +50,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
         gameProps,
         videoAutoPlay = true,
         armlessWankerMenuProps,
-        styleOverload = {}
+        styles: stylesOverride = {}
     },
     ref
 ) => {
@@ -84,7 +84,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
     function cutsceneLayout(video: Video): JSX.Element {
         return (
             <div
-                css={[gameStyles, styleOverload.container]}
+                css={[gameStyles, stylesOverride.container]}
                 {...{ onClick, onWheel }}
             >
                 <Cutscene video={video} autoPlay={videoAutoPlay} />
@@ -96,14 +96,14 @@ const Game: RefForwardingComponent<GameAble, Props> = (
         return (
             <div
                 {...{ onClick, onWheel }}
-                css={[gameStyles, styleOverload.container]}
+                css={[gameStyles, stylesOverride.container]}
             >
                 <LayerScene image={gameProps.sceneImg} />
                 <LayerImages images={gameProps.charImgs} />
                 <Textbox
                     hide={gameProps.textboxHide}
                     char={gameProps.textboxChar}
-                    styleOverload={styleOverload}
+                    styles={stylesOverride}
                 >
                     {gameProps.textboxText.split('\n').map((line, i) => (
                         <div key={i}>{line}</div>
@@ -116,7 +116,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
                             execThenExecNext(choice)
                         )
                     }))}
-                    styleOverload={styleOverload}
+                    styles={stylesOverride}
                 />
                 {args.map(armlessWankerMenu).toNullable()}
             </div>

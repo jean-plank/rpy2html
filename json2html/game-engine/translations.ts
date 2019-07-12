@@ -3,10 +3,10 @@ import { StrMap } from 'fp-ts/lib/StrMap';
 export interface Translation {
     menu: {
         pause: string;
+        prefs: string;
         // main menu buttons
         start: string;
         load: string;
-        prefs: string;
         memory: string;
         help: string;
         quit: string;
@@ -34,24 +34,29 @@ export interface Translation {
         yes: string;
         no: string;
     };
+    prefs: {
+        display: string;
+        window: string;
+        fullscreen: string;
+    };
     memory: {
         about: string;
+        bytes: string;
         delete: string;
         deleteAll: string;
         total: string;
+        noGamesYet: string;
     };
     emptySlot: string;
-    bytes: string;
-    noGamesYet: string;
 }
 
 const translations: StrMap<Translation> = new StrMap({
     en: {
         menu: {
             pause: 'Pause',
+            prefs: 'Preferences',
             start: 'Start',
             load: 'Load',
-            prefs: 'Preferences',
             memory: 'Memory',
             help: 'Help',
             quit: 'Quit',
@@ -76,23 +81,28 @@ const translations: StrMap<Translation> = new StrMap({
             yes: 'Yes',
             no: 'No'
         },
+        prefs: {
+            display: 'Display',
+            window: 'Window',
+            fullscreen: 'Fullscreen'
+        },
         memory: {
             about:
-                'Saves are stored on local browser storage. They are only avaible on this computer.',
+                'Saves are stored on local b&rowser storage. They are only avaible on this computer.',
+            bytes: 'Bytes',
             delete: 'delete',
             deleteAll: 'delete all',
-            total: 'total'
+            total: 'total',
+            noGamesYet: 'No games saved yet.'
         },
-        emptySlot: 'empty slot',
-        bytes: 'Bytes',
-        noGamesYet: 'No games saved yet.'
+        emptySlot: 'empty slot'
     },
     fr: {
         menu: {
             pause: 'Pause',
+            prefs: 'Préférences',
             start: 'Commencer',
             load: 'Charger une partie',
-            prefs: 'Préférences',
             memory: 'Mémoire',
             help: 'Aide',
             quit: 'Quitter',
@@ -121,16 +131,21 @@ const translations: StrMap<Translation> = new StrMap({
             yes: 'Oui',
             no: 'Non'
         },
+        prefs: {
+            display: 'Affichage',
+            window: 'Fenêtré',
+            fullscreen: 'Plein écran'
+        },
         memory: {
             about:
                 'Les sauvegardes sont stockées dans les fichiers locaux du navigateur. Elles ne sont disponibles que sur cet ordinateur.',
+            bytes: 'Octets',
             delete: 'supprimer',
             deleteAll: 'tout supprimer',
-            total: 'total'
+            total: 'total',
+            noGamesYet: 'Aucune jeu sauvegardé'
         },
-        emptySlot: 'emplacement vide',
-        bytes: 'Octets',
-        noGamesYet: 'Aucune jeu sauvegardé'
+        emptySlot: 'emplacement vide'
     }
 });
 export default translations;

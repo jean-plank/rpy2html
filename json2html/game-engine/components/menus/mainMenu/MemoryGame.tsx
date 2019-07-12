@@ -23,7 +23,7 @@ const MemoryGame: FunctionComponent<Props> = ({
         <div css={styles.memoryGame}>
             <div css={styles.key}>{storageKey}</div>
             <div css={styles.bytes}>
-                {formatNumber(bytes, lang)} {transl.bytes}
+                {formatNumber(bytes, lang)} {transl.memory.bytes}
             </div>
             <GuiButton onClick={deleteStorage} css={styles.btn}>
                 ✗ {strDel}

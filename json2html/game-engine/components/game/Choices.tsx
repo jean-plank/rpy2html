@@ -8,7 +8,7 @@ import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles';
 
 interface Props {
     choices: Choice[];
-    styleOverload?: {
+    styles?: {
         choice?: SerializedStyles;
     };
 }
@@ -18,12 +18,15 @@ interface Choice {
     onClick: (e: React.MouseEvent) => void;
 }
 
-const Choices: FunctionComponent<Props> = ({ choices, styleOverload = {} }) => (
+const Choices: FunctionComponent<Props> = ({
+    choices,
+    styles: stylesOverride = {}
+}) => (
     <div css={styles.choices}>
         {choices.map((choice, i) => (
             <button
                 key={i}
-                css={[styles.choice, styleOverload.choice]}
+                css={[styles.choice, stylesOverride.choice]}
                 onClick={choice.onClick}
             >
                 {choice.text}
