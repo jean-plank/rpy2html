@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { css, Global, jsx } from '@emotion/core';
 import { Do } from 'fp-ts-contrib/lib/Do';
-import { isEmpty, last } from 'fp-ts/lib/Array';
+import { findFirstMap, isEmpty, last } from 'fp-ts/lib/Array';
 import { fromNullable, none, Option, option, some } from 'fp-ts/lib/Option';
 import { lookup, toArray } from 'fp-ts/lib/StrMap';
 import {
@@ -15,6 +15,7 @@ import {
     useState
 } from 'react';
 
+import GameProps from 'game-engine/gameHistory/GameProps';
 import {
     chars,
     firstNode,
@@ -39,11 +40,11 @@ import Saves from '../storage/Saves';
 import savesReducer from '../storage/savesReducer';
 import { historyFromState, loadAction, saveAction } from '../utils/saveLoad';
 import { mediaQuery } from '../utils/styles';
-import Confirm from './Confirm';
+import Confirm, { ConfirmProps } from './Confirm';
 import Game from './game/Game';
 import GameMenu from './menus/gameMenu/GameMenu';
-import GameMenuBtn from './menus/gameMenu/GameMenuBtn';
 import MainMenu from './menus/mainMenu/MainMenu';
+import { MenuBtn } from './menus/Menu';
 import Notifications, { Notifiable } from './Notifications';
 
 export interface KeyUpAble {
@@ -55,10 +56,9 @@ export type GameAble = KeyUpAble & {
 };
 
 type View =
-    | 'NONE'
     | 'MAIN_MENU'
     | 'GAME'
-    | { type: 'GAME_MENU'; selectedBtn: GameMenuBtn };
+    | { type: 'GAME_MENU'; selectedBtn: Option<MenuBtn> };
 
 const App: FunctionComponent = () => {
     const confirmAudioShown = useRef(false);
@@ -69,8 +69,8 @@ const App: FunctionComponent = () => {
     const notifiable: RefObject<Notifiable> = createRef();
     const confirmKeyUpAble: RefObject<KeyUpAble> = createRef();
 
-    const [view, setView] = useState<View>('NONE');
-    const [confirm, setConfirm] = useState<Option<JSX.Element>>(none);
+    const [view, setView] = useState<Option<View>>(none);
+    const [confirm, setConfirm] = useState<Option<ConfirmProps>>(none);
     const [saves, dispatchSavesAction] = useReducer(
         savesReducer,
         Saves.fromStorage()
@@ -95,87 +95,87 @@ const App: FunctionComponent = () => {
         <div tabIndex={0} onKeyUp={onKeyUp} css={styles.container}>
             <Global styles={globalStyles} />
             <div css={styles.view}>
-                {getView(view)}
+                {view.chain(getView).toNullable()}
                 {<Notifications ref={notifiable} />}
-                {confirm.toNullable()}
+                {confirm.map(getConfirm).toNullable()}
             </div>
         </div>
     );
 
-    function getView(view: View): JSX.Element | null {
-        if (view === 'NONE') return null;
-        if (view === 'MAIN_MENU') {
-            return (
-                <MainMenu
-                    ref={viewKeyUpAble}
-                    startGame={startGame}
-                    saves={saves.slots}
-                    emptySaves={emptySaves}
-                    loadSave={loadSave}
-                    deleteSave={deleteSave}
-                    confirmYesNo={confirmYesNo}
-                />
-            );
-        }
-        if (view === 'GAME') {
-            return gameState.present
-                .map(([gameProps]) => (
-                    // tslint:disable-next-line: jsx-key
-                    <Game
-                        ref={gameAble}
-                        gameProps={gameProps}
-                        armlessWankerMenuProps={{
-                            showGameMenu,
-                            undo,
-                            disableUndo: isEmpty(gameState.past),
-                            skip,
-                            quickSave,
-                            quickLoad,
-                            disableQuickLoad: saves.quickSave.isNone(),
-                            soundService,
-                            currentNodeL,
-                            showMainMenu,
-                            addBlock,
-                            redo,
-                            onVideoEnded
-                        }}
-                    />
-                ))
-                .toNullable();
-        }
-        if (view.type === 'GAME_MENU') {
-            return (
-                <GameMenu
-                    ref={viewKeyUpAble}
-                    history={historyFromState(gameState)}
-                    saves={saves.slots}
-                    loadSave={loadSave}
-                    deleteSave={deleteSave}
-                    hideGameMenu={hideGameMenu}
-                    showMainMenu={showMainMenu}
-                    save={save}
-                    confirmYesNo={confirmYesNo}
-                    selectedBtn={view.selectedBtn}
-                />
-            );
-        }
-        return null;
+    function getView(view: View): Option<JSX.Element> {
+        if (view === 'MAIN_MENU') return some(mainMenuL());
+        if (view === 'GAME') return gameState.present.map(getGame);
+        return some(getGameMenu(view.selectedBtn));
+    }
+
+    function mainMenuL(): JSX.Element {
+        return (
+            <MainMenu
+                ref={viewKeyUpAble}
+                startGame={startGame}
+                saves={saves.slots}
+                emptySaves={emptySaves}
+                loadSave={loadSave}
+                deleteSave={deleteSave}
+                confirmYesNo={confirmYesNo}
+            />
+        );
+    }
+
+    function getGame([gameProps]: [GameProps, AstNode[]]): JSX.Element {
+        return (
+            <Game
+                ref={gameAble}
+                gameProps={gameProps}
+                armlessWankerMenuProps={{
+                    showGameMenu,
+                    undo,
+                    disableUndo: isEmpty(gameState.past),
+                    skip,
+                    quickSave,
+                    quickLoad,
+                    disableQuickLoad: saves.quickSave.isNone(),
+                    soundService,
+                    currentNodeL,
+                    showMainMenu,
+                    addBlock,
+                    redo,
+                    onVideoEnded
+                }}
+            />
+        );
+    }
+
+    function getGameMenu(selectedBtn: Option<MenuBtn>): JSX.Element {
+        return (
+            <GameMenu
+                ref={viewKeyUpAble}
+                history={historyFromState(gameState)}
+                saves={saves.slots}
+                loadSave={loadSave}
+                deleteSave={deleteSave}
+                hideGameMenu={hideGameMenu}
+                showMainMenu={showMainMenu}
+                save={save}
+                confirmYesNo={confirmYesNo}
+                selectedBtn={selectedBtn}
+            />
+        );
+    }
+
+    function getConfirm(iConfirm: ConfirmProps): JSX.Element {
+        return <Confirm ref={confirmKeyUpAble} {...iConfirm} />;
     }
 
     function onKeyUp(e: React.KeyboardEvent) {
-        confirm
-            .map<void>(_ =>
-                fromNullable(confirmKeyUpAble.current).map(_ => _.onKeyUp(e))
-            )
-            .orElse(() => fromNullable(gameAble.current).map(_ => _.onKeyUp(e)))
-            .orElse(() =>
-                fromNullable(viewKeyUpAble.current).map(_ => _.onKeyUp(e))
-            );
+        findFirstMap<RefObject<KeyUpAble>, KeyUpAble>(_ =>
+            fromNullable(_.current)
+        )([confirmKeyUpAble, gameAble, viewKeyUpAble]).map(_ => _.onKeyUp(e));
     }
 
     function showMainMenu() {
         soundService.playMainMenuMusic();
-        setView('MAIN_MENU');
+        setView(some('MAIN_MENU'));
     }
 
     function startGame() {
@@ -185,16 +185,16 @@ const App: FunctionComponent = () => {
     }
 
     function showGame() {
-        setView('GAME');
+        setView(some('GAME'));
     }
 
     function onVideoEnded(execNextIfNotMenu: () => void) {
         isEmpty(gameState.future) ? execNextIfNotMenu() : redo();
     }
 
-    function showGameMenu(selectedBtn: GameMenuBtn = 'NONE') {
+    function showGameMenu(selectedBtn: Option<MenuBtn> = none) {
         soundService.pauseChannels();
-        setView({ type: 'GAME_MENU', selectedBtn });
+        setView(some({ type: 'GAME_MENU', selectedBtn }));
     }
 
     function hideGameMenu() {
@@ -292,17 +292,14 @@ const App: FunctionComponent = () => {
         if (!confirmAudioShown.current) {
             confirmAudioShown.current = true;
             setConfirm(
-                some(
-                    <Confirm
-                        ref={confirmKeyUpAble}
-                        hideConfirm={hideConfirm}
-                        message={transl.confirm.audio}
-                        buttons={[
-                            { text: transl.confirm.audioBtn, onClick: okAction }
-                        ]}
-                        escapeAction={okAction}
-                    />
-                )
+                some({
+                    hideConfirm,
+                    message: transl.confirm.audio,
+                    buttons: [
+                        { text: transl.confirm.audioBtn, onClick: okAction }
+                    ],
+                    escapeAction: okAction
+                })
             );
         }
     }
@@ -313,18 +310,15 @@ const App: FunctionComponent = () => {
         actionNo?: () => void
     ) {
         setConfirm(
-            some(
-                <Confirm
-                    ref={confirmKeyUpAble}
-                    hideConfirm={hideConfirm}
-                    message={message}
-                    buttons={[
-                        { text: transl.confirm.yes, onClick: actionYes },
-                        { text: transl.confirm.no, onClick: actionNo }
-                    ]}
-                    escapeAction={actionNo}
-                />
-            )
+            some({
+                hideConfirm,
+                message,
+                buttons: [
+                    { text: transl.confirm.yes, onClick: actionYes },
+                    { text: transl.confirm.no, onClick: actionNo }
+                ],
+                escapeAction: actionNo
+            })
         );
     }
 

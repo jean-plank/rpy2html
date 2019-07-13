@@ -1,12 +1,13 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core';
-import { none, Option, some } from 'fp-ts/lib/Option';
+import { fromNullable, none, Option, some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import {
+    createRef,
     forwardRef,
     RefForwardingComponent,
-    useImperativeHandle,
-    useState
+    RefObject,
+    useImperativeHandle
 } from 'react';
 
 import { transl } from '../../../context';
@@ -15,11 +16,9 @@ import QuickSave from '../../../storage/QuickSave';
 import Save from '../../../storage/Save';
 import { KeyUpAble } from '../../App';
 import Help from '../Help';
-import MenuButton from '../MenuButton';
-import menuStyles, { gameMenuOverlay } from '../menuStyles';
+import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu';
 import Preferences from '../Preferences';
 import SaveSlots from '../SaveSlots';
-import GameMenuBtn, { gameMenuBtnLabel } from './GameMenuBtn';
 import History from './History';
 
 interface Props {
@@ -35,7 +34,7 @@ interface Props {
         actionYes: () => void,
         actionNo?: () => void
     ) => void;
-    selectedBtn?: GameMenuBtn;
+    selectedBtn?: Option<MenuBtn>;
 }
 
 const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
@@ -48,63 +47,39 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
         showMainMenu,
         save,
         confirmYesNo,
-        selectedBtn: propsSelectedBtn = 'NONE'
+        selectedBtn = none
     },
     ref
 ) => {
+    const menuAble: RefObject<MenuAble> = createRef();
+
     useImperativeHandle(ref, () => ({ onKeyUp }));
 
-    const [selectedBtn, setSelectedBtn] = useState<GameMenuBtn>(
-        propsSelectedBtn
-    );
-
-    const btns: Array<[GameMenuBtn, (e: React.MouseEvent) => void]> = [
-        ['RESUME', hideGameMenu],
-        ['HISTORY', selectBtn('HISTORY')],
-        ['SAVE', selectBtn('SAVE')],
-        ['LOAD', selectBtn('LOAD')],
-        ['PREFS', selectBtn('PREFS')],
-        ['MAIN_MENU', confirmMainMenu],
-        ['HELP', selectBtn('HELP')]
-    ];
-
     return (
-        <div css={menuStyles.menu}>
-            <div className={gameMenuOverlay} />
-            <div css={menuStyles.menuBar}>{btns.map(menuBtn)}</div>
-            <div css={menuStyles.submenuTitle}>
-                {gameMenuBtnLabel(selectedBtn)}
-            </div>
-            <div css={menuStyles.submenu}>{getSubmenu().toNullable()}</div>
-        </div>
+        <Menu
+            ref={menuAble}
+            overlay={MenuOverlay.GameMenu}
+            buttons={[
+                { btn: 'RESUME', specialAction: some(hideGameMenu) },
+                { btn: 'HISTORY' },
+                { btn: 'SAVE' },
+                { btn: 'LOAD' },
+                { btn: 'PREFS' },
+                { btn: 'MAIN_MENU', specialAction: some(confirmMainMenu) },
+                { btn: 'HELP' }
+            ]}
+            submenu={submenu}
+            selectedBtn={selectedBtn}
+        />
     );
 
-    function menuBtn(
-        [btn, onClick]: [GameMenuBtn, (e: React.MouseEvent) => void],
-        key: number
-    ): JSX.Element {
-        return (
-            <MenuButton
-                key={key}
-                onClick={onClick}
-                selected={selectedBtn === btn}
-            >
-                {gameMenuBtnLabel(btn)}
-            </MenuButton>
-        );
-    }
-
-    function selectBtn(btn: GameMenuBtn): () => void {
-        return () => setSelectedBtn(btn);
-    }
-
-    function getSubmenu(): Option<JSX.Element> {
-        if (selectedBtn === 'HISTORY') return some(<History nodes={history} />);
-        if (selectedBtn === 'SAVE') return some(getSave());
-        if (selectedBtn === 'LOAD') return some(getLoad());
-        if (selectedBtn === 'PREFS') return some(<Preferences />);
-        if (selectedBtn === 'HELP') return some(<Help />);
-        return none;
+    function submenu(btn: MenuBtn): JSX.Element | null {
+        if (btn === 'HISTORY') return <History nodes={history} />;
+        if (btn === 'SAVE') return getSave();
+        if (btn === 'LOAD') return getLoad();
+        if (btn === 'PREFS') return <Preferences />;
+        if (btn === 'HELP') return <Help />;
+        return null;
     }
 
     function getSave(): JSX.Element {
@@ -141,10 +116,12 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     }
 
     function confirmMainMenu() {
-        setSelectedBtn('MAIN_MENU');
-        confirmYesNo(transl.confirm.unsaved, showMainMenu, () =>
-            setSelectedBtn('NONE')
-        );
+        fromNullable(menuAble.current).map(({ setSelectedBtn }) => {
+            setSelectedBtn(some('MAIN_MENU'));
+            confirmYesNo(transl.confirm.unsaved, showMainMenu, () =>
+                setSelectedBtn(none)
+            );
+        });
     }
 
     function onKeyUp(e: React.KeyboardEvent) {

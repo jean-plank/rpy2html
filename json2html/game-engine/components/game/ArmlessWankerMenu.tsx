@@ -1,12 +1,13 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
+import { Option, some } from 'fp-ts/lib/Option';
 import { FunctionComponent } from 'react';
 
 import { style, transl } from '../../context';
 import { mediaQuery } from '../../utils/styles';
 import withStopPropagation from '../../utils/withStopPropagation';
 import GuiButton from '../GuiButton';
-import GameMenuBtn from '../menus/gameMenu/GameMenuBtn';
+import { MenuBtn } from '../menus/Menu';
 
 interface BtnProps {
     onClick: (e: React.MouseEvent) => void;
@@ -24,7 +25,7 @@ const AWButton: FunctionComponent<BtnProps> = ({
 );
 
 export interface ArmlessWankerMenuProps {
-    showGameMenu: (btn?: GameMenuBtn) => void;
+    showGameMenu: (btn?: Option<MenuBtn>) => void;
     undo: () => void;
     disableUndo: boolean;
     skip: () => void;
@@ -50,13 +51,13 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
             >
                 {transl.menu.back}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP('HISTORY')}>
+            <AWButton onClick={showGameMenuWSP(some('HISTORY'))}>
                 {transl.menu.history}
             </AWButton>
             <AWButton onClick={withStopPropagation(skip)}>
                 {transl.menu.skip}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP('SAVE')}>
+            <AWButton onClick={showGameMenuWSP(some('SAVE'))}>
                 {transl.menu.save}
             </AWButton>
             <AWButton onClick={withStopPropagation(quickSave)}>
@@ -72,7 +73,9 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
         </div>
     );
 
-    function showGameMenuWSP(btn?: GameMenuBtn): (e: React.MouseEvent) => void {
+    function showGameMenuWSP(
+        btn?: Option<MenuBtn>
+    ): (e: React.MouseEvent) => void {
         return withStopPropagation(() => showGameMenu(btn));
     }
 };

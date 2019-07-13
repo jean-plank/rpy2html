@@ -16,7 +16,7 @@ interface Button {
     disabled?: boolean;
 }
 
-interface Props {
+export interface ConfirmProps {
     hideConfirm: () => void;
     message: string;
     buttons: Button[];
@@ -24,7 +24,7 @@ interface Props {
 }
 
 // hideConfirm will always be called after escapeAction
-const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
+const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
     { hideConfirm, message, buttons, escapeAction },
     ref
 ) => {
@@ -74,7 +74,7 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
         e.stopPropagation();
     }
 };
-const Confirm = forwardRef<KeyUpAble, Props>(RawConfirm);
+const Confirm = forwardRef<KeyUpAble, ConfirmProps>(RawConfirm);
 export default Confirm;
 
 const styles = {

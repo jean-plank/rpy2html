@@ -1,44 +1,24 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
-import { none, Option, some } from 'fp-ts/lib/Option';
+import { fromNullable, none, Option, some } from 'fp-ts/lib/Option';
 import { lookup, StrMap } from 'fp-ts/lib/StrMap';
 import {
+    createRef,
     forwardRef,
-    KeyboardEvent,
     RefForwardingComponent,
-    useImperativeHandle,
-    useState
+    RefObject,
+    useImperativeHandle
 } from 'react';
 
-import { transl } from '../../../context';
 import QuickSave from '../../../storage/QuickSave';
 import Save from '../../../storage/Save';
 import { getBgOrElse } from '../../../utils/styles';
 import { KeyUpAble } from '../../App';
 import Help from '../Help';
-import MenuButton from '../MenuButton';
-import menuStyles, { gameMenuOverlay, mainMenuOverlay } from '../menuStyles';
+import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu';
 import Preferences from '../Preferences';
 import SaveSlots from '../SaveSlots';
 import Memory from './Memory';
-
-enum Btn {
-    None,
-    Start,
-    Load,
-    Prefs,
-    Memory,
-    Help
-}
-
-const btnLabel = (btn: Btn): string => {
-    if (btn === Btn.Start) return transl.menu.start;
-    if (btn === Btn.Load) return transl.menu.load;
-    if (btn === Btn.Prefs) return transl.menu.prefs;
-    if (btn === Btn.Memory) return transl.menu.memory;
-    if (btn === Btn.Help) return transl.menu.help;
-    return '';
-};
 
 interface Props {
     startGame: () => void;
@@ -57,55 +37,41 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     { startGame, saves, emptySaves, loadSave, deleteSave, confirmYesNo },
     ref
 ) => {
+    const menuAble: RefObject<MenuAble> = createRef();
+
     useImperativeHandle(ref, () => ({ onKeyUp }));
 
-    const [overlayClassName, setOverlay] = useState<string>(mainMenuOverlay);
-    const [selectedBtn, setSelectedBtn] = useState<Btn>(Btn.None);
-    const [submenu, setSubmenu] = useState<Option<JSX.Element>>(none);
-
-    const btns: Array<[Btn, (e: React.MouseEvent) => void]> = [
-        [Btn.Start, startGame],
-        [Btn.Load, showLoad],
-        [Btn.Prefs, showPrefs],
-        [Btn.Memory, showMemory],
-        [Btn.Help, showHelp]
-    ];
-
     return (
-        <div css={[menuStyles.menu, mainMenuStyles]}>
-            <div className={overlayClassName} />
-            <div css={menuStyles.menuBar}>{btns.map(menuBtn)}</div>
-            <div css={menuStyles.submenuTitle}>{btnLabel(selectedBtn)}</div>
-            <div css={menuStyles.submenu}>{submenu.toNullable()}</div>
-        </div>
+        <Menu
+            ref={menuAble}
+            overlay={MenuOverlay.MainMenu}
+            buttons={[
+                { btn: 'START', specialAction: some(startGame) },
+                { btn: 'LOAD' },
+                { btn: 'PREFS' },
+                { btn: 'MEMORY' },
+                { btn: 'HELP' }
+            ]}
+            submenu={submenu}
+            styles={styles}
+        />
     );
 
-    function menuBtn(
-        [btn, onClick]: [Btn, (e: React.MouseEvent) => void],
-        key: number
-    ): JSX.Element {
-        return (
-            <MenuButton
-                key={key}
-                onClick={onClick}
-                selected={selectedBtn === btn}
-            >
-                {btnLabel(btn)}
-            </MenuButton>
-        );
+    function submenu(btn: MenuBtn): JSX.Element | null {
+        if (btn === 'LOAD') return getLoad();
+        if (btn === 'PREFS') return <Preferences />;
+        if (btn === 'MEMORY') return getMemory();
+        if (btn === 'HELP') return <Help />;
+        return null;
     }
 
-    function showLoad() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Load);
-        setSubmenu(
-            some(
-                <SaveSlots
-                    saves={saves}
-                    onClick={onClick}
-                    deleteSave={deleteSave}
-                />
-            )
+    function getLoad(): JSX.Element {
+        return (
+            <SaveSlots
+                saves={saves}
+                onClick={onClick}
+                deleteSave={deleteSave}
+            />
         );
 
         function onClick(_: number, save: Option<Save>) {
@@ -113,35 +79,22 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
         }
     }
 
-    function showPrefs() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Prefs);
-        setSubmenu(some(<Preferences />));
+    function getMemory(): JSX.Element {
+        return <Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />;
     }
 
-    function showMemory() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Memory);
-        setSubmenu(
-            some(<Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />)
-        );
-    }
-
-    function showHelp() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Help);
-        setSubmenu(some(<Help />));
-    }
-
-    function onKeyUp(e: KeyboardEvent) {
-        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
+    function onKeyUp(e: React.KeyboardEvent) {
+        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
             Escape: e => {
-                if (selectedBtn !== Btn.None) {
-                    e.stopPropagation();
-                    setOverlay(mainMenuOverlay);
-                    setSubmenu(none);
-                    setSelectedBtn(Btn.None);
-                }
+                fromNullable(menuAble.current).map(
+                    ({ selectedBtn, setSelectedBtn, setOverlay }) => {
+                        if (selectedBtn.isSome()) {
+                            e.stopPropagation();
+                            setSelectedBtn(none);
+                            setOverlay(MenuOverlay.MainMenu);
+                        }
+                    }
+                );
             }
         });
         lookup(e.key, keyEvents).map(_ => _(e));
@@ -149,6 +102,6 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
 };
 export default forwardRef<KeyUpAble, Props>(MainMenu);
 
-const mainMenuStyles = css({
+const styles = css({
     ...getBgOrElse('main_menu_bg', '#5f777f')
 });
