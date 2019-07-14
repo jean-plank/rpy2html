@@ -7,9 +7,9 @@ import { none, Option, option, some } from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
 import { firstNode, style, transl } from '../../context'
-import GameProps from '../../gameHistory/GameProps'
-import statesFromHistory from '../../gameHistory/statesFromHistory'
-import Save from '../../storage/Save'
+import GameProps from '../../history/GameProps'
+import statesFromHistory from '../../history/statesFromHistory'
+import Save from '../../saves/Save'
 import { getBgOrElse, ifNoSlotBg, mediaQuery } from '../../utils/styles'
 import Game from '../game/Game'
 

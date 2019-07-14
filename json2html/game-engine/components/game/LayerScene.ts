@@ -2,7 +2,7 @@ import { css, keyframes } from '@emotion/core'
 import { Option } from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
-import Image from '../../models/medias/Image'
+import Image from '../../medias/Image'
 
 interface Props {
     image: Option<Image>

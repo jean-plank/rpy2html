@@ -2,7 +2,7 @@ import { Either } from 'fp-ts/lib/Either'
 import { none } from 'fp-ts/lib/Option'
 import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps'
+import GameProps from '../history/GameProps'
 import NodeWithImage from './NodeWithImage'
 
 export default class Scene extends NodeWithImage {

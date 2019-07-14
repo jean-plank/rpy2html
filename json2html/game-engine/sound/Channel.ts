@@ -1,7 +1,7 @@
 import { head } from 'fp-ts/lib/Array'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
-import Sound from './medias/Sound'
+import Sound from '../medias/Sound'
 
 export default class Channel {
     private currentlyPlaying: Option<HTMLAudioElement> = none
@@ -9,14 +9,19 @@ export default class Channel {
 
     constructor(
         private confirmAudio: (okAction: () => void) => void,
-        private loop = false,
-        private volume = 0.7
+        private volume: number,
+        private loop = false
     ) {}
 
     toString = (): string =>
         `Channel(${this.currentlyPlaying}, [${this.pending
             .map(_ => _.toString())
             .join(', ')}])`
+
+    setVolume = (volume: number) => {
+        this.volume = volume
+        this.currentlyPlaying.map(_ => (_.volume = volume))
+    }
 
     isAlreadyPlaying = (sound: Sound): boolean =>
         this.currentlyPlaying.exists(sound.hasSameName)

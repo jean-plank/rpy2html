@@ -3,7 +3,7 @@ import { lookup } from 'fp-ts/lib/StrMap'
 
 import AstNode, { InitArgs } from './AstNode'
 
-import Char from '../models/Char'
+import Char from '../Char'
 
 export default abstract class NodeWithChar extends AstNode {
     who: Option<Char> = none

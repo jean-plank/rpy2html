@@ -2,13 +2,13 @@ import { Do } from 'fp-ts-contrib/lib/Do'
 import { init, last } from 'fp-ts/lib/Array'
 import { fromEither, Option, option } from 'fp-ts/lib/Option'
 
-import { GameHistoryState } from '../gameHistory/gameHistoryReducer'
-import { GameState } from '../gameHistory/gameStateReducer'
-import { HistoryAction } from '../gameHistory/historiable'
-import statesFromHistory from '../gameHistory/statesFromHistory'
+import { GameHistoryState } from '../history/gameHistoryReducer'
+import { GameState } from '../history/gameStateReducer'
+import { HistoryAction } from '../history/historiable'
+import statesFromHistory from '../history/statesFromHistory'
 import AstNode from '../nodes/AstNode'
-import QuickSave from '../storage/QuickSave'
-import { SavesAction } from '../storage/savesReducer'
+import QuickSave from '../saves/QuickSave'
+import { SavesAction } from '../saves/savesReducer'
 
 export const loadAction = (
     firstNode: AstNode,

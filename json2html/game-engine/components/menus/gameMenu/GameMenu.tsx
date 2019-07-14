@@ -12,8 +12,9 @@ import {
 
 import { transl } from '../../../context'
 import AstNode from '../../../nodes/AstNode'
-import QuickSave from '../../../storage/QuickSave'
-import Save from '../../../storage/Save'
+import QuickSave from '../../../saves/QuickSave'
+import Save from '../../../saves/Save'
+import SoundService from '../../../sound/SoundService'
 import { KeyUpAble } from '../../App'
 import Help from '../Help'
 import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu'
@@ -22,6 +23,7 @@ import SaveSlots from '../SaveSlots'
 import History from './History'
 
 interface Props {
+    soundService: SoundService
     history: AstNode[]
     saves: Array<Option<Save>>
     loadSave: (save: QuickSave) => void
@@ -39,6 +41,7 @@ interface Props {
 
 const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     {
+        soundService,
         history,
         saves,
         loadSave,
@@ -77,7 +80,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
         if (btn === 'HISTORY') return <History nodes={history} />
         if (btn === 'SAVE') return getSave()
         if (btn === 'LOAD') return getLoad()
-        if (btn === 'PREFS') return <Preferences />
+        if (btn === 'PREFS') return <Preferences soundService={soundService} />
         if (btn === 'HELP') return <Help />
         return null
     }

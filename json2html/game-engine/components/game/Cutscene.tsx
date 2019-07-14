@@ -2,7 +2,7 @@
 import { css } from '@emotion/core'
 import { FunctionComponent } from 'react'
 
-import Video from '../../models/medias/Video'
+import Video from '../../medias/Video'
 
 export interface Props {
     video: Video

@@ -27,17 +27,17 @@ import {
     transl,
     videos
 } from '../context'
+import Font from '../Font'
 import gameHistoryReducer, {
     emptyGameHistoryState
-} from '../gameHistory/gameHistoryReducer'
-import GameProps from '../gameHistory/GameProps'
-import Font from '../models/Font'
+} from '../history/gameHistoryReducer'
+import GameProps from '../history/GameProps'
 import AstNode from '../nodes/AstNode'
 import Menu from '../nodes/Menu'
-import SoundService from '../SoundService'
-import QuickSave from '../storage/QuickSave'
-import Saves from '../storage/Saves'
-import savesReducer from '../storage/savesReducer'
+import QuickSave from '../saves/QuickSave'
+import Saves from '../saves/Saves'
+import savesReducer from '../saves/savesReducer'
+import SoundService from '../sound/SoundService'
 import { historyFromState, loadAction, saveAction } from '../utils/saveLoad'
 import { mediaQuery } from '../utils/styles'
 import Confirm, { ConfirmProps } from './Confirm'
@@ -112,6 +112,7 @@ const App: FunctionComponent = () => {
         return (
             <MainMenu
                 ref={viewKeyUpAble}
+                soundService={soundService}
                 startGame={startGame}
                 saves={saves.slots}
                 emptySaves={emptySaves}
@@ -150,6 +151,7 @@ const App: FunctionComponent = () => {
         return (
             <GameMenu
                 ref={viewKeyUpAble}
+                soundService={soundService}
                 history={historyFromState(gameState)}
                 saves={saves.slots}
                 loadSave={loadSave}

@@ -10,8 +10,9 @@ import {
     useImperativeHandle
 } from 'react'
 
-import QuickSave from '../../../storage/QuickSave'
-import Save from '../../../storage/Save'
+import QuickSave from '../../../saves/QuickSave'
+import Save from '../../../saves/Save'
+import SoundService from '../../../sound/SoundService'
 import { getBgOrElse } from '../../../utils/styles'
 import { KeyUpAble } from '../../App'
 import Help from '../Help'
@@ -21,6 +22,7 @@ import SaveSlots from '../SaveSlots'
 import Memory from './Memory'
 
 interface Props {
+    soundService: SoundService
     startGame: () => void
     saves: Array<Option<Save>>
     emptySaves: () => void
@@ -34,7 +36,15 @@ interface Props {
 }
 
 const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
-    { startGame, saves, emptySaves, loadSave, deleteSave, confirmYesNo },
+    {
+        soundService,
+        startGame,
+        saves,
+        emptySaves,
+        loadSave,
+        deleteSave,
+        confirmYesNo
+    },
     ref
 ) => {
     const menuAble: RefObject<MenuAble> = createRef()
@@ -59,7 +69,7 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
 
     function submenu(btn: MenuBtn): JSX.Element | null {
         if (btn === 'LOAD') return getLoad()
-        if (btn === 'PREFS') return <Preferences />
+        if (btn === 'PREFS') return <Preferences soundService={soundService} />
         if (btn === 'MEMORY') return getMemory()
         if (btn === 'HELP') return <Help />
         return null

@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/core'
 import { Option } from 'fp-ts/lib/Option'
 import { CSSProperties, FunctionComponent } from 'react'
 
-import Char from '../../../models/Char'
+import Char from '../../../Char'
 
 interface Props {
     char: Option<Char>

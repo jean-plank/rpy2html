@@ -3,7 +3,7 @@ import { none } from 'fp-ts/lib/Option'
 import { insert } from 'fp-ts/lib/StrMap'
 import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps'
+import GameProps from '../history/GameProps'
 import AstNode from './AstNode'
 
 export default class Stop extends AstNode {

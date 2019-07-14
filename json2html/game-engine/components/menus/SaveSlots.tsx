@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/core'
 import { Option } from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
-import Save from '../../storage/Save'
+import Save from '../../saves/Save'
 import SaveSlot from './SaveSlot'
 
 interface Props {

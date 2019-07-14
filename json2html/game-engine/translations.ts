@@ -38,6 +38,10 @@ export interface Translation {
         display: string;
         window: string;
         fullscreen: string;
+        volume: string;
+        music: string;
+        sound: string;
+        voice: string;
     }
     memory: {
         about: string;
@@ -84,7 +88,11 @@ const translations: StrMap<Translation> = new StrMap({
         prefs: {
             display: 'Display',
             window: 'Window',
-            fullscreen: 'Fullscreen'
+            fullscreen: 'Fullscreen',
+            volume: 'Volume',
+            music: 'Music',
+            sound: 'Sound',
+            voice: 'Voice'
         },
         memory: {
             about:
@@ -134,7 +142,11 @@ const translations: StrMap<Translation> = new StrMap({
         prefs: {
             display: 'Affichage',
             window: 'Fenêtré',
-            fullscreen: 'Plein écran'
+            fullscreen: 'Plein écran',
+            volume: 'Volume',
+            music: 'Musique',
+            sound: 'Sons',
+            voice: 'Voix'
         },
         memory: {
             about:

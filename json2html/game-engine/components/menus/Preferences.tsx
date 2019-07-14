@@ -3,29 +3,16 @@ import { css, jsx } from '@emotion/core'
 import { FunctionComponent, useEffect, useState } from 'react'
 
 import { style, transl } from '../../context'
-import MenuButton, { BtnProps } from './MenuButton'
+import SoundService from '../../sound/SoundService'
+import Volumes from '../../sound/Volumes'
+import Radio from './Radio'
+import Slider from './Slider'
 
-const PrefsBtn: FunctionComponent<BtnProps> = ({
-    onClick,
-    selected = false,
-    disabled,
-    children
-}) => (
-    <div css={styles.btn.container}>
-        <div
-            css={styles.btn.rect}
-            className={selected ? 'selected' : undefined}
-        />
-        <MenuButton
-            {...{ onClick, disabled, selected }}
-            styles={styles.btn.menuBtn}
-        >
-            {children}
-        </MenuButton>
-    </div>
-)
+interface Props {
+    soundService: SoundService
+}
 
-const Preferences: FunctionComponent = () => {
+const Preferences: FunctionComponent<Props> = ({ soundService }) => {
     const [isFullscreen, setIsFullscreen] = useState(document.fullscreen)
 
     useEffect(
@@ -38,6 +25,7 @@ const Preferences: FunctionComponent = () => {
     return (
         <div css={styles.container}>
             {document.fullscreenEnabled ? display() : null}
+            {volume()}
         </div>
     )
 
@@ -45,12 +33,12 @@ const Preferences: FunctionComponent = () => {
         return (
             <div css={styles.group}>
                 <div css={styles.title}>{transl.prefs.display}</div>
-                <PrefsBtn onClick={windowed} selected={!isFullscreen}>
+                <Radio onClick={windowed} selected={!isFullscreen}>
                     {transl.prefs.window}
-                </PrefsBtn>
-                <PrefsBtn onClick={fullscreen} selected={isFullscreen}>
+                </Radio>
+                <Radio onClick={fullscreen} selected={isFullscreen}>
                     {transl.prefs.fullscreen}
-                </PrefsBtn>
+                </Radio>
             </div>
         )
     }
@@ -61,6 +49,30 @@ const Preferences: FunctionComponent = () => {
 
     function fullscreen() {
         document.body.requestFullscreen({ navigationUI: 'hide' })
+    }
+
+    function volume(): JSX.Element {
+        return (
+            <div css={styles.group}>
+                <div css={styles.title}>{transl.prefs.volume}</div>
+                {['music', 'sound', 'voice'].map(getSlider)}
+            </div>
+        )
+
+        function getSlider(chanName: keyof Volumes, key: number): JSX.Element {
+            return (
+                <Slider
+                    key={key}
+                    title={transl.prefs[chanName]}
+                    defaultValue={soundService.volumes[chanName]}
+                    setValue={setVolume(chanName)}
+                />
+            )
+        }
+
+        function setVolume(chanName: keyof Volumes): (volume: number) => void {
+            return volume => soundService.setVolume(chanName, volume)
+        }
     }
 }
 export default Preferences
@@ -80,26 +92,5 @@ const styles = {
     title: css({
         color: style.accent_color,
         paddingBottom: '0.2em'
-    }),
-
-    btn: {
-        container: css({
-            display: 'flex',
-            alignItems: 'center'
-        }),
-
-        rect: css({
-            flexShrink: 0,
-            width: '0.3em',
-            height: '1em',
-
-            '&.selected': {
-                backgroundColor: style.accent_color
-            }
-        }),
-
-        menuBtn: css({
-            flexShrink: 0
-        })
-    }
+    })
 }

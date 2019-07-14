@@ -2,7 +2,7 @@
 import { css, CSSObject, jsx } from '@emotion/core'
 import { FunctionComponent } from 'react'
 
-import Image from '../../models/medias/Image'
+import Image from '../../medias/Image'
 
 interface Props {
     images: Image[]

@@ -5,8 +5,8 @@ import { TextAlignProperty } from 'csstype'
 import { Option } from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
+import Char from '../../Char'
 import { style } from '../../context'
-import Char from '../../models/Char'
 import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
 interface Props {

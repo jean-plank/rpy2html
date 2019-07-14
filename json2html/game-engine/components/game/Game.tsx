@@ -10,11 +10,11 @@ import {
     useImperativeHandle
 } from 'react'
 
-import GameProps from '../../gameHistory/GameProps'
-import Video from '../../models/medias/Video'
+import GameProps from '../../history/GameProps'
+import Video from '../../medias/Video'
 import AstNode from '../../nodes/AstNode'
 import Menu from '../../nodes/Menu'
-import SoundService from '../../SoundService'
+import SoundService from '../../sound/SoundService'
 import withStopPropagation from '../../utils/withStopPropagation'
 import { GameAble, KeyUpAble } from '../App'
 import ArmlessWankerMenu, { ArmlessWankerMenuProps } from './ArmlessWankerMenu'

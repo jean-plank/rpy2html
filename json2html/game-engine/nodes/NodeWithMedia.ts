@@ -1,6 +1,6 @@
 import { none, Option } from 'fp-ts/lib/Option'
 
-import Media from '../models/medias/Media'
+import Media from '../medias/Media'
 import AstNode, { AppData, InitArgs } from './AstNode'
 
 export default abstract class NodeWithMedia<T extends Media> extends AstNode {

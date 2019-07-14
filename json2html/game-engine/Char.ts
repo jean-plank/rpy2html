@@ -1,6 +1,6 @@
 import { fromNullable, Option } from 'fp-ts/lib/Option'
 
-import { RawChar } from '../../renpy-json-loader/RenpyJson'
+import { RawChar } from '../renpy-json-loader/RenpyJson'
 
 export default class Char {
     name: string

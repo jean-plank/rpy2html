@@ -1,10 +1,10 @@
 import { fromNullable, none, Option, tryCatch } from 'fp-ts/lib/Option'
 import { StrMap } from 'fp-ts/lib/StrMap'
 
-import Char from '../models/Char'
-import Image from '../models/medias/Image'
-import Sound from '../models/medias/Sound'
-import Video from '../models/medias/Video'
+import Char from '../Char'
+import Image from '../medias/Image'
+import Sound from '../medias/Sound'
+import Video from '../medias/Video'
 import MenuItem from '../nodes/MenuItem'
 
 export default class GameProps {

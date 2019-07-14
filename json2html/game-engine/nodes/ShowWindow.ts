@@ -1,7 +1,7 @@
 import { Either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps'
+import GameProps from '../history/GameProps'
 import AstNode from './AstNode'
 
 export default class ShowWindow extends AstNode {

@@ -1,4 +1,4 @@
-import Font from '../game-engine/models/Font'
+import Font from '../game-engine/Font'
 
 interface Obj<T> {
     [key: string]: T

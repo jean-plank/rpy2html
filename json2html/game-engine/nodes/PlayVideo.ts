@@ -2,8 +2,8 @@ import { Either } from 'fp-ts/lib/Either'
 import { lookup } from 'fp-ts/lib/StrMap'
 import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps'
-import Video from '../models/medias/Video'
+import GameProps from '../history/GameProps'
+import Video from '../medias/Video'
 import NodeWithMedia from './NodeWithMedia'
 
 export default class PlayVideo extends NodeWithMedia<Video> {
