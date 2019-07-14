@@ -1,20 +1,20 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { Option } from 'fp-ts/lib/Option';
-import { CSSProperties, FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { Option } from 'fp-ts/lib/Option'
+import { CSSProperties, FunctionComponent } from 'react'
 
-import Char from '../../../models/Char';
+import Char from '../../../models/Char'
 
 interface Props {
-    char: Option<Char>;
-    text: string;
+    char: Option<Char>
+    text: string
 }
 
 const HistoryLine: FunctionComponent<Props> = ({ char, text }) => {
     const charStyle = char
         .chain<CSSProperties>(_ => _.color.map(_ => ({ color: _ })))
-        .toUndefined();
-    const charName = char.map(_ => _.name).toNullable();
+        .toUndefined()
+    const charName = char.map(_ => _.name).toNullable()
 
     return (
         <div css={styles.historyLine}>
@@ -23,9 +23,9 @@ const HistoryLine: FunctionComponent<Props> = ({ char, text }) => {
             </div>
             <div css={styles.what}>{text}</div>
         </div>
-    );
-};
-export default HistoryLine;
+    )
+}
+export default HistoryLine
 
 const styles = {
     historyLine: css({
@@ -52,4 +52,4 @@ const styles = {
     what: css({
         width: '80%'
     })
-};
+}

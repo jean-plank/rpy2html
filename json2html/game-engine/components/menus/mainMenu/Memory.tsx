@@ -1,23 +1,23 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { fromNullable } from 'fp-ts/lib/Option';
-import { insert, StrMap, toArray } from 'fp-ts/lib/StrMap';
-import { FunctionComponent, useState } from 'react';
+import { css, jsx } from '@emotion/core'
+import { fromNullable } from 'fp-ts/lib/Option'
+import { insert, StrMap, toArray } from 'fp-ts/lib/StrMap'
+import { FunctionComponent, useState } from 'react'
 
-import { storageKey, storagePrefix, style, transl } from '../../../context';
-import MemoryGame from './MemoryGame';
+import { storageKey, storagePrefix, style, transl } from '../../../context'
+import MemoryGame from './MemoryGame'
 
 interface Props {
-    emptySaves: () => void;
+    emptySaves: () => void
     confirmYesNo: (
         message: string,
         actionYes: () => void,
         actionNo?: () => void
-    ) => void;
+    ) => void
 }
 
 const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
-    const [games, setGames] = useState<StrMap<number>>(allJPGamesStorages);
+    const [games, setGames] = useState<StrMap<number>>(allJPGamesStorages)
 
     const gameElts = toArray(games).map(([key, bytes], i) => (
         <MemoryGame
@@ -26,7 +26,7 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
             bytes={bytes}
             deleteStorage={deleteStorageWithConfirm(key)}
         />
-    ));
+    ))
 
     return (
         <div css={styles.memory}>
@@ -43,7 +43,7 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
             </div>
             {gameElts.length > 0 ? footer() : null}
         </div>
-    );
+    )
 
     function footer(): JSX.Element {
         return (
@@ -55,7 +55,7 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
                     deleteAll={true}
                 />
             </div>
-        );
+        )
     }
 
     function allJPGamesStorages(): StrMap<number> {
@@ -73,32 +73,32 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
                         )
                         .getOrElse(acc),
                 new StrMap<number>({})
-            );
+            )
     }
 
     function deleteStorage(key: string): () => void {
         return () => {
-            const keyWithPrefix = storagePrefix + key;
-            localStorage.removeItem(keyWithPrefix);
-            if (keyWithPrefix === storageKey) emptySaves();
-            setGames(allJPGamesStorages());
-        };
+            const keyWithPrefix = storagePrefix + key
+            localStorage.removeItem(keyWithPrefix)
+            if (keyWithPrefix === storageKey) emptySaves()
+            setGames(allJPGamesStorages())
+        }
     }
 
     function deleteStorageWithConfirm(key: string): () => void {
-        return () => confirmYesNo(transl.confirm.delete, deleteStorage(key));
+        return () => confirmYesNo(transl.confirm.delete, deleteStorage(key))
     }
 
     function deleteAll() {
         confirmYesNo(transl.confirm.deleteAll, () =>
             games.mapWithKey(_ => deleteStorage(_)())
-        );
+        )
     }
-};
-export default Memory;
+}
+export default Memory
 
 const byteCount = (str: string): number =>
-    encodeURI(str).split(/%..|./).length - 1;
+    encodeURI(str).split(/%..|./).length - 1
 
 const styles = {
     memory: css({
@@ -132,4 +132,4 @@ const styles = {
         margin: '0 2em',
         padding: '0 1em'
     })
-};
+}

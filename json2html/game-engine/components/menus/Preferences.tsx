@@ -1,9 +1,9 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { FunctionComponent, useEffect, useState } from 'react';
+import { css, jsx } from '@emotion/core'
+import { FunctionComponent, useEffect, useState } from 'react'
 
-import { style, transl } from '../../context';
-import MenuButton, { BtnProps } from './MenuButton';
+import { style, transl } from '../../context'
+import MenuButton, { BtnProps } from './MenuButton'
 
 const PrefsBtn: FunctionComponent<BtnProps> = ({
     onClick,
@@ -23,23 +23,23 @@ const PrefsBtn: FunctionComponent<BtnProps> = ({
             {children}
         </MenuButton>
     </div>
-);
+)
 
 const Preferences: FunctionComponent = () => {
-    const [isFullscreen, setIsFullscreen] = useState(document.fullscreen);
+    const [isFullscreen, setIsFullscreen] = useState(document.fullscreen)
 
     useEffect(
         () =>
             (document.onfullscreenchange = () =>
                 setIsFullscreen(document.fullscreen)),
         []
-    );
+    )
 
     return (
         <div css={styles.container}>
             {document.fullscreenEnabled ? display() : null}
         </div>
-    );
+    )
 
     function display(): JSX.Element {
         return (
@@ -52,18 +52,18 @@ const Preferences: FunctionComponent = () => {
                     {transl.prefs.fullscreen}
                 </PrefsBtn>
             </div>
-        );
+        )
     }
 
     function windowed() {
-        document.exitFullscreen();
+        document.exitFullscreen()
     }
 
     function fullscreen() {
-        document.body.requestFullscreen({ navigationUI: 'hide' });
+        document.body.requestFullscreen({ navigationUI: 'hide' })
     }
-};
-export default Preferences;
+}
+export default Preferences
 
 const styles = {
     container: css({
@@ -102,4 +102,4 @@ const styles = {
             flexShrink: 0
         })
     }
-};
+}

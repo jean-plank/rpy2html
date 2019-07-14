@@ -1,34 +1,34 @@
-import { Do } from 'fp-ts-contrib/lib/Do';
-import { tryCatch } from 'fp-ts/lib/Either';
+import { Do } from 'fp-ts-contrib/lib/Do'
+import { tryCatch2v } from 'fp-ts/lib/Either'
 import {
     fromEither,
     fromNullable,
     none,
     Option,
     option
-} from 'fp-ts/lib/Option';
-import * as t from 'io-ts';
+} from 'fp-ts/lib/Option'
+import * as t from 'io-ts'
 
-import { nbSlots, storageKey } from '../context';
-import QuickSave, { QuickSaveType } from './QuickSave';
-import Save, { SaveType } from './Save';
+import { nbSlots, storageKey } from '../context'
+import QuickSave, { QuickSaveType } from './QuickSave'
+import Save, { SaveType } from './Save'
 
 export const SavesType = t.exact(
     t.type({
         quickSave: t.union([t.null, QuickSaveType]),
         slots: t.array(t.union([t.null, SaveType]))
     })
-);
-type RawSaves = t.TypeOf<typeof SavesType>;
+)
+type RawSaves = t.TypeOf<typeof SavesType>
 
 export default class Saves {
-    quickSave: Option<QuickSave>;
-    slots: Array<Option<Save>>;
+    quickSave: Option<QuickSave>
+    slots: Array<Option<Save>>
 
     static empty: Saves = {
         quickSave: none,
         slots: Array.from({ length: nbSlots }, _ => none)
-    };
+    }
 
     static fromNullable = (rawSaves: RawSaves): Saves => ({
         quickSave: fromNullable(rawSaves.quickSave),
@@ -47,8 +47,10 @@ export default class Saves {
             )
             .bindL('parsed', ({ storage }) =>
                 fromEither(
-                    tryCatch<unknown>(() => JSON.parse(storage)).mapLeft(_ =>
-                        console.warn('Error while parsing localStorage:', _)
+                    tryCatch2v<unknown, void>(
+                        () => JSON.parse(storage),
+                        _ =>
+                            console.warn('Error while parsing localStorage:', _)
                     )
                 )
             )

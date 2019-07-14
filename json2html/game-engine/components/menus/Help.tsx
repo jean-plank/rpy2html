@@ -1,13 +1,13 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { FunctionComponent } from 'react'
 
-import { help, style } from '../../context';
+import { help, style } from '../../context'
 
 const Help: FunctionComponent = (): JSX.Element => {
-    return <div css={helpStyles} dangerouslySetInnerHTML={{ __html: help }} />;
-};
-export default Help;
+    return <div css={helpStyles} dangerouslySetInnerHTML={{ __html: help }} />
+}
+export default Help
 
 const helpStyles = css({
     height: '100%',
@@ -35,4 +35,4 @@ const helpStyles = css({
         paddingRight: '1em',
         color: style.accent_color
     }
-});
+})

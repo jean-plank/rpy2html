@@ -1,11 +1,11 @@
-import { head } from 'fp-ts/lib/Array';
-import { none, Option, some } from 'fp-ts/lib/Option';
+import { head } from 'fp-ts/lib/Array'
+import { none, Option, some } from 'fp-ts/lib/Option'
 
-import Sound from './medias/Sound';
+import Sound from './medias/Sound'
 
 export default class Channel {
-    private currentlyPlaying: Option<HTMLAudioElement> = none;
-    private pending: Sound[] = [];
+    private currentlyPlaying: Option<HTMLAudioElement> = none
+    private pending: Sound[] = []
 
     constructor(
         private confirmAudio: (okAction: () => void) => void,
@@ -23,13 +23,13 @@ export default class Channel {
 
     // Stops current channel and plays sounds.
     play = (...sounds: Sound[]) => {
-        this.stop();
+        this.stop()
         head(sounds).map(h => {
             this.playSound(h).catch(() =>
                 this.confirmAudio(() => this.play(...sounds))
             );
-            [, ...this.pending] = sounds;
-        });
+            [, ...this.pending] = sounds
+        })
     }
 
     // Plays immediatly sound but does nothing to the pending queue.
@@ -37,20 +37,20 @@ export default class Channel {
         this.playElement(sound.elt(this.volume, this.onEnded))
 
     private playElement = (elt: HTMLAudioElement): Promise<void> => {
-        this.currentlyPlaying.map(Sound.stop);
-        this.currentlyPlaying = some(elt);
-        return Sound.play(elt);
+        this.currentlyPlaying.map(Sound.stop)
+        this.currentlyPlaying = some(elt)
+        return Sound.play(elt)
     }
 
     // Stops currently playing sound and empties pending queue.
     stop = () => {
-        this.currentlyPlaying.map(Sound.stop);
-        this.currentlyPlaying = none;
-        this.pending = [];
+        this.currentlyPlaying.map(Sound.stop)
+        this.currentlyPlaying = none
+        this.pending = []
     }
 
     // Pauses currently playing sound.
-    pause = () => this.currentlyPlaying.map(Sound.pause);
+    pause = () => this.currentlyPlaying.map(Sound.pause)
 
     // Resume after pause
     resume = () =>
@@ -63,13 +63,13 @@ export default class Channel {
             .map(h => {
                 // if sounds in pending queue
                 this.playSound(h);
-                [, ...this.pending] = this.pending;
+                [, ...this.pending] = this.pending
             })
             .getOrElseL(() => {
                 // if loop start over
-                if (this.loop) this.currentlyPlaying.map(this.playElement);
+                if (this.loop) this.currentlyPlaying.map(this.playElement)
                 // else nothing is playing anymore
-                else this.currentlyPlaying = none;
-            });
+                else this.currentlyPlaying = none
+            })
     }
 }

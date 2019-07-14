@@ -1,45 +1,45 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { fromNullable, none, Option, some } from 'fp-ts/lib/Option';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
+import { css, jsx } from '@emotion/core'
+import { fromNullable, none, Option, some } from 'fp-ts/lib/Option'
+import { lookup, StrMap } from 'fp-ts/lib/StrMap'
 import {
     createRef,
     forwardRef,
     RefForwardingComponent,
     RefObject,
     useImperativeHandle
-} from 'react';
+} from 'react'
 
-import QuickSave from '../../../storage/QuickSave';
-import Save from '../../../storage/Save';
-import { getBgOrElse } from '../../../utils/styles';
-import { KeyUpAble } from '../../App';
-import Help from '../Help';
-import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu';
-import Preferences from '../Preferences';
-import SaveSlots from '../SaveSlots';
-import Memory from './Memory';
+import QuickSave from '../../../storage/QuickSave'
+import Save from '../../../storage/Save'
+import { getBgOrElse } from '../../../utils/styles'
+import { KeyUpAble } from '../../App'
+import Help from '../Help'
+import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu'
+import Preferences from '../Preferences'
+import SaveSlots from '../SaveSlots'
+import Memory from './Memory'
 
 interface Props {
-    startGame: () => void;
-    saves: Array<Option<Save>>;
-    emptySaves: () => void;
-    loadSave: (save: QuickSave) => void;
-    deleteSave: (slot: number) => void;
+    startGame: () => void
+    saves: Array<Option<Save>>
+    emptySaves: () => void
+    loadSave: (save: QuickSave) => void
+    deleteSave: (slot: number) => void
     confirmYesNo: (
         message: string,
         actionYes: () => void,
         actionNo?: () => void
-    ) => void;
+    ) => void
 }
 
 const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     { startGame, saves, emptySaves, loadSave, deleteSave, confirmYesNo },
     ref
 ) => {
-    const menuAble: RefObject<MenuAble> = createRef();
+    const menuAble: RefObject<MenuAble> = createRef()
 
-    useImperativeHandle(ref, () => ({ onKeyUp }));
+    useImperativeHandle(ref, () => ({ onKeyUp }))
 
     return (
         <Menu
@@ -55,14 +55,14 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
             submenu={submenu}
             styles={styles}
         />
-    );
+    )
 
     function submenu(btn: MenuBtn): JSX.Element | null {
-        if (btn === 'LOAD') return getLoad();
-        if (btn === 'PREFS') return <Preferences />;
-        if (btn === 'MEMORY') return getMemory();
-        if (btn === 'HELP') return <Help />;
-        return null;
+        if (btn === 'LOAD') return getLoad()
+        if (btn === 'PREFS') return <Preferences />
+        if (btn === 'MEMORY') return getMemory()
+        if (btn === 'HELP') return <Help />
+        return null
     }
 
     function getLoad(): JSX.Element {
@@ -72,15 +72,15 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 onClick={onClick}
                 deleteSave={deleteSave}
             />
-        );
+        )
 
         function onClick(_: number, save: Option<Save>) {
-            save.map(loadSave);
+            save.map(loadSave)
         }
     }
 
     function getMemory(): JSX.Element {
-        return <Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />;
+        return <Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />
     }
 
     function onKeyUp(e: React.KeyboardEvent) {
@@ -89,19 +89,19 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 fromNullable(menuAble.current).map(
                     ({ selectedBtn, setSelectedBtn, setOverlay }) => {
                         if (selectedBtn.isSome()) {
-                            e.stopPropagation();
-                            setSelectedBtn(none);
-                            setOverlay(MenuOverlay.MainMenu);
+                            e.stopPropagation()
+                            setSelectedBtn(none)
+                            setOverlay(MenuOverlay.MainMenu)
                         }
                     }
-                );
+                )
             }
-        });
-        lookup(e.key, keyEvents).map(_ => _(e));
+        })
+        lookup(e.key, keyEvents).map(_ => _(e))
     }
-};
-export default forwardRef<KeyUpAble, Props>(MainMenu);
+}
+export default forwardRef<KeyUpAble, Props>(MainMenu)
 
 const styles = css({
     ...getBgOrElse('main_menu_bg', '#5f777f')
-});
+})

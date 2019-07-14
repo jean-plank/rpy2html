@@ -1,16 +1,16 @@
 /** @jsx jsx */
-import { jsx, SerializedStyles } from '@emotion/core';
-import { fromNullable, none, Option } from 'fp-ts/lib/Option';
+import { jsx, SerializedStyles } from '@emotion/core'
+import { fromNullable, none, Option } from 'fp-ts/lib/Option'
 
-import Media from './Media';
+import Media from './Media'
 
 interface Args {
-    autoPlay: boolean;
-    css?: SerializedStyles;
+    autoPlay: boolean
+    css?: SerializedStyles
 }
 
 export default class Video extends Media {
-    private _elt: Option<HTMLVideoElement> = none;
+    private _elt: Option<HTMLVideoElement> = none
 
     private setElt = (elt: HTMLVideoElement | null) =>
         (this._elt = fromNullable(elt))
@@ -25,10 +25,10 @@ export default class Video extends Media {
     )
 
     load = () => {
-        const elt = document.createElement('video');
-        elt.src = this.file;
-        elt.preload = 'auto';
+        const elt = document.createElement('video')
+        elt.src = this.file
+        elt.preload = 'auto'
     }
 
-    onEnded = (f: () => void) => this._elt.map(_ => (_.onended = f));
+    onEnded = (f: () => void) => this._elt.map(_ => (_.onended = f))
 }

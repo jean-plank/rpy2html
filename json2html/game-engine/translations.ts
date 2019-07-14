@@ -1,4 +1,4 @@
-import { StrMap } from 'fp-ts/lib/StrMap';
+import { StrMap } from 'fp-ts/lib/StrMap'
 
 export interface Translation {
     menu: {
@@ -21,7 +21,7 @@ export interface Translation {
         qSave: string;
         qLoad: string;
         saved: string;
-    };
+    }
     confirm: {
         // diverse confirm translations
         audio: string; // the message for the pop up about playing sound
@@ -33,12 +33,12 @@ export interface Translation {
         deleteAll: string; // deleting all game's saves
         yes: string;
         no: string;
-    };
+    }
     prefs: {
         display: string;
         window: string;
         fullscreen: string;
-    };
+    }
     memory: {
         about: string;
         bytes: string;
@@ -46,8 +46,8 @@ export interface Translation {
         deleteAll: string;
         total: string;
         noGamesYet: string;
-    };
-    emptySlot: string;
+    }
+    emptySlot: string
 }
 
 const translations: StrMap<Translation> = new StrMap({
@@ -147,5 +147,5 @@ const translations: StrMap<Translation> = new StrMap({
         },
         emptySlot: 'emplacement vide'
     }
-});
-export default translations;
+})
+export default translations

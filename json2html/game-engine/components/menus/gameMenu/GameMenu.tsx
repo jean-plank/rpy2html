@@ -1,40 +1,40 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/core';
-import { fromNullable, none, Option, some } from 'fp-ts/lib/Option';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
+import { jsx } from '@emotion/core'
+import { fromNullable, none, Option, some } from 'fp-ts/lib/Option'
+import { lookup, StrMap } from 'fp-ts/lib/StrMap'
 import {
     createRef,
     forwardRef,
     RefForwardingComponent,
     RefObject,
     useImperativeHandle
-} from 'react';
+} from 'react'
 
-import { transl } from '../../../context';
-import AstNode from '../../../nodes/AstNode';
-import QuickSave from '../../../storage/QuickSave';
-import Save from '../../../storage/Save';
-import { KeyUpAble } from '../../App';
-import Help from '../Help';
-import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu';
-import Preferences from '../Preferences';
-import SaveSlots from '../SaveSlots';
-import History from './History';
+import { transl } from '../../../context'
+import AstNode from '../../../nodes/AstNode'
+import QuickSave from '../../../storage/QuickSave'
+import Save from '../../../storage/Save'
+import { KeyUpAble } from '../../App'
+import Help from '../Help'
+import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu'
+import Preferences from '../Preferences'
+import SaveSlots from '../SaveSlots'
+import History from './History'
 
 interface Props {
-    history: AstNode[];
-    saves: Array<Option<Save>>;
-    loadSave: (save: QuickSave) => void;
-    deleteSave: (slot: number) => void;
-    hideGameMenu: () => void;
-    showMainMenu: () => void;
-    save: (slot: number) => void;
+    history: AstNode[]
+    saves: Array<Option<Save>>
+    loadSave: (save: QuickSave) => void
+    deleteSave: (slot: number) => void
+    hideGameMenu: () => void
+    showMainMenu: () => void
+    save: (slot: number) => void
     confirmYesNo: (
         msg: string,
         actionYes: () => void,
         actionNo?: () => void
-    ) => void;
-    selectedBtn?: Option<MenuBtn>;
+    ) => void
+    selectedBtn?: Option<MenuBtn>
 }
 
 const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
@@ -51,9 +51,9 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     },
     ref
 ) => {
-    const menuAble: RefObject<MenuAble> = createRef();
+    const menuAble: RefObject<MenuAble> = createRef()
 
-    useImperativeHandle(ref, () => ({ onKeyUp }));
+    useImperativeHandle(ref, () => ({ onKeyUp }))
 
     return (
         <Menu
@@ -71,15 +71,15 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
             submenu={submenu}
             selectedBtn={selectedBtn}
         />
-    );
+    )
 
     function submenu(btn: MenuBtn): JSX.Element | null {
-        if (btn === 'HISTORY') return <History nodes={history} />;
-        if (btn === 'SAVE') return getSave();
-        if (btn === 'LOAD') return getLoad();
-        if (btn === 'PREFS') return <Preferences />;
-        if (btn === 'HELP') return <Help />;
-        return null;
+        if (btn === 'HISTORY') return <History nodes={history} />
+        if (btn === 'SAVE') return getSave()
+        if (btn === 'LOAD') return getLoad()
+        if (btn === 'PREFS') return <Preferences />
+        if (btn === 'HELP') return <Help />
+        return null
     }
 
     function getSave(): JSX.Element {
@@ -89,13 +89,13 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 onClick={onClick}
                 deleteSave={deleteSave}
             />
-        );
+        )
 
         function onClick(slot: number, existingSave: Option<Save>) {
             existingSave.foldL(
                 () => save(slot),
                 _ => confirmYesNo(transl.confirm.override, () => save(slot))
-            );
+            )
         }
     }
 
@@ -106,32 +106,32 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 onClick={onClick}
                 deleteSave={deleteSave}
             />
-        );
+        )
 
         function onClick(_: number, save: Option<Save>) {
             save.map(_ =>
                 confirmYesNo(transl.confirm.unsaved, () => save.map(loadSave))
-            );
+            )
         }
     }
 
     function confirmMainMenu() {
         fromNullable(menuAble.current).map(({ setSelectedBtn }) => {
-            setSelectedBtn(some('MAIN_MENU'));
+            setSelectedBtn(some('MAIN_MENU'))
             confirmYesNo(transl.confirm.unsaved, showMainMenu, () =>
                 setSelectedBtn(none)
-            );
-        });
+            )
+        })
     }
 
     function onKeyUp(e: React.KeyboardEvent) {
         const keyEvents: StrMap<(e: React.KeyboardEvent) => void> = new StrMap({
             Escape: e => {
-                e.stopPropagation();
-                hideGameMenu();
+                e.stopPropagation()
+                hideGameMenu()
             }
-        });
-        lookup(e.key, keyEvents).map(_ => _(e));
+        })
+        lookup(e.key, keyEvents).map(_ => _(e))
     }
-};
-export default forwardRef<KeyUpAble, Props>(GameMenu);
+}
+export default forwardRef<KeyUpAble, Props>(GameMenu)

@@ -1,4 +1,4 @@
-import { basename } from 'path';
+import { basename } from 'path'
 
 export default abstract class Media {
     constructor(public file: string) {}
@@ -6,5 +6,5 @@ export default abstract class Media {
     toString = (): string =>
         `${this.constructor.name}("${basename(this.file)}")`
 
-    abstract load(): void;
+    abstract load(): void
 }

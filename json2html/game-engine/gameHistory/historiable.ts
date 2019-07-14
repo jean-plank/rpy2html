@@ -1,12 +1,12 @@
-import { Do } from 'fp-ts-contrib/lib/Do';
-import { head, init, last, tail } from 'fp-ts/lib/Array';
-import { none, Option, option, some } from 'fp-ts/lib/Option';
-import { Reducer } from 'react';
+import { Do } from 'fp-ts-contrib/lib/Do'
+import { head, init, last, tail } from 'fp-ts/lib/Array'
+import { none, Option, option, some } from 'fp-ts/lib/Option'
+import { Reducer } from 'react'
 
 export class HistoryState<S> {
-    past: S[];
-    present: Option<S>;
-    future: S[];
+    past: S[]
+    present: Option<S>
+    future: S[]
 
     static empty = <S>(): HistoryState<S> => ({
         past: [],
@@ -16,14 +16,14 @@ export class HistoryState<S> {
 }
 
 interface Action<T = any> {
-    type: T;
+    type: T
 }
 
 export type HistoryAction<S> =
     | { type: 'UNDO' }
     | { type: 'REDO' }
     | { type: 'EMPTY' }
-    | { type: 'RESET'; past: S[]; present: S };
+    | { type: 'RESET'; past: S[]; present: S }
 
 const historiable = <S, A extends Action>(
     empty: S,
@@ -32,7 +32,7 @@ const historiable = <S, A extends Action>(
     prevState: HistoryState<S>,
     action: HistoryAction<S>
 ): HistoryState<S> => {
-    const { past, present: maybePresent, future } = prevState;
+    const { past, present: maybePresent, future } = prevState
 
     if (action.type === 'UNDO') {
         return Do(option)
@@ -44,7 +44,7 @@ const historiable = <S, A extends Action>(
                 present: some(previous),
                 future: [present, ...future]
             }))
-            .getOrElse(prevState);
+            .getOrElse(prevState)
     }
 
     if (action.type === 'REDO') {
@@ -57,17 +57,17 @@ const historiable = <S, A extends Action>(
                 present: some(next),
                 future: newFuture
             }))
-            .getOrElse(prevState);
+            .getOrElse(prevState)
     }
 
-    if (action.type === 'EMPTY') return HistoryState.empty();
+    if (action.type === 'EMPTY') return HistoryState.empty()
 
     if (action.type === 'RESET') {
         return {
             past: action.past,
             present: some(action.present),
             future: []
-        };
+        }
     }
 
     return maybePresent.foldL(
@@ -77,14 +77,14 @@ const historiable = <S, A extends Action>(
             future: []
         }),
         present => {
-            const newPresent = reducer(present, action);
-            if (present === newPresent) return prevState;
+            const newPresent = reducer(present, action)
+            if (present === newPresent) return prevState
             return {
                 past: [...past, present],
                 present: some(newPresent),
                 future: []
-            };
+            }
         }
-    );
-};
-export default historiable;
+    )
+}
+export default historiable

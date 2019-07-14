@@ -1,7 +1,7 @@
-import { lookup } from 'fp-ts/lib/StrMap';
+import { lookup } from 'fp-ts/lib/StrMap'
 
-import Image from '../models/medias/Image';
-import NodeWithMedia from './NodeWithMedia';
+import Image from '../models/medias/Image'
+import NodeWithMedia from './NodeWithMedia'
 
 export default abstract class NodeWithImage extends NodeWithMedia<Image> {
     constructor(imgName: string, idNexts: string[], stopExecution = false) {
@@ -10,6 +10,6 @@ export default abstract class NodeWithImage extends NodeWithMedia<Image> {
             imgName,
             idNexts,
             stopExecution
-        );
+        )
     }
 }

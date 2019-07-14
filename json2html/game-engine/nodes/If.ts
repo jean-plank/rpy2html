@@ -1,17 +1,17 @@
-import { Either } from 'fp-ts/lib/Either';
-import { identity } from 'fp-ts/lib/function';
-import { Option } from 'fp-ts/lib/Option';
-import * as t from 'io-ts';
+import { Either } from 'fp-ts/lib/Either'
+import { identity } from 'fp-ts/lib/function'
+import { Option } from 'fp-ts/lib/Option'
+import * as t from 'io-ts'
 
-import AstNode from './AstNode';
-import IfBlock from './IfBlock';
+import AstNode from './AstNode'
+import IfBlock from './IfBlock'
 
 export default class If extends AstNode {
-    protected _nexts: Option<IfBlock[]>;
+    protected _nexts: Option<IfBlock[]>
 
-    toString = (): string => `If()`;
+    toString = (): string => `If()`
 
-    reduce = identity;
+    reduce = identity
 
     nexts = (): IfBlock[] =>
         this._nexts
@@ -27,4 +27,4 @@ const IfType = t.exact(
         class_name: t.literal('If'),
         arguments: t.tuple([t.array(t.string)])
     })
-);
+)

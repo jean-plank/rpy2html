@@ -1,21 +1,21 @@
 /** @jsx jsx */
-import { css, jsx, SerializedStyles } from '@emotion/core';
-import { TextAlignProperty } from 'csstype';
-import { FunctionComponent } from 'react';
+import { css, jsx, SerializedStyles } from '@emotion/core'
+import { TextAlignProperty } from 'csstype'
+import { FunctionComponent } from 'react'
 
-import { style } from '../../context';
-import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles';
+import { style } from '../../context'
+import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
 interface Props {
-    choices: Choice[];
+    choices: Choice[]
     styles?: {
         choice?: SerializedStyles;
-    };
+    }
 }
 
 interface Choice {
-    text: string;
-    onClick: (e: React.MouseEvent) => void;
+    text: string
+    onClick: (e: React.MouseEvent) => void
 }
 
 const Choices: FunctionComponent<Props> = ({
@@ -33,8 +33,8 @@ const Choices: FunctionComponent<Props> = ({
             </button>
         ))}
     </div>
-);
-export default Choices;
+)
+export default Choices
 
 const styles = {
     choices: css({
@@ -69,4 +69,4 @@ const styles = {
             color: style.disabledbtn_color
         }
     })
-};
+}

@@ -1,6 +1,7 @@
-import * as React from 'react';
+import * as React from 'react'
 
-export default (f: () => void) => (e: React.SyntheticEvent) => {
-    e.stopPropagation();
-    f();
-};
+const withStopPropagation = (f: () => void) => (e: React.SyntheticEvent) => {
+    e.stopPropagation()
+    f()
+}
+export default withStopPropagation

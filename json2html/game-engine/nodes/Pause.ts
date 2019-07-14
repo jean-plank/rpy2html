@@ -1,15 +1,15 @@
-import { Either } from 'fp-ts/lib/Either';
-import * as t from 'io-ts';
+import { Either } from 'fp-ts/lib/Either'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import AstNode from './AstNode';
+import GameProps from '../gameHistory/GameProps'
+import AstNode from './AstNode'
 
 export default class Pause extends AstNode {
     constructor(idNexts: string[]) {
-        super(idNexts, true);
+        super(idNexts, true)
     }
 
-    toString = (): string => `Pause()`;
+    toString = (): string => `Pause()`
 
     reduce = (gameProps: GameProps): GameProps => ({
         ...gameProps,
@@ -27,4 +27,4 @@ const PauseType = t.exact(
         class_name: t.literal('Pause'),
         arguments: t.tuple([t.array(t.string)])
     })
-);
+)

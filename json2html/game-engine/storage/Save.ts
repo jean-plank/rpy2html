@@ -1,12 +1,11 @@
-import * as t from 'io-ts';
+import * as t from 'io-ts'
 
-import AstNode from '../nodes/AstNode';
-import QuickSave from './QuickSave';
-
+import AstNode from '../nodes/AstNode'
+import QuickSave from './QuickSave'
 
 export default class Save {
-    date: string;
-    history: string[];
+    date: string
+    history: string[]
 
     static fromNodes = (history: AstNode[], date: string): Save => ({
         ...QuickSave.fromNodes(history),
@@ -18,4 +17,4 @@ export const SaveType = t.exact(
         date: t.string,
         history: t.array(t.string)
     })
-);
+)

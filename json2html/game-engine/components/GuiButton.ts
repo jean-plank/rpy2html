@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
-import { TextAlignProperty } from 'csstype';
+import styled from '@emotion/styled'
+import { TextAlignProperty } from 'csstype'
 
-import { style } from '../context';
-import { mediaQuery } from '../utils/styles';
+import { style } from '../context'
+import { mediaQuery } from '../utils/styles'
 
 const GuiButton = styled.button({
     whiteSpace: 'normal',
@@ -20,5 +20,5 @@ const GuiButton = styled.button({
     ':disabled': {
         color: style.disabledbtn_color
     }
-});
-export default GuiButton;
+})
+export default GuiButton

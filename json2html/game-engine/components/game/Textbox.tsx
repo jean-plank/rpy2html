@@ -1,21 +1,21 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { SerializedStyles } from '@emotion/core';
-import { TextAlignProperty } from 'csstype';
-import { Option } from 'fp-ts/lib/Option';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { SerializedStyles } from '@emotion/core'
+import { TextAlignProperty } from 'csstype'
+import { Option } from 'fp-ts/lib/Option'
+import { FunctionComponent } from 'react'
 
-import { style } from '../../context';
-import Char from '../../models/Char';
-import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles';
+import { style } from '../../context'
+import Char from '../../models/Char'
+import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
 interface Props {
-    hide: boolean;
-    char: Option<Char>;
+    hide: boolean
+    char: Option<Char>
     styles?: {
         namebox?: SerializedStyles;
         dialog?: SerializedStyles;
-    };
+    }
 }
 
 const Textbox: FunctionComponent<Props> = ({
@@ -24,11 +24,11 @@ const Textbox: FunctionComponent<Props> = ({
     styles: stylesOverride = {},
     children
 }) => {
-    const textboxStyle = hide ? { display: 'none' } : {};
+    const textboxStyle = hide ? { display: 'none' } : {}
     const charStyle = char
         .chain<React.CSSProperties>(_ => _.color.map(_ => ({ color: _ })))
-        .getOrElse({});
-    const charName = char.map(_ => _.name).getOrElse('');
+        .getOrElse({})
+    const charName = char.map(_ => _.name).getOrElse('')
 
     return (
         <div css={styles.textbox} style={textboxStyle}>
@@ -40,9 +40,9 @@ const Textbox: FunctionComponent<Props> = ({
             </div>
             <div css={[styles.dialog, stylesOverride.dialog]}>{children}</div>
         </div>
-    );
-};
-export default Textbox;
+    )
+}
+export default Textbox
 
 const styles = {
     textbox: css({
@@ -86,4 +86,4 @@ const styles = {
             fontSize: `${style.dialog_fsize_v}vw`
         }
     })
-};
+}

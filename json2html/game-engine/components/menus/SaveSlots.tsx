@@ -1,15 +1,15 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { Option } from 'fp-ts/lib/Option';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { Option } from 'fp-ts/lib/Option'
+import { FunctionComponent } from 'react'
 
-import Save from '../../storage/Save';
-import SaveSlot from './SaveSlot';
+import Save from '../../storage/Save'
+import SaveSlot from './SaveSlot'
 
 interface Props {
-    saves: Array<Option<Save>>;
-    onClick: (slot: number, save: Option<Save>) => void;
-    deleteSave: (slot: number) => void;
+    saves: Array<Option<Save>>
+    onClick: (slot: number, save: Option<Save>) => void
+    deleteSave: (slot: number) => void
 }
 
 const SaveSlots: FunctionComponent<Props> = ({
@@ -28,17 +28,17 @@ const SaveSlots: FunctionComponent<Props> = ({
                 />
             ))}
         </div>
-    );
+    )
 
     function getOnClick(save: Option<Save>, i: number): () => void {
-        return () => onClick(i, save);
+        return () => onClick(i, save)
     }
 
     function getDeleteSave(i: number): () => void {
-        return () => deleteSave(i);
+        return () => deleteSave(i)
     }
-};
-export default SaveSlots;
+}
+export default SaveSlots
 
 const styles = {
     saveSlots: css({
@@ -51,4 +51,4 @@ const styles = {
         flexWrap: 'wrap',
         alignContent: 'center'
     })
-};
+}

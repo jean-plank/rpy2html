@@ -1,16 +1,16 @@
-import { findFirstMap, head, isEmpty } from 'fp-ts/lib/Array';
-import { Either, left, right } from 'fp-ts/lib/Either';
-import { none, some } from 'fp-ts/lib/Option';
+import { findFirstMap, head, isEmpty } from 'fp-ts/lib/Array'
+import { Either, left, right } from 'fp-ts/lib/Either'
+import { none, some } from 'fp-ts/lib/Option'
 
-import AstNode from '../nodes/AstNode';
-import GameProps from './GameProps';
-import { GameState } from './gameStateReducer';
+import AstNode from '../nodes/AstNode'
+import GameProps from './GameProps'
+import { GameState } from './gameStateReducer'
 
 const statesFromHistory = (
     firstNode: AstNode,
     history: string[]
 ): Either<string, GameState[]> => {
-    if (isEmpty(history)) return right([]);
+    if (isEmpty(history)) return right([])
     return statesFromHistRec(
         [firstNode],
         history,
@@ -18,9 +18,9 @@ const statesFromHistory = (
         [],
         false,
         []
-    );
-};
-export default statesFromHistory;
+    )
+}
+export default statesFromHistory
 
 const statesFromHistRec = (
     nexts: AstNode[],
@@ -30,23 +30,23 @@ const statesFromHistRec = (
     previousWasStopping: boolean,
     acc: Array<[GameProps, AstNode[]]>
 ): Either<string, GameState[]> => {
-    const maybeId = head(history);
+    const maybeId = head(history)
 
     if (maybeId.isNone()) {
         return right(
             previousWasStopping ? acc : [...acc, [currentProps, currentBlock]]
-        );
+        )
     }
-    const id = maybeId.value;
+    const id = maybeId.value
 
-    return findFirstMap(nexts, next =>
+    return findFirstMap((next: AstNode) =>
         next.id === id ? some(addNode(next)) : none
-    ).getOrElse(left(`Could\'nt find node with id "${id}"`));
+    )(nexts).getOrElse(left(`Could\'nt find node with id "${id}"`))
 
     function addNode(currentNode: AstNode): Either<string, GameState[]> {
-        const [, ...newHistory] = history;
-        const newProps: GameProps = currentNode.reduce(currentProps);
-        const newBlock: AstNode[] = [...currentBlock, currentNode];
+        const [, ...newHistory] = history
+        const newProps: GameProps = currentNode.reduce(currentProps)
+        const newBlock: AstNode[] = [...currentBlock, currentNode]
 
         if (currentNode.stopExecution) {
             return statesFromHistRec(
@@ -56,7 +56,7 @@ const statesFromHistRec = (
                 [],
                 true,
                 [...acc, [newProps, newBlock]]
-            );
+            )
         }
 
         return statesFromHistRec(
@@ -66,6 +66,6 @@ const statesFromHistRec = (
             newBlock,
             false,
             acc
-        );
+        )
     }
-};
+}

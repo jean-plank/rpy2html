@@ -1,8 +1,8 @@
-import { css, SerializedStyles } from '@emotion/core';
+import { css, SerializedStyles } from '@emotion/core'
 
 export default class Font {
-    src: string;
-    bold: boolean;
+    src: string
+    bold: boolean
 
     static face = (name: string, { src, bold }: Font): SerializedStyles =>
         css({

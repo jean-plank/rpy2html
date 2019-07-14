@@ -1,21 +1,21 @@
 /** @jsx jsx */
-import { css, CSSObject, jsx } from '@emotion/core';
-import { TextAlignProperty } from 'csstype';
-import { Do } from 'fp-ts-contrib/lib/Do';
-import { last } from 'fp-ts/lib/Array';
-import { none, Option, option, some } from 'fp-ts/lib/Option';
-import { FunctionComponent } from 'react';
+import { css, CSSObject, jsx } from '@emotion/core'
+import { TextAlignProperty } from 'csstype'
+import { Do } from 'fp-ts-contrib/lib/Do'
+import { last } from 'fp-ts/lib/Array'
+import { none, Option, option, some } from 'fp-ts/lib/Option'
+import { FunctionComponent } from 'react'
 
-import { firstNode, style, transl } from '../../context';
-import statesFromHistory from '../../gameHistory/statesFromHistory';
-import Save from '../../storage/Save';
-import { getBgOrElse, ifNoSlotBg, mediaQuery } from '../../utils/styles';
-import Game from '../game/Game';
+import { firstNode, style, transl } from '../../context'
+import statesFromHistory from '../../gameHistory/statesFromHistory'
+import Save from '../../storage/Save'
+import { getBgOrElse, ifNoSlotBg, mediaQuery } from '../../utils/styles'
+import Game from '../game/Game'
 
 interface Props {
-    save: Option<Save>;
-    onClick: (e: React.MouseEvent) => void;
-    deleteSave: () => void;
+    save: Option<Save>
+    onClick: (e: React.MouseEvent) => void
+    deleteSave: () => void
 }
 
 const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
@@ -23,8 +23,8 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
         .bind('save', save)
         .bindL('states', ({ save }) =>
             statesFromHistory(firstNode, save.history).fold(_ => {
-                deleteSave();
-                return none;
+                deleteSave()
+                return none
             }, some)
         )
         .bindL('currentState', ({ states }) => last(states))
@@ -40,16 +40,16 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
             ]
         )
         // tslint:disable-next-line: jsx-key
-        .getOrElse([<div css={styles.emptySlot} />, transl.emptySlot]);
+        .getOrElse([<div css={styles.emptySlot} />, transl.emptySlot])
 
     return (
         <div css={styles.saveSlot} onClick={onClick}>
             {gameRect}
             <div css={styles.text}>{label}</div>
         </div>
-    );
-};
-export default SaveSlot;
+    )
+}
+export default SaveSlot
 
 const styles = {
     saveSlot: css({
@@ -119,7 +119,7 @@ const styles = {
             }
         })
     }
-};
+}
 
 function gameAndEmptySlot(): CSSObject {
     return {
@@ -129,5 +129,5 @@ function gameAndEmptySlot(): CSSObject {
         ...ifNoSlotBg({
             backgroundColor: '#003d51'
         })
-    };
+    }
 }

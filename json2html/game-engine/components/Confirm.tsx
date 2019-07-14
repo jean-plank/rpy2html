@@ -1,26 +1,26 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
-import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react';
+import { css, jsx } from '@emotion/core'
+import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react'
 
-import { style } from '../context';
-import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles';
-import withStopPropagation from '../utils/withStopPropagation';
-import { KeyUpAble } from './App';
-import GuiButton from './GuiButton';
+import { style } from '../context'
+import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles'
+import withStopPropagation from '../utils/withStopPropagation'
+import { KeyUpAble } from './App'
+import GuiButton from './GuiButton'
 
 interface Button {
-    text: string;
-    onClick?: () => void;
-    selected?: boolean;
-    disabled?: boolean;
+    text: string
+    onClick?: () => void
+    selected?: boolean
+    disabled?: boolean
 }
 
 export interface ConfirmProps {
-    hideConfirm: () => void;
-    message: string;
-    buttons: Button[];
-    escapeAction?: () => void;
+    hideConfirm: () => void
+    message: string
+    buttons: Button[]
+    escapeAction?: () => void
 }
 
 // hideConfirm will always be called after escapeAction
@@ -28,7 +28,7 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
     { hideConfirm, message, buttons, escapeAction },
     ref
 ) => {
-    useImperativeHandle(ref, () => ({ onKeyUp }));
+    useImperativeHandle(ref, () => ({ onKeyUp }))
 
     return (
         <div css={styles.confirm} onClick={onClickBg}>
@@ -40,42 +40,42 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
                 <div css={styles.items}>{buttonsElts()}</div>
             </div>
         </div>
-    );
+    )
 
     function buttonsElts(): JSX.Element[] {
         return buttons.map((btn: Button, i: number) => (
             <GuiButton
                 key={i}
                 onClick={withStopPropagation(() => {
-                    if (btn.onClick !== undefined) btn.onClick();
-                    hideConfirm();
+                    if (btn.onClick !== undefined) btn.onClick()
+                    hideConfirm()
                 })}
             >
                 {btn.text}
             </GuiButton>
-        ));
+        ))
     }
 
     function onKeyUp(e: React.KeyboardEvent) {
         const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
             Escape: onClickBg
-        });
-        lookup(e.key, keyEvents).map(_ => _(e));
+        })
+        lookup(e.key, keyEvents).map(_ => _(e))
     }
 
     function onClickBg(e: React.SyntheticEvent) {
         withStopPropagation(() => {
-            if (escapeAction !== undefined) escapeAction();
-            hideConfirm();
-        })(e);
+            if (escapeAction !== undefined) escapeAction()
+            hideConfirm()
+        })(e)
     }
 
     function stopPropagation(e: React.MouseEvent) {
-        e.stopPropagation();
+        e.stopPropagation()
     }
-};
-const Confirm = forwardRef<KeyUpAble, ConfirmProps>(RawConfirm);
-export default Confirm;
+}
+const Confirm = forwardRef<KeyUpAble, ConfirmProps>(RawConfirm)
+export default Confirm
 
 const styles = {
     confirm: css({
@@ -114,4 +114,4 @@ const styles = {
         justifyContent: 'space-around',
         marginTop: '1.67em'
     })
-};
+}

@@ -1,15 +1,15 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { FunctionComponent } from 'react'
 
-import { lang, style, transl } from '../../../context';
-import GuiButton from '../../GuiButton';
+import { lang, style, transl } from '../../../context'
+import GuiButton from '../../GuiButton'
 
 export interface Props {
-    storageKey: string;
-    bytes: number;
-    deleteStorage: () => void;
-    deleteAll?: boolean;
+    storageKey: string
+    bytes: number
+    deleteStorage: () => void
+    deleteAll?: boolean
 }
 
 const MemoryGame: FunctionComponent<Props> = ({
@@ -18,7 +18,7 @@ const MemoryGame: FunctionComponent<Props> = ({
     deleteStorage,
     deleteAll = false
 }) => {
-    const strDel = deleteAll ? transl.memory.deleteAll : transl.memory.delete;
+    const strDel = deleteAll ? transl.memory.deleteAll : transl.memory.delete
     return (
         <div css={styles.memoryGame}>
             <div css={styles.key}>{storageKey}</div>
@@ -29,12 +29,12 @@ const MemoryGame: FunctionComponent<Props> = ({
                 ✗ {strDel}
             </GuiButton>
         </div>
-    );
-};
-export default MemoryGame;
+    )
+}
+export default MemoryGame
 
 const formatNumber = (n: number, lang: string): string =>
-    new Intl.NumberFormat(lang).format(n);
+    new Intl.NumberFormat(lang).format(n)
 
 const styles = {
     memoryGame: css({
@@ -61,4 +61,4 @@ const styles = {
         padding: '0.67em 0',
         flexShrink: 0
     })
-};
+}

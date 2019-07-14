@@ -1,10 +1,10 @@
-import { Either } from 'fp-ts/lib/Either';
-import { lookup } from 'fp-ts/lib/StrMap';
-import * as t from 'io-ts';
+import { Either } from 'fp-ts/lib/Either'
+import { lookup } from 'fp-ts/lib/StrMap'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import Video from '../models/medias/Video';
-import NodeWithMedia from './NodeWithMedia';
+import GameProps from '../gameHistory/GameProps'
+import Video from '../models/medias/Video'
+import NodeWithMedia from './NodeWithMedia'
 
 export default class PlayVideo extends NodeWithMedia<Video> {
     constructor(vidName: string, idNexts: string[]) {
@@ -13,7 +13,7 @@ export default class PlayVideo extends NodeWithMedia<Video> {
             vidName,
             idNexts,
             true
-        );
+        )
     }
 
     reduce = (gameProps: GameProps): GameProps => ({
@@ -33,4 +33,4 @@ const PlayVideoType = t.exact(
         class_name: t.literal('Video'),
         arguments: t.tuple([t.string, t.array(t.string)])
     })
-);
+)

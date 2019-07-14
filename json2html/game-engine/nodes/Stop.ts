@@ -1,17 +1,17 @@
-import { Either } from 'fp-ts/lib/Either';
-import { none } from 'fp-ts/lib/Option';
-import { insert } from 'fp-ts/lib/StrMap';
-import * as t from 'io-ts';
+import { Either } from 'fp-ts/lib/Either'
+import { none } from 'fp-ts/lib/Option'
+import { insert } from 'fp-ts/lib/StrMap'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import AstNode from './AstNode';
+import GameProps from '../gameHistory/GameProps'
+import AstNode from './AstNode'
 
 export default class Stop extends AstNode {
     constructor(private chanName: string, idNexts: string[]) {
-        super(idNexts);
+        super(idNexts)
     }
 
-    toString = (): string => `Stop("${this.chanName}")`;
+    toString = (): string => `Stop("${this.chanName}")`
 
     reduce = (gameProps: GameProps): GameProps => ({
         ...gameProps,
@@ -29,4 +29,4 @@ const StopType = t.exact(
         class_name: t.literal('Stop'),
         arguments: t.tuple([t.string, t.array(t.string)])
     })
-);
+)

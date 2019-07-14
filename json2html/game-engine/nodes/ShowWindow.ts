@@ -1,15 +1,15 @@
-import { Either } from 'fp-ts/lib/Either';
-import * as t from 'io-ts';
+import { Either } from 'fp-ts/lib/Either'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import AstNode from './AstNode';
+import GameProps from '../gameHistory/GameProps'
+import AstNode from './AstNode'
 
 export default class ShowWindow extends AstNode {
     constructor(private show: boolean, idNexts: string[]) {
-        super(idNexts);
+        super(idNexts)
     }
 
-    toString = (): string => `ShowWindow(${this.show})`;
+    toString = (): string => `ShowWindow(${this.show})`
 
     reduce = (gameProps: GameProps): GameProps => ({
         ...gameProps,
@@ -27,4 +27,4 @@ const ShowWindowType = t.exact(
         class_name: t.literal('ShowWindow'),
         arguments: t.tuple([t.boolean, t.array(t.string)])
     })
-);
+)

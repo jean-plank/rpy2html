@@ -1,8 +1,8 @@
-import { Either } from 'fp-ts/lib/Either';
-import * as t from 'io-ts';
+import { Either } from 'fp-ts/lib/Either'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import NodeWithImage from './NodeWithImage';
+import GameProps from '../gameHistory/GameProps'
+import NodeWithImage from './NodeWithImage'
 
 export default class Hide extends NodeWithImage {
     reduce = (gameProps: GameProps): GameProps =>
@@ -24,4 +24,4 @@ const HideType = t.exact(
         class_name: t.literal('Hide'),
         arguments: t.tuple([t.string, t.array(t.string)])
     })
-);
+)

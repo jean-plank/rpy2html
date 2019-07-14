@@ -1,16 +1,16 @@
 /** @jsx jsx */
-import { css, jsx, SerializedStyles } from '@emotion/core';
-import { none, Option, some } from 'fp-ts/lib/Option';
+import { css, jsx, SerializedStyles } from '@emotion/core'
+import { none, Option, some } from 'fp-ts/lib/Option'
 import {
     forwardRef,
     RefForwardingComponent,
     useImperativeHandle,
     useState
-} from 'react';
+} from 'react'
 
-import { style, transl } from '../../context';
-import { getBgOrElse, ifOldStyle, mediaQuery } from '../../utils/styles';
-import MenuButton from './MenuButton';
+import { style, transl } from '../../context'
+import { getBgOrElse, ifOldStyle, mediaQuery } from '../../utils/styles'
+import MenuButton from './MenuButton'
 
 export type MenuBtn =
     | 'START'
@@ -21,48 +21,48 @@ export type MenuBtn =
     | 'PREFS'
     | 'MAIN_MENU'
     | 'MEMORY'
-    | 'HELP';
+    | 'HELP'
 
 const menuBtnLabel = (btn: MenuBtn): string => {
     switch (btn) {
         case 'START':
-            return transl.menu.start;
+            return transl.menu.start
         case 'RESUME':
-            return transl.menu.resume;
+            return transl.menu.resume
         case 'HISTORY':
-            return transl.menu.history;
+            return transl.menu.history
         case 'SAVE':
-            return transl.menu.save;
+            return transl.menu.save
         case 'LOAD':
-            return transl.menu.load;
+            return transl.menu.load
         case 'PREFS':
-            return transl.menu.prefs;
+            return transl.menu.prefs
         case 'MAIN_MENU':
-            return transl.menu.mainMenu;
+            return transl.menu.mainMenu
         case 'MEMORY':
-            return transl.menu.memory;
+            return transl.menu.memory
         case 'HELP':
-            return transl.menu.help;
+            return transl.menu.help
     }
-};
+}
 
 export interface MenuAble {
-    selectedBtn: Option<MenuBtn>;
-    setSelectedBtn: (btn: Option<MenuBtn>) => void;
-    setOverlay: (overlay: MenuOverlay) => void;
+    selectedBtn: Option<MenuBtn>
+    setSelectedBtn: (btn: Option<MenuBtn>) => void
+    setOverlay: (overlay: MenuOverlay) => void
 }
 
 interface Props {
-    overlay: MenuOverlay;
-    buttons: BtnWithAction[];
-    submenu: (btn: MenuBtn) => JSX.Element | null;
-    selectedBtn?: Option<MenuBtn>;
-    styles?: SerializedStyles;
+    overlay: MenuOverlay
+    buttons: BtnWithAction[]
+    submenu: (btn: MenuBtn) => JSX.Element | null
+    selectedBtn?: Option<MenuBtn>
+    styles?: SerializedStyles
 }
 
 interface BtnWithAction {
-    btn: MenuBtn;
-    specialAction?: Option<(e: React.MouseEvent) => void>;
+    btn: MenuBtn
+    specialAction?: Option<(e: React.MouseEvent) => void>
 }
 
 const Menu: RefForwardingComponent<MenuAble, Props> = (
@@ -79,12 +79,12 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
         selectedBtn,
         setSelectedBtn,
         setOverlay
-    }));
+    }))
 
-    const [overlayClassName, setOverlay] = useState<MenuOverlay>(overlay);
+    const [overlayClassName, setOverlay] = useState<MenuOverlay>(overlay)
     const [selectedBtn, setSelectedBtn] = useState<Option<MenuBtn>>(
         propsSelectedBtn
-    );
+    )
 
     return (
         <div css={[styles.menu, stylesOverride]}>
@@ -93,10 +93,10 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
             <div css={styles.submenuTitle}>{ifSelectedBtn(menuBtnLabel)}</div>
             <div css={styles.submenu}>{ifSelectedBtn(submenu)}</div>
         </div>
-    );
+    )
 
     function ifSelectedBtn<T>(f: (btn: MenuBtn) => T): T | null {
-        return selectedBtn.fold(null, f);
+        return selectedBtn.fold(null, f)
     }
 
     function menuBtn(
@@ -111,20 +111,20 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
             >
                 {menuBtnLabel(btn)}
             </MenuButton>
-        );
+        )
 
         function onClick(e: React.MouseEvent) {
             specialAction.foldL(
                 () => {
-                    setSelectedBtn(some(btn));
-                    setOverlay(MenuOverlay.GameMenu);
+                    setSelectedBtn(some(btn))
+                    setOverlay(MenuOverlay.GameMenu)
                 },
                 action => action(e)
-            );
+            )
         }
     }
-};
-export default forwardRef<MenuAble, Props>(Menu);
+}
+export default forwardRef<MenuAble, Props>(Menu)
 
 export enum MenuOverlay {
     MainMenu = 'main-menu-overlay',
@@ -194,4 +194,4 @@ const styles = {
             fontSize: `${style.guibtn_fsize_v}vw`
         }
     })
-};
+}

@@ -1,17 +1,17 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { Option, some } from 'fp-ts/lib/Option';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { Option, some } from 'fp-ts/lib/Option'
+import { FunctionComponent } from 'react'
 
-import { style, transl } from '../../context';
-import { mediaQuery } from '../../utils/styles';
-import withStopPropagation from '../../utils/withStopPropagation';
-import GuiButton from '../GuiButton';
-import { MenuBtn } from '../menus/Menu';
+import { style, transl } from '../../context'
+import { mediaQuery } from '../../utils/styles'
+import withStopPropagation from '../../utils/withStopPropagation'
+import GuiButton from '../GuiButton'
+import { MenuBtn } from '../menus/Menu'
 
 interface BtnProps {
-    onClick: (e: React.MouseEvent) => void;
-    disabled?: boolean;
+    onClick: (e: React.MouseEvent) => void
+    disabled?: boolean
 }
 
 const AWButton: FunctionComponent<BtnProps> = ({
@@ -22,16 +22,16 @@ const AWButton: FunctionComponent<BtnProps> = ({
     <GuiButton {...{ onClick, disabled }} css={styles.button}>
         {children}
     </GuiButton>
-);
+)
 
 export interface ArmlessWankerMenuProps {
-    showGameMenu: (btn?: Option<MenuBtn>) => void;
-    undo: () => void;
-    disableUndo: boolean;
-    skip: () => void;
-    quickSave: () => void;
-    quickLoad: () => void;
-    disableQuickLoad: boolean;
+    showGameMenu: (btn?: Option<MenuBtn>) => void
+    undo: () => void
+    disableUndo: boolean
+    skip: () => void
+    quickSave: () => void
+    quickLoad: () => void
+    disableQuickLoad: boolean
 }
 
 const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
@@ -71,15 +71,15 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
             </AWButton>
             <AWButton onClick={showGameMenuWSP()}>{transl.menu.pause}</AWButton>
         </div>
-    );
+    )
 
     function showGameMenuWSP(
         btn?: Option<MenuBtn>
     ): (e: React.MouseEvent) => void {
-        return withStopPropagation(() => showGameMenu(btn));
+        return withStopPropagation(() => showGameMenu(btn))
     }
-};
-export default ArmlessWankerMenu;
+}
+export default ArmlessWankerMenu
 
 const styles = {
     armlessWankerMenu: css({
@@ -99,4 +99,4 @@ const styles = {
             fontSize: `${style.quickbtn_fsize_v}vw`
         }
     })
-};
+}
