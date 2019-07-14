@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
+import { fromNullable } from 'fp-ts/lib/Option'
 import { lookup, StrMap } from 'fp-ts/lib/StrMap'
 import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react'
 
@@ -47,7 +48,7 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
             <GuiButton
                 key={i}
                 onClick={withStopPropagation(() => {
-                    if (btn.onClick !== undefined) btn.onClick()
+                    fromNullable(btn.onClick).map(_ => _())
                     hideConfirm()
                 })}
             >
@@ -65,7 +66,7 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
 
     function onClickBg(e: React.SyntheticEvent) {
         withStopPropagation(() => {
-            if (escapeAction !== undefined) escapeAction()
+            fromNullable(escapeAction).map(_ => _())
             hideConfirm()
         })(e)
     }

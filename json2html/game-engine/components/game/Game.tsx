@@ -26,7 +26,7 @@ import Textbox from './Textbox'
 
 interface Props {
     gameProps: GameProps
-    videoAutoPlay?: boolean
+    isSaveSlot?: boolean
     armlessWankerMenuProps?: ExtendedArmlessWankerProps
     styles?: {
         container?: SerializedStyles;
@@ -48,7 +48,7 @@ type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
 const Game: RefForwardingComponent<GameAble, Props> = (
     {
         gameProps,
-        videoAutoPlay = true,
+        isSaveSlot = false,
         armlessWankerMenuProps,
         styles: stylesOverride = {}
     },
@@ -87,7 +87,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
                 css={[gameStyles, stylesOverride.container]}
                 {...{ onClick, onWheel }}
             >
-                <Cutscene video={video} autoPlay={videoAutoPlay} />
+                <Cutscene video={video} autoPlay={!isSaveSlot} />
             </div>
         )
     }
@@ -98,7 +98,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
                 {...{ onClick, onWheel }}
                 css={[gameStyles, stylesOverride.container]}
             >
-                <LayerScene image={gameProps.sceneImg} />
+                <LayerScene image={gameProps.sceneImg} animated={!isSaveSlot} />
                 <LayerImages images={gameProps.charImgs} />
                 <Textbox
                     hide={gameProps.textboxHide}

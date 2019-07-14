@@ -9,7 +9,7 @@ export default class Font {
             '@font-face': {
                 fontFamily: name,
                 src: `url('${src}')`,
-                ...(bold ? { fontWeight: 'bold' } : {})
+                ...(bold ? { fontWeight: 'bold' } : undefined)
             }
         })
 }

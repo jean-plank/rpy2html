@@ -24,7 +24,7 @@ const Textbox: FunctionComponent<Props> = ({
     styles: stylesOverride = {},
     children
 }) => {
-    const textboxStyle = hide ? { display: 'none' } : {}
+    const textboxStyle = hide ? { display: 'none' } : undefined
     const charStyle = char
         .chain<React.CSSProperties>(_ => _.color.map(_ => ({ color: _ })))
         .getOrElse({})

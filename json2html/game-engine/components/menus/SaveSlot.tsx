@@ -7,6 +7,7 @@ import { none, Option, option, some } from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
 import { firstNode, style, transl } from '../../context'
+import GameProps from '../../gameHistory/GameProps'
 import statesFromHistory from '../../gameHistory/statesFromHistory'
 import Save from '../../storage/Save'
 import { getBgOrElse, ifNoSlotBg, mediaQuery } from '../../utils/styles'
@@ -30,17 +31,11 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
         .bindL('currentState', ({ states }) => last(states))
         .return<[JSX.Element, string]>(
             ({ currentState: [gameProps], save: { date } }) => [
-                // tslint:disable-next-line: jsx-key
-                <Game
-                    gameProps={gameProps}
-                    videoAutoPlay={false}
-                    styles={styles.game}
-                />,
+                getGame(gameProps),
                 date
             ]
         )
-        // tslint:disable-next-line: jsx-key
-        .getOrElse([<div css={styles.emptySlot} />, transl.emptySlot])
+        .getOrElse([emptySlotL(), transl.emptySlot])
 
     return (
         <div css={styles.saveSlot} onClick={onClick}>
@@ -50,6 +45,12 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
     )
 }
 export default SaveSlot
+
+const getGame = (gameProps: GameProps): JSX.Element => (
+    <Game gameProps={gameProps} isSaveSlot={true} styles={styles.game} />
+)
+
+const emptySlotL = () => <div css={styles.emptySlot} />
 
 const styles = {
     saveSlot: css({

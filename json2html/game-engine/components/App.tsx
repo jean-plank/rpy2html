@@ -15,7 +15,6 @@ import {
     useState
 } from 'react'
 
-import GameProps from 'game-engine/gameHistory/GameProps'
 import {
     chars,
     firstNode,
@@ -31,6 +30,7 @@ import {
 import gameHistoryReducer, {
     emptyGameHistoryState
 } from '../gameHistory/gameHistoryReducer'
+import GameProps from '../gameHistory/GameProps'
 import Font from '../models/Font'
 import AstNode from '../nodes/AstNode'
 import Menu from '../nodes/Menu'

@@ -1,10 +1,11 @@
 /** @jsx jsx */
-import { jsx, SerializedStyles } from '@emotion/core'
+import { InterpolationWithTheme, jsx } from '@emotion/core'
+
 import Media from './Media'
 
 interface Args {
     key?: string | number
-    css?: SerializedStyles
+    css?: InterpolationWithTheme<any>
 }
 
 export default class Image extends Media {
