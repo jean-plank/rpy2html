@@ -9,8 +9,8 @@
     "lint": "tslint -p tsconfig.json",
     "test": "jest",
     "~test": "jest --watchAll",
-    "dc:graph": "depcruise --exclude '(^node_modules|^dist|^test|\\.d\\.ts$|context\\.ts|styles\\.ts)' --output-type dot . | dot -T svg > dependencygraph.svg",
-    "dc:osage": "depcruise --exclude '(^node_modules|^dist|^test|\\.d\\.ts$|context\\.ts|styles\\.ts)' --output-type dot . | osage -Gpack=16 -Gsplines=ortho -GpackMode=array2 -T svg > dependencygraph.svg",
+    "dc:graph": "depcruise --exclude '(^node_modules|^dist|^test|\\.d\\.ts$|context\\.ts)' --output-type dot . | dot -T svg > dependencygraph.svg",
+    "dc:osage": "depcruise --exclude '(^node_modules|^dist|^test|\\.d\\.ts$|context\\.ts)' --output-type dot . | osage -Gpack=16 -Gsplines=ortho -GpackMode=array2 -T svg > dependencygraph.svg",
     "dc:check": "depcruise --validate .dependency-cruiser.js ."
   },
   "repository": {
