@@ -38,6 +38,11 @@ import QuickSave from '../saves/QuickSave'
 import Saves from '../saves/Saves'
 import savesReducer from '../saves/savesReducer'
 import SoundService from '../sound/SoundService'
+import {
+    enterFullscreen,
+    exitFullscreen,
+    isFullscreen
+} from '../utils/fullscreen'
 import { historyFromState, loadAction, saveAction } from '../utils/saveLoad'
 import { mediaQuery } from '../utils/styles'
 import Confirm, { ConfirmProps } from './Confirm'
@@ -170,11 +175,18 @@ const App: FunctionComponent = () => {
     }
 
     function onKeyUp(e: React.KeyboardEvent) {
+        if (e.key === 'f') return toggleFullscreen()
+
         findFirstMap((_: RefObject<KeyUpAble>) => fromNullable(_.current))([
             confirmKeyUpAble,
             gameAble,
             viewKeyUpAble
         ]).map(_ => _.onKeyUp(e))
+
+        function toggleFullscreen() {
+            if (isFullscreen()) exitFullscreen()
+            else enterFullscreen()
+        }
     }
 
     function showMainMenu() {

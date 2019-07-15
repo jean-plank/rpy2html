@@ -5,6 +5,11 @@ import { FunctionComponent, useEffect, useState } from 'react'
 import { style, transl } from '../../context'
 import SoundService from '../../sound/SoundService'
 import Volumes from '../../sound/Volumes'
+import {
+    enterFullscreen,
+    exitFullscreen,
+    isFullscreen
+} from '../../utils/fullscreen'
 import Radio from './Radio'
 import Slider from './Slider'
 
@@ -13,12 +18,12 @@ interface Props {
 }
 
 const Preferences: FunctionComponent<Props> = ({ soundService }) => {
-    const [isFullscreen, setIsFullscreen] = useState(document.fullscreen)
+    const [isFS, setIsFullscreen] = useState(isFullscreen())
 
     useEffect(
         () =>
             (document.onfullscreenchange = () =>
-                setIsFullscreen(document.fullscreen)),
+                setIsFullscreen(isFullscreen())),
         []
     )
 
@@ -33,22 +38,14 @@ const Preferences: FunctionComponent<Props> = ({ soundService }) => {
         return (
             <div css={styles.group}>
                 <div css={styles.title}>{transl.prefs.display}</div>
-                <Radio onClick={windowed} selected={!isFullscreen}>
+                <Radio onClick={exitFullscreen} selected={!isFS}>
                     {transl.prefs.window}
                 </Radio>
-                <Radio onClick={fullscreen} selected={isFullscreen}>
+                <Radio onClick={enterFullscreen} selected={isFS}>
                     {transl.prefs.fullscreen}
                 </Radio>
             </div>
         )
-    }
-
-    function windowed() {
-        document.exitFullscreen()
-    }
-
-    function fullscreen() {
-        document.body.requestFullscreen({ navigationUI: 'hide' })
     }
 
     function volume(): JSX.Element {
@@ -82,11 +79,14 @@ const styles = {
         height: '100%',
         width: '100%',
         display: 'flex',
-        alignItems: 'center'
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'start',
+        padding: '0 8%'
     }),
 
     group: css({
-        marginLeft: '4%'
+        margin: '2% 0'
     }),
 
     title: css({

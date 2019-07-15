@@ -8,3 +8,4 @@
 | Page Down, Mouse Wheel Down | Roll forward to later dialogue               |
 | S                           | Quick save                                   |
 | L                           | Quick load                                   |
+| F                           | Toggle fullscreen                            |

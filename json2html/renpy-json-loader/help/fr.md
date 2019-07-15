@@ -8,3 +8,4 @@
 | Page Suivante, Molette Bas    | Revenir au dialogue suivant                       |
 | S                             | Sauvegarde rapide                                 |
 | Q                             | Chargement rapide                                 |
+| F                             | Plein écran / Fenêtré                             |
