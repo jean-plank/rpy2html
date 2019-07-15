@@ -17,10 +17,16 @@ interface Props {
     save: Option<Save>
     onClick: (e: React.MouseEvent) => void
     deleteSave: () => void
+    disabledIfEmpty?: boolean
 }
 
-const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
-    const [gameRect, label]: [JSX.Element, string] = Do(option)
+const SaveSlot: FunctionComponent<Props> = ({
+    save,
+    onClick,
+    deleteSave,
+    disabledIfEmpty = false
+}) => {
+    const rectAndLabel: Option<[JSX.Element, string]> = Do(option)
         .bind('save', save)
         .bindL('states', ({ save }) =>
             statesFromHistory(firstNode, save.history).fold(_ => {
@@ -35,13 +41,17 @@ const SaveSlot: FunctionComponent<Props> = ({ save, onClick, deleteSave }) => {
                 date
             ]
         )
-        .getOrElse([emptySlotL(), transl.emptySlot])
+    const disabled = rectAndLabel.isNone() && disabledIfEmpty
+    const [gameRect, label] = rectAndLabel.getOrElse([
+        emptySlotL(),
+        transl.emptySlot
+    ])
 
     return (
-        <div css={styles.saveSlot} onClick={onClick}>
+        <button css={styles.saveSlot} onClick={onClick} disabled={disabled}>
             {gameRect}
             <div css={styles.text}>{label}</div>
-        </div>
+        </button>
     )
 }
 export default SaveSlot
@@ -69,7 +79,7 @@ const styles = {
         [mediaQuery(style)]: {
             fontSize: `${style.slot_fsize_v}vw`
         },
-        ':hover': {
+        ':hover:not([disabled])': {
             ...getBgOrElse('slot_hover')
         }
     }),

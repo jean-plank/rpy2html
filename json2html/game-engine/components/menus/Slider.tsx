@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, SerializedStyles } from '@emotion/core'
+import { css, jsx, SerializedStyles } from '@emotion/core'
 import { fromNullable } from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
@@ -34,6 +34,7 @@ const Slider: FunctionComponent<Props> = ({
                 step={0.1}
                 defaultValue={defaultValue.toString()}
                 onChange={onChange}
+                css={inputStyles}
             />
         </div>
     )
@@ -44,3 +45,7 @@ const Slider: FunctionComponent<Props> = ({
     }
 }
 export default Slider
+
+const inputStyles = css({
+    cursor: 'pointer'
+})

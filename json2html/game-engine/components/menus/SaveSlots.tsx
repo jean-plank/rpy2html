@@ -10,12 +10,14 @@ interface Props {
     saves: Array<Option<Save>>
     onClick: (slot: number, save: Option<Save>) => void
     deleteSave: (slot: number) => void
+    disabledIfEmpty?: boolean
 }
 
 const SaveSlots: FunctionComponent<Props> = ({
     saves,
     onClick,
-    deleteSave
+    deleteSave,
+    disabledIfEmpty
 }) => {
     return (
         <div css={styles.saveSlots}>
@@ -25,6 +27,7 @@ const SaveSlots: FunctionComponent<Props> = ({
                     save={save}
                     onClick={getOnClick(save, i)}
                     deleteSave={getDeleteSave(i)}
+                    disabledIfEmpty={disabledIfEmpty}
                 />
             ))}
         </div>

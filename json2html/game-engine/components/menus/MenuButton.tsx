@@ -15,12 +15,13 @@ export interface BtnProps {
 const MenuButton: FunctionComponent<BtnProps> = ({
     onClick,
     selected = false,
-    disabled,
+    disabled = false,
     styles: stylesOverride,
     children
 }) => (
     <GuiButton
-        {...{ onClick, disabled }}
+        onClick={onClick}
+        disabled={disabled || selected}
         className={selected ? 'selected' : undefined}
         css={[buttonStyles, stylesOverride]}
     >

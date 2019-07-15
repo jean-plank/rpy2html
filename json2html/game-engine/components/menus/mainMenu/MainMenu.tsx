@@ -81,6 +81,7 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 saves={saves}
                 onClick={onClick}
                 deleteSave={deleteSave}
+                disabledIfEmpty={true}
             />
         )
 
