@@ -33,6 +33,7 @@ export interface Style {
     selected_color: string
     disabledbtn_color: string
     accent_color: string
+    muted_color: string
 
     game_width: number
     game_height: number

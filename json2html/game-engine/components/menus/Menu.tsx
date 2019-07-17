@@ -10,7 +10,7 @@ import {
 
 import { style, transl } from '../../context'
 import { getBgOrElse, ifOldStyle, mediaQuery } from '../../utils/styles'
-import MenuButton from './MenuButton'
+import SelectableButton from '../SelectableButton'
 
 export type MenuBtn =
     | 'START'
@@ -104,13 +104,14 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
         key: number
     ): JSX.Element {
         return (
-            <MenuButton
+            <SelectableButton
                 key={key}
                 onClick={onClick}
                 selected={selectedBtn.exists(_ => _ === btn)}
+                styles={styles.btn}
             >
                 {menuBtnLabel(btn)}
-            </MenuButton>
+            </SelectableButton>
         )
 
         function onClick(e: React.MouseEvent) {
@@ -193,5 +194,10 @@ const styles = {
         [mediaQuery(style)]: {
             fontSize: `${style.guibtn_fsize_v}vw`
         }
+    }),
+
+    btn: css({
+        padding: style.guibtn_padding,
+        height: style.guibtn_height
     })
 }

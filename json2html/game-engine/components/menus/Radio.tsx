@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/core'
 import { FunctionComponent } from 'react'
 
 import { style } from '../../context'
-import MenuButton, { BtnProps } from './MenuButton'
+import SelectableButton, { BtnProps } from '../SelectableButton'
 
 const Radio: FunctionComponent<BtnProps> = ({
     onClick,
@@ -13,12 +13,12 @@ const Radio: FunctionComponent<BtnProps> = ({
 }) => (
     <div css={styles.container}>
         <div css={styles.rect} className={selected ? 'selected' : undefined} />
-        <MenuButton
+        <SelectableButton
             {...{ onClick, disabled, selected }}
-            styles={styles.menuBtn}
+            styles={styles.btn}
         >
             {children}
-        </MenuButton>
+        </SelectableButton>
     </div>
 )
 export default Radio
@@ -39,7 +39,8 @@ const styles = {
         }
     }),
 
-    menuBtn: css({
-        flexShrink: 0
+    btn: css({
+        flexShrink: 0,
+        padding: '0.1em 0.5em'
     })
 }

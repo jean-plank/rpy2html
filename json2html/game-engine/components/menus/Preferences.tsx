@@ -50,7 +50,7 @@ const Preferences: FunctionComponent<Props> = ({ soundService }) => {
 
     function volume(): JSX.Element {
         return (
-            <div css={styles.group}>
+            <div css={[styles.group, styles.sliders]}>
                 <div css={styles.title}>{transl.prefs.volume}</div>
                 {['music', 'sound', 'voice'].map(getSlider)}
             </div>
@@ -63,6 +63,7 @@ const Preferences: FunctionComponent<Props> = ({ soundService }) => {
                     title={transl.prefs[chanName]}
                     defaultValue={soundService.volumes[chanName]}
                     setValue={setVolume(chanName)}
+                    styles={{ container: styles.slider.container }}
                 />
             )
         }
@@ -92,5 +93,18 @@ const styles = {
     title: css({
         color: style.accent_color,
         paddingBottom: '0.2em'
-    })
+    }),
+
+    sliders: css({
+        width: '40%'
+    }),
+
+    slider: {
+        container: css({
+            width: '100%',
+            ':not(:last-of-type)': {
+                marginBottom: '1em'
+            }
+        })
+    }
 }

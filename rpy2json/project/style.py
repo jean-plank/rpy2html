@@ -23,6 +23,7 @@ def new_style(gui, config, fonts_usages, Borders):
     res['selected_color'] = gui.selected_color
     res['disabledbtn_color'] = gui.insensitive_color
     res['accent_color'] = gui.accent_color
+    res['muted_color'] = gui.muted_color
 
     # game
     HEIGHT = config.screen_height
@@ -156,6 +157,7 @@ def old_style(gui, config, fonts_usages, Borders):
     res['selected_color'] = '#ffffff'
     res['disabledbtn_color'] = '#666666'
     res['accent_color'] = '#0099cc'
+    res['muted_color'] = '#003d51'
 
     # game
     HEIGHT = config.screen_height

@@ -5,6 +5,7 @@
     "selected_color",
     "disabledbtn_color",
     "accent_color",
+    "muted_color",
 
     "game_width",
     "game_height",
@@ -89,6 +90,7 @@
     "selected_color": { "type": "string" },
     "disabledbtn_color": { "type": "string" },
     "accent_color": { "type": "string" },
+    "muted_color": { "type": "string" },
 
     "game_width": { "type": "number" },
     "game_height": { "type": "number" },
