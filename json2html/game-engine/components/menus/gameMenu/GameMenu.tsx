@@ -128,8 +128,8 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
         })
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents: StrMap<(e: React.KeyboardEvent) => void> = new StrMap({
+    function onKeyUp(e: KeyboardEvent) {
+        const keyEvents: StrMap<(e: KeyboardEvent) => void> = new StrMap({
             Escape: e => {
                 e.stopPropagation()
                 hideGameMenu()

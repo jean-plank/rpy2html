@@ -57,14 +57,14 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
         ))
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
+    function onKeyUp(e: KeyboardEvent) {
+        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
             Escape: onClickBg
         })
         lookup(e.key, keyEvents).map(_ => _(e))
     }
 
-    function onClickBg(e: React.SyntheticEvent) {
+    function onClickBg(e: React.SyntheticEvent | Event) {
         withStopPropagation(() => {
             fromNullable(escapeAction).map(_ => _())
             hideConfirm()

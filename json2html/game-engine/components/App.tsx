@@ -53,7 +53,7 @@ import { MenuBtn } from './menus/Menu'
 import Notifications, { Notifiable } from './Notifications'
 
 export interface KeyUpAble {
-    onKeyUp: (e: React.KeyboardEvent) => void
+    onKeyUp: (e: KeyboardEvent) => void
 }
 
 export type GameAble = KeyUpAble & {
@@ -69,10 +69,17 @@ const App: FunctionComponent = () => {
     const confirmAudioShown = useRef(false)
     const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
-    const viewKeyUpAble: RefObject<KeyUpAble> = createRef()
-    const gameAble: RefObject<GameAble> = createRef()
-    const notifiable: RefObject<Notifiable> = createRef()
-    const confirmKeyUpAble: RefObject<KeyUpAble> = createRef()
+    const viewKeyUpAble = createRef<KeyUpAble>()
+    const gameAble = createRef<GameAble>()
+    const notifiable = createRef<Notifiable>()
+    const confirmKeyUpAble = createRef<KeyUpAble>()
+
+    const topKeyUpAble = useRef<Option<KeyUpAble>>(none)
+    useEffect(() => {
+        topKeyUpAble.current = findFirstMap((_: RefObject<KeyUpAble>) =>
+            fromNullable(_.current)
+        )([confirmKeyUpAble, gameAble, viewKeyUpAble])
+    })
 
     const [view, setView] = useState<Option<View>>(none)
     const [confirm, setConfirm] = useState<Option<ConfirmProps>>(none)
@@ -87,17 +94,10 @@ const App: FunctionComponent = () => {
 
     const data = { nodes, chars, sounds, videos, images }
 
-    useEffect(() => {
-        nodes.mapWithKey((id, node) =>
-            node.init({ id, data, execThenExecNext })
-        )
-        firstNode.loadBlock()
-        initDom()
-        showMainMenu()
-    }, [])
+    useEffect(initAll, [])
 
     return (
-        <div tabIndex={0} onKeyUp={onKeyUp} css={styles.container}>
+        <div css={styles.container}>
             <Global styles={globalStyles} />
             <div css={styles.view}>
                 {view.chain(getView).toNullable()}
@@ -174,19 +174,40 @@ const App: FunctionComponent = () => {
         return <Confirm ref={confirmKeyUpAble} {...iConfirm} />
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
+    function onKeyUp(e: KeyboardEvent) {
         if (e.key === 'f') return toggleFullscreen()
-
-        findFirstMap((_: RefObject<KeyUpAble>) => fromNullable(_.current))([
-            confirmKeyUpAble,
-            gameAble,
-            viewKeyUpAble
-        ]).map(_ => _.onKeyUp(e))
 
         function toggleFullscreen() {
             if (isFullscreen()) exitFullscreen()
             else enterFullscreen()
         }
+
+        topKeyUpAble.current.map(_ => _.onKeyUp(e))
+    }
+
+    function initAll() {
+        nodes.mapWithKey((id, node) =>
+            node.init({ id, data, execThenExecNext })
+        )
+        initDom()
+        firstNode.loadBlock()
+        showMainMenu()
+    }
+
+    function initDom() {
+        document.title = gameName
+        lookup('game_icon', images).map(
+            icon =>
+                (fromNullable(document.querySelector(
+                    'link[rel*="icon"]'
+                ) as HTMLLinkElement).getOrElseL(() => {
+                    const link = document.createElement('link')
+                    link.rel = 'shortcut icon'
+                    document.head.appendChild(link)
+                    return link
+                }).href = icon.file)
+        )
+        document.addEventListener('keyup', onKeyUp)
     }
 
     function showMainMenu() {
@@ -347,21 +368,6 @@ const App: FunctionComponent = () => {
     }
 }
 export default App
-
-const initDom = () => {
-    document.title = gameName
-    lookup('game_icon', images).map(
-        icon =>
-            (fromNullable(document.querySelector(
-                'link[rel*="icon"]'
-            ) as HTMLLinkElement).getOrElseL(() => {
-                const link = document.createElement('link')
-                link.rel = 'shortcut icon'
-                document.head.appendChild(link)
-                return link
-            }).href = icon.file)
-    )
-}
 
 const globalStyles = css(
     {

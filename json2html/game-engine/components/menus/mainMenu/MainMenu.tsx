@@ -94,8 +94,8 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
         return <Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
+    function onKeyUp(e: KeyboardEvent) {
+        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
             Escape: e => {
                 fromNullable(menuAble.current).map(
                     ({ selectedBtn, setSelectedBtn, setOverlay }) => {

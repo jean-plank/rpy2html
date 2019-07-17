@@ -127,8 +127,8 @@ const Game: RefForwardingComponent<GameAble, Props> = (
         return <ArmlessWankerMenu {...props} />
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
+    function onKeyUp(e: KeyboardEvent) {
+        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
             ArrowUp: () => {},
             ArrowDown: () => {},
             ArrowLeft: () => {},
