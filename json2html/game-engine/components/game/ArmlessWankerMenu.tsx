@@ -69,7 +69,9 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
             >
                 {transl.menu.qLoad}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP()}>{transl.menu.pause}</AWButton>
+            <AWButton onClick={showGameMenuWSP(some('PREFS'))}>
+                {transl.menu.prefs}
+            </AWButton>
         </div>
     )
 
