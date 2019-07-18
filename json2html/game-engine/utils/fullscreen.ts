@@ -1,6 +1,6 @@
-export const isFullscreen = () => document.fullscreen
+export const isFullscreen = (): boolean => document.fullscreenElement !== null
 
-export const exitFullscreen = () => document.exitFullscreen()
+export const exitFullscreen = (): Promise<void> => document.exitFullscreen()
 
-export const enterFullscreen = () =>
+export const enterFullscreen = (): Promise<void> =>
     document.body.requestFullscreen({ navigationUI: 'hide' })
