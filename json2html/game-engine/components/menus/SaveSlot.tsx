@@ -85,7 +85,8 @@ const styles = {
     }),
 
     text: css({
-        marginTop: '0.33em'
+        position: 'absolute',
+        bottom: '2em'
     }),
 
     emptySlot: css({
@@ -101,7 +102,6 @@ const styles = {
     game: {
         container: css({
             ...gameAndEmptySlot(),
-            position: 'relative',
 
             '& video': {
                 position: 'relative'

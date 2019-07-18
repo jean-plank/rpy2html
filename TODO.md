@@ -8,6 +8,6 @@
 
 * Slider and Radio styled from gui
 
-* cutscene before main menu
-
 * convert a NativeEvent to a SyntheticEvent (or KeyboardEvent.key support ?)
+
+* Menu : return button

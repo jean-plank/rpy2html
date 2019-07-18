@@ -71,7 +71,7 @@ const styles = {
     }),
 
     input: css({
-        '-webkit-appearance': 'none',
+        WebkitAppearance: 'none',
         margin: '0.2em 0 0',
         height: '1em',
         width: '100%',
@@ -82,7 +82,7 @@ const styles = {
         },
         '::-webkit-slider-thumb': {
             ...thumb,
-            '-webkit-appearance': 'none',
+            WebkitAppearance: 'none',
             marginTop: 0
         },
         '::-moz-range-thumb': thumb,

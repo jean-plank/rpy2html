@@ -395,7 +395,6 @@ const globalStyles = css(
             fontSize: '1em',
             padding: 0,
             textOverflow: 'unset',
-            whiteSpace: 'nowrap',
             '&:not([disabled])': {
                 cursor: 'pointer'
             }
