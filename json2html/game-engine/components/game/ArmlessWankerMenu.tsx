@@ -7,7 +7,7 @@ import { style, transl } from '../../context'
 import { mediaQuery } from '../../utils/styles'
 import withStopPropagation from '../../utils/withStopPropagation'
 import GuiButton from '../GuiButton'
-import { MenuBtn } from '../menus/Menu'
+import MenuBtn, { menuBtnLabel } from '../menus/MenuBtn'
 
 interface BtnProps {
     onClick: (e: React.MouseEvent) => void
@@ -49,36 +49,34 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
                 onClick={withStopPropagation(undo)}
                 disabled={disableUndo}
             >
-                {transl.menu.back}
+                {transl.armless.back}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP(some('HISTORY'))}>
-                {transl.menu.history}
-            </AWButton>
+            {showGameMenuBtn('HISTORY')}
             <AWButton onClick={withStopPropagation(skip)}>
-                {transl.menu.skip}
+                {transl.armless.skip}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP(some('SAVE'))}>
-                {transl.menu.save}
-            </AWButton>
+            {showGameMenuBtn('SAVE')}
             <AWButton onClick={withStopPropagation(quickSave)}>
-                {transl.menu.qSave}
+                {transl.armless.qSave}
             </AWButton>
             <AWButton
                 onClick={withStopPropagation(quickLoad)}
                 disabled={disableQuickLoad}
             >
-                {transl.menu.qLoad}
+                {transl.armless.qLoad}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP(some('PREFS'))}>
-                {transl.menu.prefs}
-            </AWButton>
+            {showGameMenuBtn('PREFS')}
         </div>
     )
 
-    function showGameMenuWSP(
-        btn?: Option<MenuBtn>
-    ): (e: React.MouseEvent) => void {
-        return withStopPropagation(() => showGameMenu(btn))
+    function showGameMenuBtn(btn: MenuBtn): JSX.Element {
+        return (
+            <AWButton
+                onClick={withStopPropagation(() => showGameMenu(some(btn)))}
+            >
+                {menuBtnLabel(btn)}
+            </AWButton>
+        )
     }
 }
 export default ArmlessWankerMenu

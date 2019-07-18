@@ -17,7 +17,8 @@ import Save from '../../../saves/Save'
 import SoundService from '../../../sound/SoundService'
 import { KeyUpAble } from '../../App'
 import Help from '../Help'
-import Menu, { MenuAble, MenuBtn, MenuOverlay } from '../Menu'
+import Menu, { MenuAble, MenuOverlay } from '../Menu'
+import MenuBtn from '../MenuBtn'
 import Preferences from '../Preferences'
 import SaveSlots from '../SaveSlots'
 import History from './History'
@@ -63,7 +64,6 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
             ref={menuAble}
             overlay={MenuOverlay.GameMenu}
             buttons={[
-                { btn: 'RESUME', specialAction: some(hideGameMenu) },
                 { btn: 'HISTORY' },
                 { btn: 'SAVE' },
                 { btn: 'LOAD' },
@@ -71,6 +71,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 { btn: 'MAIN_MENU', specialAction: some(confirmMainMenu) },
                 { btn: 'HELP' }
             ]}
+            returnAction={hideGameMenu}
             submenu={submenu}
             selectedBtn={selectedBtn}
         />

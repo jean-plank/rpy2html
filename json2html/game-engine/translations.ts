@@ -2,20 +2,18 @@ import { StrMap } from 'fp-ts/lib/StrMap'
 
 export interface Translation {
     menu: {
-        pause: string;
-        prefs: string;
-        // main menu buttons
         start: string;
-        load: string;
-        memory: string;
-        help: string;
-        quit: string;
-        // game menu buttons
         resume: string;
         history: string;
         save: string;
+        load: string;
+        prefs: string;
         mainMenu: string;
-        // armless wanker menu
+        memory: string;
+        help: string;
+        return: string;
+    }
+    armless: {
         back: string;
         skip: string;
         qSave: string;
@@ -23,7 +21,7 @@ export interface Translation {
         saved: string;
     }
     confirm: {
-        // diverse confirm translations
+        // miscellaneous confirm translations
         audio: string; // the message for the pop up about playing sound
         audioBtn: string; // the button associated
         quit: string; // quit game confirm
@@ -57,17 +55,18 @@ export interface Translation {
 const translations: StrMap<Translation> = new StrMap({
     en: {
         menu: {
-            pause: 'Pause',
-            prefs: 'Preferences',
             start: 'Start',
-            load: 'Load',
-            memory: 'Memory',
-            help: 'Help',
-            quit: 'Quit',
             resume: 'Resume',
             history: 'History',
             save: 'Save',
+            load: 'Load',
+            prefs: 'Preferences',
             mainMenu: 'Main Menu',
+            memory: 'Memory',
+            help: 'Help',
+            return: 'Return'
+        },
+        armless: {
             back: 'Back',
             skip: 'Skip',
             qSave: 'Quick save',
@@ -107,17 +106,18 @@ const translations: StrMap<Translation> = new StrMap({
     },
     fr: {
         menu: {
-            pause: 'Pause',
-            prefs: 'Préférences',
             start: 'Commencer',
-            load: 'Charger une partie',
-            memory: 'Mémoire',
-            help: 'Aide',
-            quit: 'Quitter',
             resume: 'Continuer',
             history: 'Historique',
             save: 'Sauvegarder',
+            load: 'Charger une partie',
+            prefs: 'Préférences',
             mainMenu: 'Menu Principal',
+            memory: 'Mémoire',
+            help: 'Aide',
+            return: 'Retour'
+        },
+        armless: {
             back: 'Retour',
             skip: 'Passer',
             qSave: 'Sauvegarde rapide',

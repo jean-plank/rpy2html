@@ -10,41 +10,9 @@ import {
 
 import { style, transl } from '../../context'
 import { getBgOrElse, ifOldStyle, mediaQuery } from '../../utils/styles'
+import GuiButton from '../GuiButton'
 import SelectableButton from '../SelectableButton'
-
-export type MenuBtn =
-    | 'START'
-    | 'RESUME'
-    | 'HISTORY'
-    | 'SAVE'
-    | 'LOAD'
-    | 'PREFS'
-    | 'MAIN_MENU'
-    | 'MEMORY'
-    | 'HELP'
-
-const menuBtnLabel = (btn: MenuBtn): string => {
-    switch (btn) {
-        case 'START':
-            return transl.menu.start
-        case 'RESUME':
-            return transl.menu.resume
-        case 'HISTORY':
-            return transl.menu.history
-        case 'SAVE':
-            return transl.menu.save
-        case 'LOAD':
-            return transl.menu.load
-        case 'PREFS':
-            return transl.menu.prefs
-        case 'MAIN_MENU':
-            return transl.menu.mainMenu
-        case 'MEMORY':
-            return transl.menu.memory
-        case 'HELP':
-            return transl.menu.help
-    }
-}
+import MenuBtn, { menuBtnLabel } from './MenuBtn'
 
 export interface MenuAble {
     selectedBtn: Option<MenuBtn>
@@ -55,6 +23,7 @@ export interface MenuAble {
 interface Props {
     overlay: MenuOverlay
     buttons: BtnWithAction[]
+    returnAction?: (e: React.MouseEvent) => void
     submenu: (btn: MenuBtn) => JSX.Element | null
     selectedBtn?: Option<MenuBtn>
     styles?: SerializedStyles
@@ -69,6 +38,7 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
     {
         overlay,
         buttons,
+        returnAction,
         submenu,
         selectedBtn: propsSelectedBtn = none,
         styles: stylesOverride
@@ -89,11 +59,27 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
     return (
         <div css={[styles.menu, stylesOverride]}>
             <div className={overlayClassName} />
-            <div css={styles.menuBar}>{buttons.map(menuBtn)}</div>
+            <div css={styles.menuBar}>
+                {buttons.map(menuBtn)}
+                {returnBtn()}
+            </div>
             <div css={styles.submenuTitle}>{ifSelectedBtn(menuBtnLabel)}</div>
             <div css={styles.submenu}>{ifSelectedBtn(submenu)}</div>
         </div>
     )
+
+    function returnBtn(): JSX.Element | null {
+        return ifSelectedBtn(() => (
+            <GuiButton
+                onClick={
+                    returnAction === undefined ? unselectSubmenu : returnAction
+                }
+                css={[styles.btn, styles.returnBtn]}
+            >
+                {transl.menu.return}
+            </GuiButton>
+        ))
+    }
 
     function ifSelectedBtn<T>(f: (btn: MenuBtn) => T): T | null {
         return selectedBtn.fold(null, f)
@@ -123,6 +109,11 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
                 action => action(e)
             )
         }
+    }
+
+    function unselectSubmenu() {
+        setSelectedBtn(none)
+        setOverlay(overlay)
     }
 }
 export default forwardRef<MenuAble, Props>(Menu)
@@ -174,6 +165,16 @@ const styles = {
         })
     }),
 
+    btn: css({
+        padding: style.guibtn_padding,
+        height: style.guibtn_height
+    }),
+
+    returnBtn: css({
+        position: 'absolute',
+        bottom: '1em'
+    }),
+
     submenuTitle: css({
         position: 'absolute',
         top: '1%',
@@ -194,10 +195,5 @@ const styles = {
         [mediaQuery(style)]: {
             fontSize: `${style.guibtn_fsize_v}vw`
         }
-    }),
-
-    btn: css({
-        padding: style.guibtn_padding,
-        height: style.guibtn_height
     })
 }

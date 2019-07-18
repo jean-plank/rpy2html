@@ -49,7 +49,7 @@ import Confirm, { ConfirmProps } from './Confirm'
 import Game from './game/Game'
 import GameMenu from './menus/gameMenu/GameMenu'
 import MainMenu from './menus/mainMenu/MainMenu'
-import { MenuBtn } from './menus/Menu'
+import MenuBtn from './menus/MenuBtn'
 import Notifications, { Notifiable } from './Notifications'
 
 export interface KeyUpAble {
@@ -322,7 +322,7 @@ const App: FunctionComponent = () => {
 
     function quickSave() {
         dispatchSavesAction(saveAction(gameState))
-        notify(transl.menu.saved)
+        notify(transl.armless.saved)
     }
 
     function confirmAudio(okAction: () => void) {
