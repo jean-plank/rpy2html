@@ -3,12 +3,12 @@ import { StrMap } from 'fp-ts/lib/StrMap'
 
 import gameHistoryReducer, {
     emptyGameHistoryState
-} from '../game-engine/gameHistory/gameHistoryReducer'
-import GameProps from '../game-engine/gameHistory/GameProps'
-import { GameState } from '../game-engine/gameHistory/gameStateReducer'
-import { HistoryState } from '../game-engine/gameHistory/historiable'
-import Image from '../game-engine/models/medias/Image'
-import Sound from '../game-engine/models/medias/Sound'
+} from '../game-engine/history/gameHistoryReducer'
+import GameProps from '../game-engine/history/GameProps'
+import { GameState } from '../game-engine/history/gameStateReducer'
+import { HistoryState } from '../game-engine/history/historiable'
+import Image from '../game-engine/medias/Image'
+import Sound from '../game-engine/medias/Sound'
 import AstNode, { AppData } from '../game-engine/nodes/AstNode'
 import Play from '../game-engine/nodes/Play'
 import Show from '../game-engine/nodes/Show'
