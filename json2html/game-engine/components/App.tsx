@@ -185,16 +185,16 @@ const App: FunctionComponent = () => {
         topKeyUpAble.current.map(_ => _.onKeyUp(e))
     }
 
-    function initAll() {
+    function initAll(): () => void {
         nodes.mapWithKey((id, node) =>
             node.init({ id, data, execThenExecNext })
         )
-        initDom()
         firstNode.loadBlock()
         showMainMenu()
+        return initDom()
     }
 
-    function initDom() {
+    function initDom(): () => void {
         document.title = gameName
         lookup('game_icon', images).map(
             icon =>
@@ -207,7 +207,9 @@ const App: FunctionComponent = () => {
                     return link
                 }).href = icon.file)
         )
+
         document.addEventListener('keyup', onKeyUp)
+        return () => document.removeEventListener('keyup', onKeyUp)
     }
 
     function showMainMenu() {
