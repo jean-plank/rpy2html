@@ -1,4 +1,5 @@
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -24,9 +25,10 @@ export default class PyExpr extends AstNode {
         return gameProps
     }
 
-    static decode = (pyExpr: unknown): Either<t.Errors, PyExpr> =>
-        PyExprType.decode(pyExpr).map(
-            ({ arguments: [code, idNexts] }) => new PyExpr(code, idNexts)
+    static decode = (pyExpr: unknown): E.Either<t.Errors, PyExpr> =>
+        pipe(
+            PyExprType.decode(pyExpr),
+            E.map(({ arguments: [code, idNexts] }) => new PyExpr(code, idNexts))
         )
 }
 

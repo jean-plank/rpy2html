@@ -1,8 +1,8 @@
 /** @jsx jsx */
 import { css, jsx, SerializedStyles } from '@emotion/core'
-import { last } from 'fp-ts/lib/Array'
-import { fromNullable, Option, some } from 'fp-ts/lib/Option'
-import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import * as R from 'fp-ts/lib/Record'
 import {
     forwardRef,
     RefForwardingComponent,
@@ -10,10 +10,12 @@ import {
     useImperativeHandle
 } from 'react'
 
+import { pipe } from 'fp-ts/lib/pipeable'
 import GameProps from '../../history/GameProps'
 import Video from '../../medias/Video'
 import AstNode from '../../nodes/AstNode'
 import Menu from '../../nodes/Menu'
+import Obj from '../../Obj'
 import SoundService from '../../sound/SoundService'
 import withStopPropagation from '../../utils/withStopPropagation'
 import { GameAble, KeyUpAble } from '../App'
@@ -38,7 +40,7 @@ interface Props {
 
 type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
     soundService: SoundService;
-    currentNodeL: () => Option<AstNode>;
+    currentNodeL: () => O.Option<AstNode>;
     showMainMenu: () => void;
     addBlock: (block: AstNode[]) => void;
     redo: () => void;
@@ -59,27 +61,41 @@ const Game: RefForwardingComponent<GameAble, Props> = (
         execThenExecNext
     }))
 
-    const args = fromNullable(armlessWankerMenuProps)
+    const args = O.fromNullable(armlessWankerMenuProps)
 
     useEffect(() => {
-        gameProps.video.map(video =>
-            args.map(({ onVideoEnded }) =>
-                video.onEnded(() => onVideoEnded(execNextIfNotMenu))
+        pipe(
+            gameProps.video,
+            O.map(video =>
+                pipe(
+                    args,
+                    O.map(({ onVideoEnded }) =>
+                        video.onEnded(() => onVideoEnded(execNextIfNotMenu))
+                    )
+                )
             )
         )
     }, [gameProps.video])
 
     useEffect(() => {
-        args.map(_ => _.soundService.applySounds(gameProps.sounds))
+        pipe(
+            args,
+            O.map(_ => _.soundService.applySounds(gameProps.sounds))
+        )
     }, [gameProps.sounds])
 
     useEffect(() => {
-        args.map(_ => _.soundService.applyAudios(gameProps.audios))
+        pipe(
+            args,
+            O.map(_ => _.soundService.applyAudios(gameProps.audios))
+        )
     }, [gameProps.audios])
 
-    return gameProps.video
-        .map(_ => cutsceneLayout(_))
-        .getOrElseL(defaultLayout)
+    return pipe(
+        gameProps.video,
+        O.map(_ => cutsceneLayout(_)),
+        O.getOrElse(defaultLayout)
+    )
 
     function cutsceneLayout(video: Video): JSX.Element {
         return (
@@ -118,7 +134,11 @@ const Game: RefForwardingComponent<GameAble, Props> = (
                     }))}
                     styles={stylesOverride}
                 />
-                {args.map(armlessWankerMenu).toNullable()}
+                {pipe(
+                    args,
+                    O.map(armlessWankerMenu),
+                    O.toNullable
+                )}
             </div>
         )
     }
@@ -128,7 +148,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             ArrowUp: () => {},
             ArrowDown: () => {},
             ArrowLeft: () => {},
@@ -144,49 +164,95 @@ const Game: RefForwardingComponent<GameAble, Props> = (
             v: () => {},
             s: ifArgsExists(({ quickSave }) => quickSave()),
             l: ifArgsExists(({ quickLoad }) => quickLoad())
-        })
-        lookup(e.key, keyEvents).map(action => {
-            e.preventDefault()
-            e.stopPropagation()
-            action(e)
-        })
-    }
-
-    function onClick(e: React.MouseEvent) {
-        if (e.button === 0) execNextIfNotMenu()
-        else if (e.button === 1) args.map(({ showGameMenu }) => showGameMenu())
-    }
-
-    function onWheel(e: React.WheelEvent) {
-        if (e.deltaY < 0) args.map(({ undo }) => undo())
-        else if (e.deltaY > 0) args.map(({ redo }) => redo())
-    }
-
-    function execThenExecNext(node: AstNode) {
-        execute(some([node, ...node.followingBlock().getOrElse([])]))
-    }
-
-    function execNextIfNotMenu() {
-        args.map(({ currentNodeL }) =>
-            currentNodeL().map(node => {
-                if (!(node instanceof Menu)) execute(node.followingBlock())
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(action => {
+                e.preventDefault()
+                e.stopPropagation()
+                action(e)
             })
         )
     }
 
-    function execute(maybeBlock: Option<AstNode[]>) {
-        args.map(({ showMainMenu, addBlock }) =>
-            maybeBlock.foldL(showMainMenu, block => {
-                last(block).map(_ => _.nexts().forEach(_ => _.loadBlock()))
-                addBlock(block)
-            })
+    function onClick(e: React.MouseEvent) {
+        if (e.button === 0) execNextIfNotMenu()
+        else if (e.button === 1) {
+            pipe(
+                args,
+                O.map(({ showGameMenu }) => showGameMenu())
+            )
+        }
+    }
+
+    function onWheel(e: React.WheelEvent) {
+        if (e.deltaY < 0) {
+            pipe(
+                args,
+                O.map(({ undo }) => undo())
+            )
+        } else if (e.deltaY > 0) {
+            pipe(
+                args,
+                O.map(({ redo }) => redo())
+            )
+        }
+    }
+
+    function execThenExecNext(node: AstNode) {
+        execute(
+            O.some([
+                node,
+                ...pipe(
+                    node.followingBlock(),
+                    O.getOrElse(() => [])
+                )
+            ])
+        )
+    }
+
+    function execNextIfNotMenu() {
+        pipe(
+            args,
+            O.map(({ currentNodeL }) =>
+                pipe(
+                    currentNodeL(),
+                    O.map(node => {
+                        if (!(node instanceof Menu)) {
+                            execute(node.followingBlock())
+                        }
+                    })
+                )
+            )
+        )
+    }
+
+    function execute(maybeBlock: O.Option<AstNode[]>) {
+        pipe(
+            args,
+            O.map(({ showMainMenu, addBlock }) =>
+                pipe(
+                    maybeBlock,
+                    O.fold(showMainMenu, block => {
+                        pipe(
+                            A.last(block),
+                            O.map(_ => _.nexts().forEach(_ => _.loadBlock()))
+                        )
+                        addBlock(block)
+                    })
+                )
+            )
         )
     }
 
     function ifArgsExists(
         f: (args: ExtendedArmlessWankerProps) => void
     ): () => void {
-        return () => args.map(_ => f(_))
+        return () =>
+            pipe(
+                args,
+                O.map(_ => f(_))
+            )
     }
 }
 export default forwardRef<KeyUpAble, Props>(Game)

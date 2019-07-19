@@ -1,9 +1,12 @@
-import { Either } from 'fp-ts/lib/Either'
-import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import * as t from 'io-ts'
 
-import RenpyJson, { RawNode } from '../renpy-json-loader/RenpyJson'
+import RenpyJson, { RawNode, Style } from '../renpy-json-loader/RenpyJson'
 import Char from './Char'
+import Font from './Font'
 import Image from './medias/Image'
 import Sound from './medias/Sound'
 import Video from './medias/Video'
@@ -22,60 +25,84 @@ import Scene from './nodes/Scene'
 import Show from './nodes/Show'
 import ShowWindow from './nodes/ShowWindow'
 import Stop from './nodes/Stop'
-import translations from './translations'
+import Obj from './Obj'
+import translations, { Translation } from './translations'
 
 const json = require(`../renpy-json-loader/index!${__INPUT_JSON}`) as RenpyJson
 
-export const nbSlots = 6
-export const storagePrefix = 'jpGame-'
-export const storageKey = storagePrefix + json.game_name + ` (${json.lang})`
+export const nbSlots: number = 6
+export const storagePrefix: string = 'jpGame-'
+export const storageKey: string =
+    storagePrefix + json.game_name + ` (${json.lang})`
 
-export const nodes: StrMap<AstNode> = new StrMap(json.nodes).map(parseNode)
-
-export const chars: StrMap<Char> = new StrMap(json.characters).map(
-    Char.fromRawChar
+export const nodes: Obj<AstNode> = pipe(
+    json.nodes,
+    R.map(parseNode)
 )
 
-export const sounds: StrMap<Sound> = new StrMap(json.sounds).mapWithKey(
-    (name, file) => new Sound(name, file)
+export const chars: Obj<Char> = pipe(
+    json.characters,
+    R.map(Char.fromRawChar)
 )
 
-export const videos: StrMap<Video> = new StrMap(json.videos).map(
-    _ => new Video(_)
+export const sounds: Obj<Sound> = pipe(
+    json.sounds,
+    R.mapWithIndex((name, file) => new Sound(name, file))
 )
 
-export const images: StrMap<Image> = new StrMap(json.images).mapWithKey(
-    (name, file) => new Image(name, file)
+export const videos: Obj<Video> = pipe(
+    json.videos,
+    R.map(_ => new Video(_))
 )
 
-export const style = json.style
-export const fonts = new StrMap(json.fonts)
-export const transl = lookup(json.lang, translations).getOrElse(
-    translations.value.en // we're all consenting adults here
+export const images: Obj<Image> = pipe(
+    json.images,
+    R.mapWithIndex((name, file) => new Image(name, file))
 )
-export const lang = json.lang
-export const help = json.help
-export const firstNode = lookup('0', nodes).getOrElseL(() => {
-    throw EvalError('A node with id 0 is needed to start the story.')
-})
-export const gameName = json.game_name
+
+export const style: Style = json.style
+export const fonts: Obj<Font> = json.fonts
+export const transl: Translation = pipe(
+    R.lookup(json.lang, translations),
+    O.getOrElse(() => translations.en) // we're all consenting adults here
+)
+export const lang: string = json.lang
+export const help: string = json.help
+export const firstNode: AstNode = pipe(
+    R.lookup('0', nodes),
+    O.getOrElse(() => {
+        throw EvalError('A node with id 0 is needed to start the story.')
+    })
+)
+export const gameName: string = json.game_name
 
 function parseNode(rawNode: RawNode): AstNode {
-    return (Hide.decode(rawNode) as Either<t.Errors, AstNode>)
-        .alt(If.decode(rawNode))
-        .alt(IfBlock.decode(rawNode))
-        .alt(Menu.decode(rawNode))
-        .alt(MenuItem.decode(rawNode))
-        .alt(Pause.decode(rawNode))
-        .alt(Play.decode(rawNode))
-        .alt(PlayVideo.decode(rawNode))
-        .alt(PyExpr.decode(rawNode))
-        .alt(Say.decode(rawNode))
-        .alt(Scene.decode(rawNode))
-        .alt(Show.decode(rawNode))
-        .alt(ShowWindow.decode(rawNode))
-        .alt(Stop.decode(rawNode))
-        .fold(
+    const res = [
+        E.alt(() => If.decode(rawNode)),
+        E.alt(() => IfBlock.decode(rawNode)),
+        E.alt(() => Menu.decode(rawNode)),
+        E.alt(() => MenuItem.decode(rawNode)),
+        E.alt(() => Pause.decode(rawNode)),
+        E.alt(() => Play.decode(rawNode)),
+        E.alt(() => PlayVideo.decode(rawNode)),
+        E.alt(() => PyExpr.decode(rawNode)),
+        E.alt(() => Say.decode(rawNode)),
+        E.alt(() => Scene.decode(rawNode)),
+        E.alt(() => Show.decode(rawNode)),
+        E.alt(() => ShowWindow.decode(rawNode)),
+        E.alt(() => Stop.decode(rawNode))
+    ].reduce<E.Either<t.Errors, AstNode>>(
+        (acc, decode) =>
+            pipe(
+                acc,
+                decode
+            ),
+        Hide.decode(rawNode)
+    )
+
+    return pipe(
+        res,
+        E.fold(
             errors => {
                 console.error(
                     "Couldn't parse node:",
@@ -88,4 +115,5 @@ function parseNode(rawNode: RawNode): AstNode {
             },
             _ => _
         )
+    )
 }

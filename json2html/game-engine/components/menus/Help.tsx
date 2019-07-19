@@ -4,9 +4,8 @@ import { FunctionComponent } from 'react'
 
 import { help, style } from '../../context'
 
-const Help: FunctionComponent = (): JSX.Element => {
-    return <div css={helpStyles} dangerouslySetInnerHTML={{ __html: help }} />
-}
+const Help: FunctionComponent = (): JSX.Element =>
+    <div css={helpStyles} dangerouslySetInnerHTML={{ __html: help }} />
 export default Help
 
 const helpStyles = css({

@@ -1,4 +1,4 @@
-import { none, some } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 
 import { isOption } from '../game-engine/history/GameProps'
 
@@ -14,7 +14,7 @@ describe(isOption, () => {
     })
 
     it('should return true for options', () => {
-        expect(isOption(some(2))).toBe(true)
-        expect(isOption(none)).toBe(true)
+        expect(isOption(O.some(2))).toBe(true)
+        expect(isOption(O.none)).toBe(true)
     })
 })

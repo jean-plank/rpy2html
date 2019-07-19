@@ -1,5 +1,4 @@
-import { none, some } from 'fp-ts/lib/Option'
-import { StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
 
 import gameHistoryReducer, {
     emptyGameHistoryState
@@ -22,21 +21,21 @@ describe(gameHistoryReducer, () => {
         })
         expect(empty).toEqual({
             past: [],
-            present: none,
+            present: O.none,
             future: []
         })
     })
 
-    const data = {
-        sounds: new StrMap({
+    const data = ({
+        sounds: {
             music1: new Sound('music1', 'fileMusic1'),
             sound1: new Sound('sound1', 'fileSound1')
-        }),
-        images: new StrMap({
+        },
+        images: {
             toto: new Image('toto', 'fileToto'),
             titi: new Image('titi', 'fileTiti')
-        })
-    } as AppData
+        }
+    } as unknown) as AppData
     const node1 = new Play('music', 'music1', [])
     const node2 = new Play('sound', 'sound1', [])
     const node3 = new Show('toto', [])
@@ -49,10 +48,10 @@ describe(gameHistoryReducer, () => {
 
     const block1Props = {
         ...GameProps.empty,
-        sounds: new StrMap({
-            music: some(new Sound('music1', 'fileMusic1')),
-            sound: some(new Sound('sound1', 'fileSound1'))
-        })
+        sounds: {
+            music: O.some(new Sound('music1', 'fileMusic1')),
+            sound: O.some(new Sound('sound1', 'fileSound1'))
+        }
     }
     const block2Props = {
         ...GameProps.empty,
@@ -60,10 +59,10 @@ describe(gameHistoryReducer, () => {
             new Image('toto', 'fileToto'),
             new Image('titi', 'fileTiti')
         ],
-        sounds: new StrMap({
-            music: some(new Sound('music1', 'fileMusic1')),
-            sound: none
-        })
+        sounds: {
+            music: O.some(new Sound('music1', 'fileMusic1')),
+            sound: O.none
+        }
     }
 
     it('should have one block', () => {
@@ -74,7 +73,7 @@ describe(gameHistoryReducer, () => {
         expect(state.toString()).toBe(
             {
                 past: [],
-                present: some([block1Props, block1]),
+                present: O.some([block1Props, block1]),
                 future: []
             }.toString()
         )
@@ -95,7 +94,7 @@ describe(gameHistoryReducer, () => {
         expect(state.toString()).toEqual(
             {
                 past: [[block1Props, block1]],
-                present: some([block2Props, block2]),
+                present: O.some([block2Props, block2]),
                 future: []
             }.toString()
         )
@@ -119,7 +118,7 @@ describe(gameHistoryReducer, () => {
         expect(state.toString()).toEqual(
             {
                 past: [],
-                present: some([block1Props, block1]),
+                present: O.some([block1Props, block1]),
                 future: [[block2Props, block2]]
             }.toString()
         )
@@ -146,7 +145,7 @@ describe(gameHistoryReducer, () => {
         expect(state.toString()).toEqual(
             {
                 past: [[block1Props, block1]],
-                present: some([block2Props, block2]),
+                present: O.some([block2Props, block2]),
                 future: []
             }.toString()
         )

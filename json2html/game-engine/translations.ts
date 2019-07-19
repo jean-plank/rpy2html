@@ -1,4 +1,4 @@
-import { StrMap } from 'fp-ts/lib/StrMap'
+import Obj from './Obj'
 
 export interface Translation {
     menu: {
@@ -52,7 +52,7 @@ export interface Translation {
     emptySlot: string
 }
 
-const translations: StrMap<Translation> = new StrMap({
+const translations: Obj<Translation> = {
     en: {
         menu: {
             start: 'Start',
@@ -159,5 +159,5 @@ const translations: StrMap<Translation> = new StrMap({
         },
         emptySlot: 'emplacement vide'
     }
-})
+}
 export default translations

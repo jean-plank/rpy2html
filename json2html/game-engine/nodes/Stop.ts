@@ -1,6 +1,6 @@
-import { Either } from 'fp-ts/lib/Either'
-import { none } from 'fp-ts/lib/Option'
-import { insert } from 'fp-ts/lib/StrMap'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -15,12 +15,19 @@ export default class Stop extends AstNode {
 
     reduce = (gameProps: GameProps): GameProps => ({
         ...gameProps,
-        sounds: insert(this.chanName, none, gameProps.sounds)
+        sounds: {
+            ...gameProps.sounds,
+            [this.chanName]: O.none
+        }
     })
 
-    static decode = (hide: unknown): Either<t.Errors, Stop> =>
-        StopType.decode(hide).map(
-            ({ arguments: [chanName, idNexts] }) => new Stop(chanName, idNexts)
+    static decode = (hide: unknown): E.Either<t.Errors, Stop> =>
+        pipe(
+            StopType.decode(hide),
+            E.map(
+                ({ arguments: [chanName, idNexts] }) =>
+                    new Stop(chanName, idNexts)
+            )
         )
 }
 

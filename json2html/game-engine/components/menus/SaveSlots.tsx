@@ -1,14 +1,14 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import { Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
 import Save from '../../saves/Save'
 import SaveSlot from './SaveSlot'
 
 interface Props {
-    saves: Array<Option<Save>>
-    onClick: (slot: number, save: Option<Save>) => void
+    saves: O.Option<Save>[]
+    onClick: (slot: number, save: O.Option<Save>) => void
     deleteSave: (slot: number) => void
     disabledIfEmpty?: boolean
 }
@@ -33,7 +33,7 @@ const SaveSlots: FunctionComponent<Props> = ({
         </div>
     )
 
-    function getOnClick(save: Option<Save>, i: number): () => void {
+    function getOnClick(save: O.Option<Save>, i: number): () => void {
         return () => onClick(i, save)
     }
 

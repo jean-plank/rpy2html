@@ -1,8 +1,5 @@
 import Font from '../game-engine/Font'
-
-interface Obj<T> {
-    [key: string]: T
-}
+import Obj from '../game-engine/Obj'
 
 // TypeScript version of the validation jsons.
 // If you add things below, don't forget to update the validation jsons.

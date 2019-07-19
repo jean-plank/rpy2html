@@ -1,22 +1,26 @@
 import { css, keyframes } from '@emotion/core'
-import { Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import { FunctionComponent } from 'react'
 
 import Image from '../../medias/Image'
 
 interface Props {
-    image: Option<Image>
+    image: O.Option<Image>
     animated?: boolean
 }
 
 const LayerScene: FunctionComponent<Props> = ({ image, animated = true }) =>
-    image
-        .map(_ =>
+    pipe(
+        image,
+        O.map(_ =>
             _.elt({
                 css: [styles.base, animated ? styles.animated : null]
             })
-        )
-        .toNullable()
+        ),
+        O.toNullable
+    )
+
 export default LayerScene
 
 const styles = {

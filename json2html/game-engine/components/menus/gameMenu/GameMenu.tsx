@@ -1,7 +1,8 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import { fromNullable, none, Option, some } from 'fp-ts/lib/Option'
-import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import {
     createRef,
     forwardRef,
@@ -12,6 +13,7 @@ import {
 
 import { transl } from '../../../context'
 import AstNode from '../../../nodes/AstNode'
+import Obj from '../../../Obj'
 import QuickSave from '../../../saves/QuickSave'
 import Save from '../../../saves/Save'
 import SoundService from '../../../sound/SoundService'
@@ -26,7 +28,7 @@ import History from './History'
 interface Props {
     soundService: SoundService
     history: AstNode[]
-    saves: Array<Option<Save>>
+    saves: O.Option<Save>[]
     loadSave: (save: QuickSave) => void
     deleteSave: (slot: number) => void
     hideGameMenu: () => void
@@ -37,7 +39,7 @@ interface Props {
         actionYes: () => void,
         actionNo?: () => void
     ) => void
-    selectedBtn?: Option<MenuBtn>
+    selectedBtn?: O.Option<MenuBtn>
 }
 
 const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
@@ -51,7 +53,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
         showMainMenu,
         save,
         confirmYesNo,
-        selectedBtn = none
+        selectedBtn = O.none
     },
     ref
 ) => {
@@ -68,7 +70,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 { btn: 'SAVE' },
                 { btn: 'LOAD' },
                 { btn: 'PREFS' },
-                { btn: 'MAIN_MENU', specialAction: some(confirmMainMenu) },
+                { btn: 'MAIN_MENU', specialAction: O.some(confirmMainMenu) },
                 { btn: 'HELP' }
             ]}
             returnAction={hideGameMenu}
@@ -95,10 +97,13 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
             />
         )
 
-        function onClick(slot: number, existingSave: Option<Save>) {
-            existingSave.foldL(
-                () => save(slot),
-                _ => confirmYesNo(transl.confirm.override, () => save(slot))
+        function onClick(slot: number, existingSave: O.Option<Save>) {
+            pipe(
+                existingSave,
+                O.fold(
+                    () => save(slot),
+                    _ => confirmYesNo(transl.confirm.override, () => save(slot))
+                )
             )
         }
     }
@@ -113,30 +118,44 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
             />
         )
 
-        function onClick(_: number, save: Option<Save>) {
-            save.map(_ =>
-                confirmYesNo(transl.confirm.unsaved, () => save.map(loadSave))
+        function onClick(_: number, save: O.Option<Save>) {
+            pipe(
+                save,
+                O.map(_ =>
+                    confirmYesNo(transl.confirm.unsaved, () =>
+                        pipe(
+                            save,
+                            O.map(loadSave)
+                        )
+                    )
+                )
             )
         }
     }
 
     function confirmMainMenu() {
-        fromNullable(menuAble.current).map(({ setSelectedBtn }) => {
-            setSelectedBtn(some('MAIN_MENU'))
-            confirmYesNo(transl.confirm.unsaved, showMainMenu, () =>
-                setSelectedBtn(none)
-            )
-        })
+        pipe(
+            O.fromNullable(menuAble.current),
+            O.map(({ setSelectedBtn }) => {
+                setSelectedBtn(O.some('MAIN_MENU'))
+                confirmYesNo(transl.confirm.unsaved, showMainMenu, () =>
+                    setSelectedBtn(O.none)
+                )
+            })
+        )
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        const keyEvents: StrMap<(e: KeyboardEvent) => void> = new StrMap({
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             Escape: e => {
                 e.stopPropagation()
                 hideGameMenu()
             }
-        })
-        lookup(e.key, keyEvents).map(_ => _(e))
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(_ => _(e))
+        )
     }
 }
 export default forwardRef<KeyUpAble, Props>(GameMenu)

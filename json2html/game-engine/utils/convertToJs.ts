@@ -1,8 +1,10 @@
-import { fromNullable } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 const convertToJs = (code: string): string =>
-    fromNullable(` ${code} `.match(word))
-        .map(_ =>
+    pipe(
+        O.fromNullable(` ${code} `.match(word)),
+        O.map(_ =>
             _.reduce((acc, m) => {
                 const trimedM = m.trim()
                 if (kwords.indexOf(trimedM) === -1) {
@@ -10,8 +12,9 @@ const convertToJs = (code: string): string =>
                 }
                 return acc
             }, code).replace('==', '===')
-        )
-        .getOrElse(code)
+        ),
+        O.getOrElse(() => code)
+    )
 export default convertToJs
 
 const word = /\W([a-zA-Z_]\w*)\W/g

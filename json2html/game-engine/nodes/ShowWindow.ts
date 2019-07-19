@@ -1,4 +1,5 @@
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -16,9 +17,13 @@ export default class ShowWindow extends AstNode {
         showWindow: this.show
     })
 
-    static decode = (showWindow: unknown): Either<t.Errors, ShowWindow> =>
-        ShowWindowType.decode(showWindow).map(
-            ({ arguments: [show, idNexts] }) => new ShowWindow(show, idNexts)
+    static decode = (showWindow: unknown): E.Either<t.Errors, ShowWindow> =>
+        pipe(
+            ShowWindowType.decode(showWindow),
+            E.map(
+                ({ arguments: [show, idNexts] }) =>
+                    new ShowWindow(show, idNexts)
+            )
         )
 }
 

@@ -2,7 +2,8 @@
 import { css, jsx } from '@emotion/core'
 import { SerializedStyles } from '@emotion/core'
 import { TextAlignProperty } from 'csstype'
-import { Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import { FunctionComponent } from 'react'
 
 import Char from '../../Char'
@@ -11,7 +12,7 @@ import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
 interface Props {
     hide: boolean
-    char: Option<Char>
+    char: O.Option<Char>
     styles?: {
         namebox?: SerializedStyles;
         dialog?: SerializedStyles;
@@ -25,10 +26,21 @@ const Textbox: FunctionComponent<Props> = ({
     children
 }) => {
     const textboxStyle = hide ? { display: 'none' } : undefined
-    const charStyle = char
-        .chain<React.CSSProperties>(_ => _.color.map(_ => ({ color: _ })))
-        .getOrElse({})
-    const charName = char.map(_ => _.name).getOrElse('')
+    const charStyle: React.CSSProperties = pipe(
+        char,
+        O.chain(_ =>
+            pipe(
+                _.color,
+                O.map(_ => ({ color: _ }))
+            )
+        ),
+        O.getOrElse(() => ({}))
+    )
+    const charName = pipe(
+        char,
+        O.map(_ => _.name),
+        O.getOrElse(() => '')
+    )
 
     return (
         <div css={styles.textbox} style={textboxStyle}>

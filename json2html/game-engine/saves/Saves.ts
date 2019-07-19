@@ -1,4 +1,4 @@
-import { fromNullable, none, Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 import * as t from 'io-ts'
 
 import { nbSlots, storageKey } from '../context'
@@ -15,22 +15,22 @@ export const SavesType = t.exact(
 type RawSaves = t.TypeOf<typeof SavesType>
 
 export default class Saves {
-    quickSave: Option<QuickSave>
-    slots: Array<Option<Save>>
+    quickSave: O.Option<QuickSave>
+    slots: O.Option<Save>[]
 
     static empty: Saves = {
-        quickSave: none,
-        slots: Array.from({ length: nbSlots }, _ => none)
+        quickSave: O.none,
+        slots: Array.from({ length: nbSlots }, _ => O.none)
     }
 
     static fromNullable = (rawSaves: RawSaves): Saves => ({
-        quickSave: fromNullable(rawSaves.quickSave),
-        slots: rawSaves.slots.map(fromNullable)
+        quickSave: O.fromNullable(rawSaves.quickSave),
+        slots: rawSaves.slots.map(O.fromNullable)
     })
 
     static toNullable = (saves: Saves): RawSaves => ({
-        quickSave: saves.quickSave.toNullable(),
-        slots: saves.slots.map(_ => _.toNullable())
+        quickSave: O.toNullable(saves.quickSave),
+        slots: saves.slots.map(O.toNullable)
     })
 
     static fromStorage = (): Saves =>

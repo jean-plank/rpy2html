@@ -1,5 +1,6 @@
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
 import { identity } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import convertToJs from '../utils/convertToJs'
@@ -17,10 +18,13 @@ export default class MenuItem extends AstNode {
 
     reduce = identity
 
-    static decode = (menuItem: unknown): Either<t.Errors, MenuItem> =>
-        MenuItemType.decode(menuItem).map(
-            ({ arguments: [imgName, condition, idNexts] }) =>
-                new MenuItem(imgName, condition, idNexts)
+    static decode = (menuItem: unknown): E.Either<t.Errors, MenuItem> =>
+        pipe(
+            MenuItemType.decode(menuItem),
+            E.map(
+                ({ arguments: [imgName, condition, idNexts] }) =>
+                    new MenuItem(imgName, condition, idNexts)
+            )
         )
 }
 

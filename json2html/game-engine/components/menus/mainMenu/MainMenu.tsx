@@ -1,7 +1,8 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import { fromNullable, none, Option, some } from 'fp-ts/lib/Option'
-import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import {
     createRef,
     forwardRef,
@@ -10,6 +11,7 @@ import {
     useImperativeHandle
 } from 'react'
 
+import Obj from '../../../Obj'
 import QuickSave from '../../../saves/QuickSave'
 import Save from '../../../saves/Save'
 import SoundService from '../../../sound/SoundService'
@@ -25,7 +27,7 @@ import Memory from './Memory'
 interface Props {
     soundService: SoundService
     startGame: () => void
-    saves: Array<Option<Save>>
+    saves: O.Option<Save>[]
     emptySaves: () => void
     loadSave: (save: QuickSave) => void
     deleteSave: (slot: number) => void
@@ -57,7 +59,7 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
             ref={menuAble}
             overlay={MenuOverlay.MainMenu}
             buttons={[
-                { btn: 'START', specialAction: some(startGame) },
+                { btn: 'START', specialAction: O.some(startGame) },
                 { btn: 'LOAD' },
                 { btn: 'PREFS' },
                 { btn: 'MEMORY' },
@@ -86,8 +88,11 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
             />
         )
 
-        function onClick(_: number, save: Option<Save>) {
-            save.map(loadSave)
+        function onClick(_: number, save: O.Option<Save>) {
+            pipe(
+                save,
+                O.map(loadSave)
+            )
         }
     }
 
@@ -96,20 +101,24 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             Escape: e => {
-                fromNullable(menuAble.current).map(
-                    ({ selectedBtn, setSelectedBtn, setOverlay }) => {
-                        if (selectedBtn.isSome()) {
+                pipe(
+                    O.fromNullable(menuAble.current),
+                    O.map(({ selectedBtn, setSelectedBtn, setOverlay }) => {
+                        if (O.isSome(selectedBtn)) {
                             e.stopPropagation()
-                            setSelectedBtn(none)
+                            setSelectedBtn(O.none)
                             setOverlay(MenuOverlay.MainMenu)
                         }
-                    }
+                    })
                 )
             }
-        })
-        lookup(e.key, keyEvents).map(_ => _(e))
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(_ => _(e))
+        )
     }
 }
 export default forwardRef<KeyUpAble, Props>(MainMenu)

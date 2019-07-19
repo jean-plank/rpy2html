@@ -1,4 +1,6 @@
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -6,17 +8,23 @@ import NodeWithImage from './NodeWithImage'
 
 export default class Show extends NodeWithImage {
     reduce = (gameProps: GameProps): GameProps =>
-        this.media
-            .filter(_ => !gameProps.charImgs.includes(_))
-            .map(_ => ({
+        pipe(
+            this.media,
+            O.filter(_ => !gameProps.charImgs.includes(_)),
+            O.map(_ => ({
                 ...gameProps,
                 charImgs: [...gameProps.charImgs, _]
-            }))
-            .getOrElse(gameProps)
+            })),
+            O.getOrElse(() => gameProps)
+        )
 
-    static decode = (show: unknown): Either<t.Errors, Show> =>
-        ShowType.decode(show).map(
-            ({ arguments: [imgName, idNexts] }) => new Show(imgName, idNexts)
+    static decode = (show: unknown): E.Either<t.Errors, Show> =>
+        pipe(
+            ShowType.decode(show),
+            E.map(
+                ({ arguments: [imgName, idNexts] }) =>
+                    new Show(imgName, idNexts)
+            )
         )
 }
 

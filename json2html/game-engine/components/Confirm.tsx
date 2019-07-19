@@ -1,10 +1,12 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import { fromNullable } from 'fp-ts/lib/Option'
-import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react'
 
 import { style } from '../context'
+import Obj from '../Obj'
 import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles'
 import withStopPropagation from '../utils/withStopPropagation'
 import { KeyUpAble } from './App'
@@ -48,7 +50,10 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
             <GuiButton
                 key={i}
                 onClick={withStopPropagation(() => {
-                    fromNullable(btn.onClick).map(_ => _())
+                    pipe(
+                        O.fromNullable(btn.onClick),
+                        O.map(_ => _())
+                    )
                     hideConfirm()
                 })}
             >
@@ -58,15 +63,21 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             Escape: onClickBg
-        })
-        lookup(e.key, keyEvents).map(_ => _(e))
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(_ => _(e))
+        )
     }
 
     function onClickBg(e: React.SyntheticEvent | Event) {
         withStopPropagation(() => {
-            fromNullable(escapeAction).map(_ => _())
+            pipe(
+                O.fromNullable(escapeAction),
+                O.map(_ => _())
+            )
             hideConfirm()
         })(e)
     }

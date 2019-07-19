@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { css, jsx, SerializedStyles } from '@emotion/core'
-import { none, Option, some } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import {
     forwardRef,
     RefForwardingComponent,
@@ -15,8 +16,8 @@ import SelectableButton from '../SelectableButton'
 import MenuBtn, { menuBtnLabel } from './MenuBtn'
 
 export interface MenuAble {
-    selectedBtn: Option<MenuBtn>
-    setSelectedBtn: (btn: Option<MenuBtn>) => void
+    selectedBtn: O.Option<MenuBtn>
+    setSelectedBtn: (btn: O.Option<MenuBtn>) => void
     setOverlay: (overlay: MenuOverlay) => void
 }
 
@@ -25,13 +26,13 @@ interface Props {
     buttons: BtnWithAction[]
     returnAction?: (e: React.MouseEvent) => void
     submenu: (btn: MenuBtn) => JSX.Element | null
-    selectedBtn?: Option<MenuBtn>
+    selectedBtn?: O.Option<MenuBtn>
     styles?: SerializedStyles
 }
 
 interface BtnWithAction {
     btn: MenuBtn
-    specialAction?: Option<(e: React.MouseEvent) => void>
+    specialAction?: O.Option<(e: React.MouseEvent) => void>
 }
 
 const Menu: RefForwardingComponent<MenuAble, Props> = (
@@ -40,7 +41,7 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
         buttons,
         returnAction,
         submenu,
-        selectedBtn: propsSelectedBtn = none,
+        selectedBtn: propsSelectedBtn = O.none,
         styles: stylesOverride
     },
     ref
@@ -52,7 +53,7 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
     }))
 
     const [overlayClassName, setOverlay] = useState<MenuOverlay>(overlay)
-    const [selectedBtn, setSelectedBtn] = useState<Option<MenuBtn>>(
+    const [selectedBtn, setSelectedBtn] = useState<O.Option<MenuBtn>>(
         propsSelectedBtn
     )
 
@@ -82,18 +83,24 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
     }
 
     function ifSelectedBtn<T>(f: (btn: MenuBtn) => T): T | null {
-        return selectedBtn.fold(null, f)
+        return pipe(
+            selectedBtn,
+            O.fold(() => null, f)
+        )
     }
 
     function menuBtn(
-        { btn, specialAction = none }: BtnWithAction,
+        { btn, specialAction = O.none }: BtnWithAction,
         key: number
     ): JSX.Element {
         return (
             <SelectableButton
                 key={key}
                 onClick={onClick}
-                selected={selectedBtn.exists(_ => _ === btn)}
+                selected={pipe(
+                    selectedBtn,
+                    O.exists(_ => _ === btn)
+                )}
                 styles={styles.btn}
             >
                 {menuBtnLabel(btn)}
@@ -101,18 +108,21 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
         )
 
         function onClick(e: React.MouseEvent) {
-            specialAction.foldL(
-                () => {
-                    setSelectedBtn(some(btn))
-                    setOverlay(MenuOverlay.GameMenu)
-                },
-                action => action(e)
+            pipe(
+                specialAction,
+                O.fold(
+                    () => {
+                        setSelectedBtn(O.some(btn))
+                        setOverlay(MenuOverlay.GameMenu)
+                    },
+                    action => action(e)
+                )
             )
         }
     }
 
     function unselectSubmenu() {
-        setSelectedBtn(none)
+        setSelectedBtn(O.none)
         setOverlay(overlay)
     }
 }

@@ -1,6 +1,8 @@
 import { Do } from 'fp-ts-contrib/lib/Do'
-import { init, last } from 'fp-ts/lib/Array'
-import { fromEither, Option, option } from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/lib/Array'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 import { GameHistoryState } from '../history/gameHistoryReducer'
 import { GameState } from '../history/gameStateReducer'
@@ -13,19 +15,25 @@ import { SavesAction } from '../saves/savesReducer'
 export const loadAction = (
     firstNode: AstNode,
     save: QuickSave
-): Option<HistoryAction<GameState>> =>
-    Do(option)
+): O.Option<HistoryAction<GameState>> =>
+    Do(O.option)
         .bindL('newPast', () =>
-            fromEither(
-                statesFromHistory(firstNode, save.history).mapLeft(_ =>
-                    console.error('Error while loading save:', _)
+            O.fromEither(
+                pipe(
+                    statesFromHistory(firstNode, save.history),
+                    E.mapLeft(_ =>
+                        console.error('Error while loading save:', _)
+                    )
                 )
             )
         )
-        .bindL('present', ({ newPast }) => last(newPast))
+        .bindL('present', ({ newPast }) => A.last(newPast))
         .return(({ newPast, present }) => ({
             type: 'RESET',
-            past: init(newPast).getOrElse([]),
+            past: pipe(
+                A.init(newPast),
+                O.getOrElse(() => [])
+            ),
             present
         }))
 
@@ -43,5 +51,9 @@ export const historyFromState = ({
     present
 }: GameHistoryState): AstNode[] => {
     const res = past.reduce<AstNode[]>((acc, [, _]) => [...acc, ..._], [])
-    return present.map(([, _]) => [...res, ..._]).getOrElse(res)
+    return pipe(
+        present,
+        O.map(([, _]) => [...res, ..._]),
+        O.getOrElse(() => res)
+    )
 }

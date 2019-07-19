@@ -2,8 +2,10 @@
 import { css, CSSObject, jsx } from '@emotion/core'
 import { TextAlignProperty } from 'csstype'
 import { Do } from 'fp-ts-contrib/lib/Do'
-import { last } from 'fp-ts/lib/Array'
-import { none, Option, option, some } from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/lib/Array'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import { FunctionComponent } from 'react'
 
 import { firstNode, style, transl } from '../../context'
@@ -14,7 +16,7 @@ import { getBgOrElse, ifNoSlotBg, mediaQuery } from '../../utils/styles'
 import Game from '../game/Game'
 
 interface Props {
-    save: Option<Save>
+    save: O.Option<Save>
     onClick: (e: React.MouseEvent) => void
     deleteSave: () => void
     disabledIfEmpty?: boolean
@@ -26,26 +28,29 @@ const SaveSlot: FunctionComponent<Props> = ({
     deleteSave,
     disabledIfEmpty = false
 }) => {
-    const rectAndLabel: Option<[JSX.Element, string]> = Do(option)
+    const rectAndLabel: O.Option<[JSX.Element, string]> = Do(O.option)
         .bind('save', save)
         .bindL('states', ({ save }) =>
-            statesFromHistory(firstNode, save.history).fold(_ => {
-                deleteSave()
-                return none
-            }, some)
+            pipe(
+                statesFromHistory(firstNode, save.history),
+                E.fold(() => {
+                    deleteSave()
+                    return O.none
+                }, O.some)
+            )
         )
-        .bindL('currentState', ({ states }) => last(states))
+        .bindL('currentState', ({ states }) => A.last(states))
         .return<[JSX.Element, string]>(
             ({ currentState: [gameProps], save: { date } }) => [
                 getGame(gameProps),
                 date
             ]
         )
-    const disabled = rectAndLabel.isNone() && disabledIfEmpty
-    const [gameRect, label] = rectAndLabel.getOrElse([
-        emptySlotL(),
-        transl.emptySlot
-    ])
+    const disabled = O.isNone(rectAndLabel) && disabledIfEmpty
+    const [gameRect, label] = pipe(
+        rectAndLabel,
+        O.getOrElse(() => [emptySlotL(), transl.emptySlot])
+    )
 
     return (
         <button css={styles.saveSlot} onClick={onClick} disabled={disabled}>

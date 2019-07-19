@@ -1,6 +1,7 @@
-import { findFirstMap, head, isEmpty } from 'fp-ts/lib/Array'
-import { Either, left, right } from 'fp-ts/lib/Either'
-import { none, some } from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/lib/Array'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 import AstNode from '../nodes/AstNode'
 import GameProps from './GameProps'
@@ -9,8 +10,8 @@ import { GameState } from './gameStateReducer'
 const statesFromHistory = (
     firstNode: AstNode,
     history: string[]
-): Either<string, GameState[]> => {
-    if (isEmpty(history)) return right([])
+): E.Either<string, GameState[]> => {
+    if (A.isEmpty(history)) return E.right([])
     return statesFromHistRec(
         [firstNode],
         history,
@@ -28,22 +29,25 @@ const statesFromHistRec = (
     currentProps: GameProps,
     currentBlock: AstNode[],
     previousWasStopping: boolean,
-    acc: Array<[GameProps, AstNode[]]>
-): Either<string, GameState[]> => {
-    const maybeId = head(history)
+    acc: [GameProps, AstNode[]][]
+): E.Either<string, GameState[]> => {
+    const maybeId = A.head(history)
 
-    if (maybeId.isNone()) {
-        return right(
+    if (O.isNone(maybeId)) {
+        return E.right(
             previousWasStopping ? acc : [...acc, [currentProps, currentBlock]]
         )
     }
     const id = maybeId.value
 
-    return findFirstMap((next: AstNode) =>
-        next.id === id ? some(addNode(next)) : none
-    )(nexts).getOrElse(left(`Could\'nt find node with id "${id}"`))
+    return pipe(
+        A.findFirstMap((next: AstNode) =>
+            next.id === id ? O.some(addNode(next)) : O.none
+        )(nexts),
+        O.getOrElse(() => E.left(`Could\'nt find node with id "${id}"`))
+    )
 
-    function addNode(currentNode: AstNode): Either<string, GameState[]> {
+    function addNode(currentNode: AstNode): E.Either<string, GameState[]> {
         const [, ...newHistory] = history
         const newProps: GameProps = currentNode.reduce(currentProps)
         const newBlock: AstNode[] = [...currentBlock, currentNode]

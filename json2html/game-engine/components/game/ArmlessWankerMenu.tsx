@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import { Option, some } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
 import { style, transl } from '../../context'
@@ -25,7 +25,7 @@ const AWButton: FunctionComponent<BtnProps> = ({
 )
 
 export interface ArmlessWankerMenuProps {
-    showGameMenu: (btn?: Option<MenuBtn>) => void
+    showGameMenu: (btn?: O.Option<MenuBtn>) => void
     undo: () => void
     disableUndo: boolean
     skip: () => void
@@ -72,7 +72,7 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
     function showGameMenuBtn(btn: MenuBtn): JSX.Element {
         return (
             <AWButton
-                onClick={withStopPropagation(() => showGameMenu(some(btn)))}
+                onClick={withStopPropagation(() => showGameMenu(O.some(btn)))}
             >
                 {menuBtnLabel(btn)}
             </AWButton>

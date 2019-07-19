@@ -1,5 +1,6 @@
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
 import { identity } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import convertToJs from '../utils/convertToJs'
@@ -19,10 +20,13 @@ export default class IfBlock extends AstNode {
 
     condition = (): boolean => eval(this.rawCondition) === true
 
-    static decode = (ifBlock: unknown): Either<t.Errors, IfBlock> =>
-        IfBlockType.decode(ifBlock).map(
-            ({ arguments: [condition, idNexts] }) =>
-                new IfBlock(condition, idNexts)
+    static decode = (ifBlock: unknown): E.Either<t.Errors, IfBlock> =>
+        pipe(
+            IfBlockType.decode(ifBlock),
+            E.map(
+                ({ arguments: [condition, idNexts] }) =>
+                    new IfBlock(condition, idNexts)
+            )
         )
 }
 

@@ -1,16 +1,17 @@
 import { Do } from 'fp-ts-contrib/lib/Do'
-import { head, init, last, tail } from 'fp-ts/lib/Array'
-import { none, Option, option, some } from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import { Reducer } from 'react'
 
 export class HistoryState<S> {
     past: S[]
-    present: Option<S>
+    present: O.Option<S>
     future: S[]
 
     static empty = <S>(): HistoryState<S> => ({
         past: [],
-        present: none,
+        present: O.none,
         future: []
     })
 }
@@ -35,29 +36,33 @@ const historiable = <S, A extends Action>(
     const { past, present: maybePresent, future } = prevState
 
     if (action.type === 'UNDO') {
-        return Do(option)
-            .bind('present', maybePresent)
-            .bindL('newPast', () => init(past))
-            .bindL('previous', () => last(past))
-            .return(({ newPast, previous, present }) => ({
-                past: newPast,
-                present: some(previous),
-                future: [present, ...future]
-            }))
-            .getOrElse(prevState)
+        return pipe(
+            Do(O.option)
+                .bind('present', maybePresent)
+                .bindL('newPast', () => A.init(past))
+                .bindL('previous', () => A.last(past))
+                .return(({ newPast, previous, present }) => ({
+                    past: newPast,
+                    present: O.some(previous),
+                    future: [present, ...future]
+                })),
+            O.getOrElse(() => prevState)
+        )
     }
 
     if (action.type === 'REDO') {
-        return Do(option)
-            .bind('present', maybePresent)
-            .bindL('next', () => head(future))
-            .bindL('newFuture', () => tail(future))
-            .return(({ present, next, newFuture }) => ({
-                past: [...past, present],
-                present: some(next),
-                future: newFuture
-            }))
-            .getOrElse(prevState)
+        return pipe(
+            Do(O.option)
+                .bind('present', maybePresent)
+                .bindL('next', () => A.head(future))
+                .bindL('newFuture', () => A.tail(future))
+                .return(({ present, next, newFuture }) => ({
+                    past: [...past, present],
+                    present: O.some(next),
+                    future: newFuture
+                })),
+            O.getOrElse(() => prevState)
+        )
     }
 
     if (action.type === 'EMPTY') return HistoryState.empty()
@@ -65,26 +70,29 @@ const historiable = <S, A extends Action>(
     if (action.type === 'RESET') {
         return {
             past: action.past,
-            present: some(action.present),
+            present: O.some(action.present),
             future: []
         }
     }
 
-    return maybePresent.foldL(
-        () => ({
-            past,
-            present: some(reducer(empty, action)),
-            future: []
-        }),
-        present => {
-            const newPresent = reducer(present, action)
-            if (present === newPresent) return prevState
-            return {
-                past: [...past, present],
-                present: some(newPresent),
+    return pipe(
+        maybePresent,
+        O.fold(
+            () => ({
+                past,
+                present: O.some(reducer(empty, action)),
                 future: []
+            }),
+            present => {
+                const newPresent = reducer(present, action)
+                if (present === newPresent) return prevState
+                return {
+                    past: [...past, present],
+                    present: O.some(newPresent),
+                    future: []
+                }
             }
-        }
+        )
     )
 }
 export default historiable

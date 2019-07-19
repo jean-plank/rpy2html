@@ -1,5 +1,4 @@
-import { none, some } from 'fp-ts/lib/Option'
-import { StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
 
 import Image from '../game-engine/medias/Image'
 import { AppData } from '../game-engine/nodes/AstNode'
@@ -11,24 +10,24 @@ describe('AstNode.followingBlock', () => {
 
     it('should return none for node without nexts', () => {
         const node = new Show('', [])
-        expect(node.followingBlock()).toEqual(none)
+        expect(node.followingBlock()).toEqual(O.none)
     })
 
     it('should return nodes until stopping node', () => {
         const node = new Show('toto', ['node1'])
         const node1 = new Show('toto', ['node2'])
-        const node2 = new Say(none, '', ['node3'])
+        const node2 = new Say(O.none, '', ['node3'])
         const node3 = new Show('toto', [])
 
         const data = ({
-            nodes: new StrMap({ node1, node2, node3 }),
-            images: new StrMap({ toto: new Image('toto', 'fileToto') })
+            nodes: { node1, node2, node3 },
+            images: { toto: new Image('toto', 'fileToto') }
         } as unknown) as AppData;
         [node, node1, node2, node3].map(_ =>
             _.init({ id: '', data, execThenExecNext })
         )
 
-        expect(node.followingBlock()).toEqual(some([node1, node2]))
+        expect(node.followingBlock()).toEqual(O.some([node1, node2]))
     })
 
     it('should return nodes until end', () => {
@@ -36,12 +35,12 @@ describe('AstNode.followingBlock', () => {
         const node1 = new Show('toto', [])
 
         const data = ({
-            nodes: new StrMap({ node1 }),
-            images: new StrMap({ toto: new Image('toto', 'fileToto') })
+            nodes: { node1 },
+            images: { toto: new Image('toto', 'fileToto') }
         } as unknown) as AppData;
         [node, node1].map(_ => _.init({ id: '', data, execThenExecNext }))
 
-        expect(node.followingBlock()).toEqual(some([node1]))
+        expect(node.followingBlock()).toEqual(O.some([node1]))
     })
 
     it('should throw when more than one next', () => {
@@ -50,8 +49,8 @@ describe('AstNode.followingBlock', () => {
         const node2 = new Show('toto', [])
 
         const data = ({
-            nodes: new StrMap({ node1, node2 }),
-            images: new StrMap({ toto: new Image('toto', 'fileToto') })
+            nodes: { node1, node2 },
+            images: { toto: new Image('toto', 'fileToto') }
         } as unknown) as AppData;
         [node, node1, node2].map(_ =>
             _.init({ id: '', data, execThenExecNext })

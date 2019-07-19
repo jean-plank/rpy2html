@@ -1,5 +1,6 @@
-import { updateAt } from 'fp-ts/lib/Array'
-import { none, Option, some } from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 import { Reducer } from 'react'
 
 import { lang } from '../context'
@@ -32,7 +33,7 @@ const savesReducer: Reducer<Saves, SavesAction> = (prevState, action) => {
     if (action.type === 'QUICK_SAVE') {
         const newState = {
             ...prevState,
-            quickSave: some(QuickSave.fromNodes(action.history))
+            quickSave: O.some(QuickSave.fromNodes(action.history))
         }
         Saves.store(newState)
         return newState
@@ -50,12 +51,12 @@ const savesReducer: Reducer<Saves, SavesAction> = (prevState, action) => {
         return updateSlot(
             prevState,
             action.slot,
-            some(Save.fromNodes(action.history, date))
+            O.some(Save.fromNodes(action.history, date))
         )
     }
 
     if (action.type === 'DELETE') {
-        return updateSlot(prevState, action.slot, none)
+        return updateSlot(prevState, action.slot, O.none)
     }
 
     return prevState
@@ -65,15 +66,17 @@ export default savesReducer
 const updateSlot = (
     prevState: Saves,
     slot: number,
-    newValue: Option<Save>
+    newValue: O.Option<Save>
 ): Saves =>
-    updateAt(slot, newValue)(prevState.slots)
-        .map(slots => {
+    pipe(
+        A.updateAt(slot, newValue)(prevState.slots),
+        O.map(slots => {
             const newState = {
                 ...prevState,
                 slots
             }
             Saves.store(newState)
             return newState
-        })
-        .getOrElse(prevState)
+        }),
+        O.getOrElse(() => prevState)
+    )

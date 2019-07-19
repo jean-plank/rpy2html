@@ -1,13 +1,13 @@
 /** @jsx jsx */
 import { css, Global, jsx } from '@emotion/core'
 import { Do } from 'fp-ts-contrib/lib/Do'
-import { findFirstMap, isEmpty, last } from 'fp-ts/lib/Array'
-import { fromNullable, none, Option, option, some } from 'fp-ts/lib/Option'
-import { lookup, toArray } from 'fp-ts/lib/StrMap'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import {
     createRef,
     FunctionComponent,
-    RefObject,
     useEffect,
     useMemo,
     useReducer,
@@ -15,18 +15,8 @@ import {
     useState
 } from 'react'
 
-import {
-    chars,
-    firstNode,
-    fonts,
-    gameName,
-    images,
-    nodes,
-    sounds,
-    style,
-    transl,
-    videos
-} from '../context'
+import * as context from '../context'
+import { transl } from '../context'
 import Font from '../Font'
 import gameHistoryReducer, {
     emptyGameHistoryState
@@ -63,7 +53,7 @@ export type GameAble = KeyUpAble & {
 type View =
     | 'MAIN_MENU'
     | 'GAME'
-    | { type: 'GAME_MENU'; selectedBtn: Option<MenuBtn> }
+    | { type: 'GAME_MENU'; selectedBtn: O.Option<MenuBtn> }
 
 const App: FunctionComponent = () => {
     const confirmAudioShown = useRef(false)
@@ -74,15 +64,16 @@ const App: FunctionComponent = () => {
     const notifiable = createRef<Notifiable>()
     const confirmKeyUpAble = createRef<KeyUpAble>()
 
-    const topKeyUpAble = useRef<Option<KeyUpAble>>(none)
+    const topKeyUpAble = useRef<O.Option<KeyUpAble>>(O.none)
     useEffect(() => {
-        topKeyUpAble.current = findFirstMap((_: RefObject<KeyUpAble>) =>
-            fromNullable(_.current)
-        )([confirmKeyUpAble, gameAble, viewKeyUpAble])
+        topKeyUpAble.current = pipe(
+            [confirmKeyUpAble, gameAble, viewKeyUpAble],
+            A.findFirstMap(_ => O.fromNullable(_.current))
+        )
     })
 
-    const [view, setView] = useState<Option<View>>(none)
-    const [confirm, setConfirm] = useState<Option<ConfirmProps>>(none)
+    const [view, setView] = useState<O.Option<View>>(O.none)
+    const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
     const [saves, dispatchSavesAction] = useReducer(
         savesReducer,
         Saves.fromStorage()
@@ -92,7 +83,7 @@ const App: FunctionComponent = () => {
         emptyGameHistoryState
     )
 
-    const data = { nodes, chars, sounds, videos, images }
+    const data = context
 
     useEffect(initAll, [])
 
@@ -100,17 +91,30 @@ const App: FunctionComponent = () => {
         <div css={styles.container}>
             <Global styles={globalStyles} />
             <div css={styles.view}>
-                {view.chain(getView).toNullable()}
+                {pipe(
+                    view,
+                    O.chain(getView),
+                    O.toNullable
+                )}
                 {<Notifications ref={notifiable} />}
-                {confirm.map(getConfirm).toNullable()}
+                {pipe(
+                    confirm,
+                    O.map(getConfirm),
+                    O.toNullable
+                )}
             </div>
         </div>
     )
 
-    function getView(view: View): Option<JSX.Element> {
-        if (view === 'MAIN_MENU') return some(mainMenuL())
-        if (view === 'GAME') return gameState.present.map(getGame)
-        return some(getGameMenu(view.selectedBtn))
+    function getView(view: View): O.Option<JSX.Element> {
+        if (view === 'MAIN_MENU') return O.some(mainMenuL())
+        if (view === 'GAME') {
+            return pipe(
+                gameState.present,
+                O.map(getGame)
+            )
+        }
+        return O.some(getGameMenu(view.selectedBtn))
     }
 
     function mainMenuL(): JSX.Element {
@@ -136,11 +140,11 @@ const App: FunctionComponent = () => {
                 armlessWankerMenuProps={{
                     showGameMenu,
                     undo,
-                    disableUndo: isEmpty(gameState.past),
+                    disableUndo: A.isEmpty(gameState.past),
                     skip,
                     quickSave,
                     quickLoad,
-                    disableQuickLoad: saves.quickSave.isNone(),
+                    disableQuickLoad: O.isNone(saves.quickSave),
                     soundService,
                     currentNodeL,
                     showMainMenu,
@@ -152,7 +156,7 @@ const App: FunctionComponent = () => {
         )
     }
 
-    function getGameMenu(selectedBtn: Option<MenuBtn>): JSX.Element {
+    function getGameMenu(selectedBtn: O.Option<MenuBtn>): JSX.Element {
         return (
             <GameMenu
                 ref={viewKeyUpAble}
@@ -182,30 +186,42 @@ const App: FunctionComponent = () => {
             else enterFullscreen()
         }
 
-        topKeyUpAble.current.map(_ => _.onKeyUp(e))
+        pipe(
+            topKeyUpAble.current,
+            O.map(_ => _.onKeyUp(e))
+        )
     }
 
     function initAll(): () => void {
-        nodes.mapWithKey((id, node) =>
-            node.init({ id, data, execThenExecNext })
+        pipe(
+            context.nodes,
+            R.mapWithIndex((id, node) =>
+                node.init({ id, data, execThenExecNext })
+            )
         )
-        firstNode.loadBlock()
+        context.firstNode.loadBlock()
         showMainMenu()
         return initDom()
     }
 
     function initDom(): () => void {
-        document.title = gameName
-        lookup('game_icon', images).map(
-            icon =>
-                (fromNullable(document.querySelector(
-                    'link[rel*="icon"]'
-                ) as HTMLLinkElement).getOrElseL(() => {
-                    const link = document.createElement('link')
-                    link.rel = 'shortcut icon'
-                    document.head.appendChild(link)
-                    return link
-                }).href = icon.file)
+        document.title = context.gameName
+        pipe(
+            R.lookup('game_icon', context.images),
+            O.map(
+                icon =>
+                    (pipe(
+                        O.fromNullable(document.querySelector(
+                            'link[rel*="icon"]'
+                        ) as HTMLLinkElement),
+                        O.getOrElse(() => {
+                            const link = document.createElement('link')
+                            link.rel = 'shortcut icon'
+                            document.head.appendChild(link)
+                            return link
+                        })
+                    ).href = icon.file)
+            )
         )
 
         document.addEventListener('keyup', onKeyUp)
@@ -214,26 +230,32 @@ const App: FunctionComponent = () => {
 
     function showMainMenu() {
         soundService.playMainMenuMusic()
-        setView(some('MAIN_MENU'))
+        setView(O.some('MAIN_MENU'))
     }
 
     function startGame() {
         dispatchGameHistoryAction({ type: 'EMPTY' })
-        addBlock([firstNode, ...firstNode.followingBlock().getOrElse([])])
+        addBlock([
+            context.firstNode,
+            ...pipe(
+                context.firstNode.followingBlock(),
+                O.getOrElse(() => [])
+            )
+        ])
         showGame()
     }
 
     function showGame() {
-        setView(some('GAME'))
+        setView(O.some('GAME'))
     }
 
     function onVideoEnded(execNextIfNotMenu: () => void) {
-        isEmpty(gameState.future) ? execNextIfNotMenu() : redo()
+        A.isEmpty(gameState.future) ? execNextIfNotMenu() : redo()
     }
 
-    function showGameMenu(selectedBtn: Option<MenuBtn> = none) {
+    function showGameMenu(selectedBtn: O.Option<MenuBtn> = O.none) {
         soundService.pauseChannels()
-        setView(some({ type: 'GAME_MENU', selectedBtn }))
+        setView(O.some({ type: 'GAME_MENU', selectedBtn }))
     }
 
     function hideGameMenu() {
@@ -243,33 +265,55 @@ const App: FunctionComponent = () => {
 
     function execThenExecNext(node: AstNode): () => void {
         return () =>
-            fromNullable(gameAble.current).map(_ => _.execThenExecNext(node))
+            pipe(
+                O.fromNullable(gameAble.current),
+                O.map(_ => _.execThenExecNext(node))
+            )
     }
 
     function skip() {
-        currentNodeL().map(currentNode => {
-            if (!(currentNode instanceof Menu)) {
-                skipFromNode(currentNode)
-                    .map<void>(_ => _.map(addBlock))
-                    .getOrElseL(showMainMenu)
-            }
-        })
+        pipe(
+            currentNodeL(),
+            O.map(currentNode => {
+                if (!(currentNode instanceof Menu)) {
+                    pipe(
+                        skipFromNode(currentNode),
+                        O.map<AstNode[][], void>(_ => _.map(addBlock)),
+                        O.getOrElse(showMainMenu)
+                    )
+                }
+            })
+        )
 
-        function skipFromNode(node: AstNode): Option<AstNode[][]> {
-            return node
-                .followingBlock()
-                .chain(block => last(block).map(skipRec([block])))
+        function skipFromNode(node: AstNode): O.Option<AstNode[][]> {
+            return pipe(
+                node.followingBlock(),
+                O.chain(block =>
+                    pipe(
+                        A.last(block),
+                        O.map(skipRec([block]))
+                    )
+                )
+            )
         }
 
         function skipRec(acc: AstNode[][]): (node: AstNode) => AstNode[][] {
             return node => {
                 if (node instanceof Menu) return acc
-                return node.followingBlock().fold<AstNode[][]>(acc, block => {
-                    const newAcc = [...acc, block]
-                    return last(block)
-                        .map(skipRec(newAcc))
-                        .getOrElse(newAcc)
-                })
+                return pipe(
+                    node.followingBlock(),
+                    O.fold(
+                        () => acc,
+                        block => {
+                            const newAcc = [...acc, block]
+                            return pipe(
+                                A.last(block),
+                                O.map(skipRec(newAcc)),
+                                O.getOrElse(() => newAcc)
+                            )
+                        }
+                    )
+                )
             }
         }
     }
@@ -278,10 +322,10 @@ const App: FunctionComponent = () => {
         dispatchGameHistoryAction({ type: 'ADD_BLOCK', block })
     }
 
-    function currentNodeL(): Option<AstNode> {
-        return Do(option)
+    function currentNodeL(): O.Option<AstNode> {
+        return Do(O.option)
             .bind('present', gameState.present)
-            .bindL('currentNode', ({ present: [, block] }) => last(block))
+            .bindL('currentNode', ({ present: [, block] }) => A.last(block))
             .return(({ currentNode }) => currentNode)
     }
 
@@ -305,13 +349,15 @@ const App: FunctionComponent = () => {
     }
 
     function loadSave(save: QuickSave) {
-        loadAction(firstNode, save)
-            .map(_ => {
+        pipe(
+            loadAction(context.firstNode, save),
+            O.map(_ => {
                 soundService.stopChannels()
                 dispatchGameHistoryAction(_)
                 showGame()
-            })
-            .getOrElseL(() => notify("Couldn't restore save"))
+            }),
+            O.getOrElse(() => notify("Couldn't restore save"))
+        )
     }
 
     function save(slot: number) {
@@ -319,19 +365,22 @@ const App: FunctionComponent = () => {
     }
 
     function quickLoad() {
-        saves.quickSave.map(loadSave)
+        pipe(
+            saves.quickSave,
+            O.map(loadSave)
+        )
     }
 
     function quickSave() {
         dispatchSavesAction(saveAction(gameState))
-        notify(transl.armless.saved)
+        notify(context.transl.armless.saved)
     }
 
     function confirmAudio(okAction: () => void) {
         if (!confirmAudioShown.current) {
             confirmAudioShown.current = true
             setConfirm(
-                some({
+                O.some({
                     hideConfirm,
                     message: transl.confirm.audio,
                     buttons: [
@@ -349,7 +398,7 @@ const App: FunctionComponent = () => {
         actionNo?: () => void
     ) {
         setConfirm(
-            some({
+            O.some({
                 hideConfirm,
                 message,
                 buttons: [
@@ -362,11 +411,14 @@ const App: FunctionComponent = () => {
     }
 
     function hideConfirm() {
-        setConfirm(none)
+        setConfirm(O.none)
     }
 
     function notify(message: string) {
-        fromNullable(notifiable.current).map(_ => _.notify(message))
+        pipe(
+            O.fromNullable(notifiable.current),
+            O.map(_ => _.notify(message))
+        )
     }
 }
 export default App
@@ -406,7 +458,7 @@ const globalStyles = css(
 )
 
 function getFonts() {
-    return toArray(fonts).map(([name, font]) =>
+    return R.toArray(context.fonts).map(([name, font]) =>
         name === 'dejavusans_bold_ttf'
             ? Font.face('dejavusans_ttf', font)
             : Font.face(name, font)
@@ -419,7 +471,7 @@ const styles = {
         justifyContent: 'center',
         width: '100vw',
         height: '100vh',
-        [mediaQuery(style)]: {
+        [mediaQuery(context.style)]: {
             flexDirection: 'column'
         },
 
@@ -432,10 +484,12 @@ const styles = {
         height: '100vh',
         overflow: 'hidden',
         position: 'relative',
-        width: `${(100 * style.game_width) / style.game_height}vh`,
-        [mediaQuery(style)]: {
+        width: `${(100 * context.style.game_width) /
+            context.style.game_height}vh`,
+        [mediaQuery(context.style)]: {
             width: '100vw',
-            height: `${(100 * style.game_height) / style.game_width}vw`
+            height: `${(100 * context.style.game_height) /
+                context.style.game_width}vw`
         }
     })
 }

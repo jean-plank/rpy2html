@@ -1,5 +1,6 @@
-import { Either } from 'fp-ts/lib/Either'
-import { lookup } from 'fp-ts/lib/StrMap'
+import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -9,7 +10,7 @@ import NodeWithMedia from './NodeWithMedia'
 export default class PlayVideo extends NodeWithMedia<Video> {
     constructor(vidName: string, idNexts: string[]) {
         super(
-            (data, vidName) => lookup(vidName, data.videos),
+            (data, vidName) => R.lookup(vidName, data.videos),
             vidName,
             idNexts,
             true
@@ -21,10 +22,13 @@ export default class PlayVideo extends NodeWithMedia<Video> {
         video: this.media
     })
 
-    static decode = (playVideo: unknown): Either<t.Errors, PlayVideo> =>
-        PlayVideoType.decode(playVideo).map(
-            ({ arguments: [vidName, idNexts] }) =>
-                new PlayVideo(vidName, idNexts)
+    static decode = (playVideo: unknown): E.Either<t.Errors, PlayVideo> =>
+        pipe(
+            PlayVideoType.decode(playVideo),
+            E.map(
+                ({ arguments: [vidName, idNexts] }) =>
+                    new PlayVideo(vidName, idNexts)
+            )
         )
 }
 

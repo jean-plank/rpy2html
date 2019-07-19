@@ -1,4 +1,5 @@
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -16,9 +17,10 @@ export default class Pause extends AstNode {
         textboxHide: !gameProps.showWindow
     })
 
-    static decode = (pause: unknown): Either<t.Errors, Pause> =>
-        PauseType.decode(pause).map(
-            ({ arguments: [idNexts] }) => new Pause(idNexts)
+    static decode = (pause: unknown): E.Either<t.Errors, Pause> =>
+        pipe(
+            PauseType.decode(pause),
+            E.map(({ arguments: [idNexts] }) => new Pause(idNexts))
         )
 }
 

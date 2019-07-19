@@ -1,10 +1,12 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import { fromNullable } from 'fp-ts/lib/Option'
-import { insert, StrMap, toArray } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import { FunctionComponent, useState } from 'react'
 
 import { storageKey, storagePrefix, style, transl } from '../../../context'
+import Obj from '../../../Obj'
 import MemoryGame from './MemoryGame'
 
 interface Props {
@@ -17,9 +19,9 @@ interface Props {
 }
 
 const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
-    const [games, setGames] = useState<StrMap<number>>(allJPGamesStorages)
+    const [games, setGames] = useState<Obj<number>>(allJPGamesStorages)
 
-    const gameElts = toArray(games).map(([key, bytes], i) => (
+    const gameElts = R.toArray(games).map(([key, bytes], i) => (
         <MemoryGame
             key={i}
             storageKey={key}
@@ -48,7 +50,10 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
             <div css={styles.footer}>
                 <MemoryGame
                     storageKey={transl.memory.total}
-                    bytes={games.reduce(0, (a, b) => a + b)}
+                    bytes={pipe(
+                        games,
+                        R.reduce(0, (a, b) => a + b)
+                    )}
                     deleteStorage={deleteAll}
                     deleteAll={true}
                 />
@@ -56,21 +61,22 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
         )
     }
 
-    function allJPGamesStorages(): StrMap<number> {
+    function allJPGamesStorages(): Obj<number> {
         return Object.keys(localStorage)
             .filter(key => key.startsWith(storagePrefix))
-            .reduce(
+            .reduce<Obj<number>>(
                 (acc, key) =>
-                    fromNullable(localStorage.getItem(key))
-                        .map(_ =>
-                            insert(
+                    pipe(
+                        O.fromNullable(localStorage.getItem(key)),
+                        O.map(_ =>
+                            R.insertAt(
                                 key.replace(storagePrefix, ''),
-                                byteCount(_),
-                                acc
-                            )
-                        )
-                        .getOrElse(acc),
-                new StrMap<number>({})
+                                byteCount(_)
+                            )(acc)
+                        ),
+                        O.getOrElse(() => acc)
+                    ),
+                {}
             )
     }
 
@@ -89,7 +95,10 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
 
     function deleteAll() {
         confirmYesNo(transl.confirm.deleteAll, () =>
-            games.mapWithKey(_ => deleteStorage(_)())
+            pipe(
+                games,
+                R.mapWithIndex(_ => deleteStorage(_)())
+            )
         )
     }
 }

@@ -1,5 +1,7 @@
-import { Either } from 'fp-ts/lib/Either'
-import { insert, lookup } from 'fp-ts/lib/StrMap'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
@@ -9,7 +11,7 @@ import NodeWithMedia from './NodeWithMedia'
 export default class Play extends NodeWithMedia<Sound> {
     constructor(private chanName: string, sndName: string, idNexts: string[]) {
         super(
-            (data, sndName) => lookup(sndName, data.sounds),
+            (data, sndName) => R.lookup(sndName, data.sounds),
             sndName,
             idNexts
         )
@@ -19,21 +21,29 @@ export default class Play extends NodeWithMedia<Sound> {
 
     reduce = (gameProps: GameProps): GameProps =>
         this.chanName === 'audio'
-            ? this.media
-                  .map(audio => ({
+            ? pipe(
+                  this.media,
+                  O.map(audio => ({
                       ...gameProps,
                       audios: [...gameProps.audios, audio]
-                  }))
-                  .getOrElse(gameProps)
+                  })),
+                  O.getOrElse(() => gameProps)
+              )
             : {
                   ...gameProps,
-                  sounds: insert(this.chanName, this.media, gameProps.sounds)
+                  sounds: {
+                      ...gameProps.sounds,
+                      [this.chanName]: this.media
+                  }
               }
 
-    static decode = (play: unknown): Either<t.Errors, Play> =>
-        PlayType.decode(play).map(
-            ({ arguments: [chanName, sndName, idNexts] }) =>
-                new Play(chanName, sndName, idNexts)
+    static decode = (play: unknown): E.Either<t.Errors, Play> =>
+        pipe(
+            PlayType.decode(play),
+            E.map(
+                ({ arguments: [chanName, sndName, idNexts] }) =>
+                    new Play(chanName, sndName, idNexts)
+            )
         )
 }
 

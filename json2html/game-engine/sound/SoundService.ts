@@ -1,49 +1,82 @@
-import { none, Option, some } from 'fp-ts/lib/Option'
-import { insert, lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 
 import { sounds } from '../context'
 import Sound from '../medias/Sound'
+import Obj from '../Obj'
 import Channel from './Channel'
 import Volumes from './Volumes'
 
 export default class SoundService {
     volumes: Volumes = Volumes.fromStorage()
 
-    private channels: StrMap<Channel>
-    private mainMenuMusic: Option<Sound>
+    private channels: Obj<Channel>
+    private mainMenuMusic: O.Option<Sound>
 
     constructor(private confirmAudio: (okAction: () => void) => void) {
-        this.channels = new StrMap({
+        this.channels = {
             music: new Channel(confirmAudio, this.volumes.music, true)
-        })
-        this.mainMenuMusic = lookup('main_menu_music', sounds)
+        }
+        this.mainMenuMusic = R.lookup('main_menu_music', sounds)
     }
 
     playMainMenuMusic = () => {
-        this.channels.map(_ => _.stop())
-        this.mainMenuMusic.map(mainMenuMusic =>
-            lookup('music', this.channels).map(_ => _.play(mainMenuMusic))
+        pipe(
+            this.channels,
+            R.map(_ => _.stop())
+        )
+        pipe(
+            this.mainMenuMusic,
+            O.map(mainMenuMusic =>
+                pipe(
+                    R.lookup('music', this.channels),
+                    O.map(_ => _.play(mainMenuMusic))
+                )
+            )
         )
     }
 
-    stopChannels = () => this.channels.map(_ => _.stop())
+    stopChannels = () =>
+        pipe(
+            this.channels,
+            R.map(_ => _.stop())
+        )
 
-    pauseChannels = () => this.channels.map(_ => _.pause())
+    pauseChannels = () =>
+        pipe(
+            this.channels,
+            R.map(_ => _.pause())
+        )
 
-    resumeChannels = () => this.channels.map(_ => _.resume())
+    resumeChannels = () =>
+        pipe(
+            this.channels,
+            R.map(_ => _.resume())
+        )
 
-    applySounds = (sounds: StrMap<Option<Sound>>) =>
-        sounds.mapWithKey((chanName, sound) =>
-            lookup(chanName, this.channels)
-                .orElse(() =>
-                    sound.isSome() ? some(this.newChannel(chanName)) : none
-                )
-                .map(channel =>
-                    sound.foldL(
-                        channel.stop,
-                        this.playIfNotMusicAndAlready(chanName, channel)
+    applySounds = (sounds: Obj<O.Option<Sound>>) =>
+        pipe(
+            sounds,
+            R.mapWithIndex((chanName, sound) =>
+                pipe(
+                    R.lookup(chanName, this.channels),
+                    O.alt(() =>
+                        O.isSome(sound)
+                            ? O.some(this.newChannel(chanName))
+                            : O.none
+                    ),
+                    O.map(channel =>
+                        pipe(
+                            sound,
+                            O.fold(
+                                channel.stop,
+                                this.playIfNotMusicAndAlready(chanName, channel)
+                            )
+                        )
                     )
                 )
+            )
         )
 
     private newChannel = (chanName: string): Channel => {
@@ -51,7 +84,10 @@ export default class SoundService {
             this.confirmAudio,
             chanName === 'voice' ? this.volumes.voice : this.volumes.sound
         )
-        this.channels = insert(chanName, channel, this.channels)
+        this.channels = {
+            ...this.channels,
+            [chanName]: channel
+        }
         return channel
     }
 
@@ -75,10 +111,18 @@ export default class SoundService {
     }
 
     private setSoundVolume = (volume: number) =>
-        this.channels.mapWithKey((name, chan) => {
-            if (name !== 'music' && name !== 'voice') chan.setVolume(volume)
-        })
+        pipe(
+            this.channels,
+            R.mapWithIndex((name, chan) => {
+                if (name !== 'music' && name !== 'voice') {
+                    chan.setVolume(volume)
+                }
+            })
+        )
 
     private setChannelVolume = (chanName: keyof Volumes, volume: number) =>
-        lookup(chanName, this.channels).map(_ => _.setVolume(volume))
+        pipe(
+            R.lookup(chanName, this.channels),
+            O.map(_ => _.setVolume(volume))
+        )
 }

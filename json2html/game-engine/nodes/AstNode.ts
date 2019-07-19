@@ -1,12 +1,14 @@
-import { filterMap, isEmpty } from 'fp-ts/lib/Array'
-import { none, Option, some } from 'fp-ts/lib/Option'
-import { lookup, StrMap } from 'fp-ts/lib/StrMap'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 
 import Char from '../Char'
 import GameProps from '../history/GameProps'
 import Image from '../medias/Image'
 import Sound from '../medias/Sound'
 import Video from '../medias/Video'
+import Obj from '../Obj'
 
 export interface InitArgs {
     id: string
@@ -15,17 +17,17 @@ export interface InitArgs {
 }
 
 export interface AppData {
-    nodes: StrMap<AstNode>
-    chars: StrMap<Char>
-    sounds: StrMap<Sound>
-    videos: StrMap<Video>
-    images: StrMap<Image>
+    nodes: Obj<AstNode>
+    chars: Obj<Char>
+    sounds: Obj<Sound>
+    videos: Obj<Video>
+    images: Obj<Image>
 }
 
 export default abstract class AstNode {
     id: string
 
-    protected _nexts: Option<AstNode[]> = none
+    protected _nexts: O.Option<AstNode[]> = O.none
     protected execThenExecNext: (node: AstNode) => () => void = () => () => {}
 
     // _nexts will be set in init when all nodes are created
@@ -37,8 +39,8 @@ export default abstract class AstNode {
     abstract toString(): string
 
     init({ id, data, execThenExecNext }: InitArgs) {
-        this._nexts = some(
-            filterMap((_: string) => lookup(_, data.nodes))(this.idNexts)
+        this._nexts = O.some(
+            A.filterMap((_: string) => R.lookup(_, data.nodes))(this.idNexts)
         )
         this.execThenExecNext = execThenExecNext
         this.id = id
@@ -47,7 +49,10 @@ export default abstract class AstNode {
     abstract reduce(gameProps: GameProps): GameProps
 
     nexts(): AstNode[] {
-        return this._nexts.getOrElse([])
+        return pipe(
+            this._nexts,
+            O.getOrElse(() => [])
+        )
     }
 
     protected load() {}
@@ -61,9 +66,9 @@ export default abstract class AstNode {
         if (!this.stopExecution) this.nexts().forEach(_ => _.loadBlock())
     }
 
-    followingBlock(): Option<AstNode[]> {
-        if (isEmpty(this.nexts())) return none
-        return some(this.followingBlockRec([]))
+    followingBlock(): O.Option<AstNode[]> {
+        if (A.isEmpty(this.nexts())) return O.none
+        return O.some(this.followingBlockRec([]))
     }
 
     private followingBlockRec(acc: AstNode[]): AstNode[] {

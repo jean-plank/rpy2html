@@ -1,13 +1,14 @@
-import { none, Option } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 
 import Media from '../medias/Media'
 import AstNode, { AppData, InitArgs } from './AstNode'
 
 export default abstract class NodeWithMedia<T extends Media> extends AstNode {
-    protected media: Option<T> = none
+    protected media: O.Option<T> = O.none
 
     constructor(
-        private fromData: (data: AppData, mediaName: string) => Option<T>,
+        private fromData: (data: AppData, mediaName: string) => O.Option<T>,
         public mediaName: string,
         idNexts: string[],
         stopExecution = false
@@ -22,13 +23,16 @@ export default abstract class NodeWithMedia<T extends Media> extends AstNode {
     protected load() {
         super.load()
         if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55')
-        this.media.map(_ => _.load())
+        pipe(
+            this.media,
+            O.map(_ => _.load())
+        )
     }
 
     init({ id, data, execThenExecNext }: InitArgs) {
         super.init({ id, data, execThenExecNext })
         this.media = this.fromData(data, this.mediaName)
-        if (this.media.isNone()) {
+        if (O.isNone(this.media)) {
             console.warn(
                 `${this.constructor.name}: invalid name: ${this.mediaName}`
             )

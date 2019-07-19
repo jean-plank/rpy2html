@@ -1,34 +1,36 @@
-import { fromNullable, none, Option, tryCatch } from 'fp-ts/lib/Option'
-import { StrMap } from 'fp-ts/lib/StrMap'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 
 import Char from '../Char'
 import Image from '../medias/Image'
 import Sound from '../medias/Sound'
 import Video from '../medias/Video'
 import MenuItem from '../nodes/MenuItem'
+import Obj from '../Obj'
 
 export default class GameProps {
-    sceneImg: Option<Image>
+    sceneImg: O.Option<Image>
     charImgs: Image[]
     showWindow: boolean
     textboxHide: boolean
-    textboxChar: Option<Char>
+    textboxChar: O.Option<Char>
     textboxText: string
     choices: MenuItem[]
-    video: Option<Video>
-    sounds: StrMap<Option<Sound>> // key chanName
+    video: O.Option<Video>
+    sounds: Obj<O.Option<Sound>> // key chanName
     audios: Sound[]
 
     static empty: GameProps = {
-        sceneImg: none,
+        sceneImg: O.none,
         charImgs: [],
         showWindow: true,
         textboxHide: false,
-        textboxChar: none,
+        textboxChar: O.none,
         textboxText: '',
         choices: [],
-        video: none,
-        sounds: new StrMap({}),
+        video: O.none,
+        sounds: {},
         audios: []
     }
 
@@ -36,9 +38,12 @@ export default class GameProps {
         ...props,
         textboxHide: false,
         choices: [],
-        video: none,
-        sounds: props.sounds.mapWithKey((chanName, sound) =>
-            chanName === 'music' ? sound : none
+        video: O.none,
+        sounds: pipe(
+            props.sounds,
+            R.mapWithIndex((chanName, sound) =>
+                chanName === 'music' ? sound : O.none
+            )
         ),
         audios: []
     })
@@ -49,13 +54,25 @@ export default class GameProps {
                 return { ...acc, [key]: val.map(_ => _.toString()) }
             }
             if (isOption(val)) {
-                return { ...acc, [key]: val.map(_ => _.toString()) }
+                return {
+                    ...acc,
+                    [key]: pipe(
+                        val,
+                        O.map(_ => _.toString())
+                    )
+                }
             }
             if (key === 'sounds') {
                 return {
                     ...acc,
-                    sounds: props.sounds.map(_ =>
-                        _.map(_ => _.toString()).toString()
+                    sounds: pipe(
+                        props.sounds,
+                        R.map(_ =>
+                            pipe(
+                                _,
+                                O.map(_ => _.toString())
+                            ).toString()
+                        )
                     )
                 }
             }
@@ -63,7 +80,13 @@ export default class GameProps {
         }, {})
 }
 
-export const isOption = (obj: any): obj is Option<any> =>
-    tryCatch(() => fromNullable(obj._tag)).exists(_ =>
-        _.exists(tag => tag === 'Some' || tag === 'None')
+export const isOption = (obj: any): obj is O.Option<any> =>
+    pipe(
+        O.tryCatch(() => O.fromNullable(obj._tag)),
+        O.exists(_ =>
+            pipe(
+                _,
+                O.exists(tag => tag === 'Some' || tag === 'None')
+            )
+        )
     )
