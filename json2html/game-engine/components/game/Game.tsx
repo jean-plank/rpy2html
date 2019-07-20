@@ -161,7 +161,7 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
             PageDown: ifArgsExists(({ redo }) => redo()),
             h: () => {},
             v: () => {},
-            s: ifArgsExists(({ quickSave }) => quickSave()),
+            s: ifArgsExists(({ savesHook: { quickSave } }) => quickSave()),
             l: ifArgsExists(({ quickLoad }) => quickLoad())
         }
         pipe(

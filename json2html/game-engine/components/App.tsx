@@ -15,27 +15,27 @@ import {
     useState
 } from 'react'
 
-import * as context from '../context'
 import { transl } from '../context'
+import * as context from '../context'
 import Font from '../Font'
 import gameHistoryReducer, {
     emptyGameHistoryState
 } from '../history/gameHistoryReducer'
 import GameProps from '../history/GameProps'
+import historyFromState from '../history/historyFromState'
+import loadAction from '../history/loadAction'
 import useAppKeyUpAbles from '../hooks/useAppKeyUpAbles'
 import useKeyUp from '../hooks/useKeyUp'
+import useSaves from '../hooks/useSaves'
 import AstNode, { AppData } from '../nodes/AstNode'
 import Menu from '../nodes/Menu'
 import QuickSave from '../saves/QuickSave'
-import Saves from '../saves/Saves'
-import savesReducer from '../saves/savesReducer'
 import SoundService from '../sound/SoundService'
 import {
     enterFullscreen,
     exitFullscreen,
     isFullscreen
 } from '../utils/fullscreen'
-import { historyFromState, loadAction, saveAction } from '../utils/saveLoad'
 import { mediaQuery } from '../utils/styles'
 import Confirm, { ConfirmProps } from './Confirm'
 import Game from './game/Game'
@@ -67,14 +67,13 @@ const App: FunctionComponent = () => {
 
     const [view, setView] = useState<O.Option<View>>(O.none)
     const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
-    const [saves, dispatchSavesAction] = useReducer(
-        savesReducer,
-        Saves.fromStorage()
-    )
+
     const [gameState, dispatchGameHistoryAction] = useReducer(
         gameHistoryReducer,
         emptyGameHistoryState
     )
+    const savesHook = useSaves(gameState, notify)
+    const { saves } = savesHook
 
     useEffect(() => initAll(context), [])
 
@@ -116,10 +115,8 @@ const App: FunctionComponent = () => {
                 ref={viewKeyUpAble}
                 soundService={soundService}
                 startGame={startGame}
-                saves={saves.slots}
-                emptySaves={emptySaves}
+                savesHook={savesHook}
                 loadSave={loadSave}
-                deleteSave={deleteSave}
                 confirmYesNo={confirmYesNo}
             />
         )
@@ -135,9 +132,8 @@ const App: FunctionComponent = () => {
                     undo,
                     disableUndo: A.isEmpty(gameState.past),
                     skip,
-                    quickSave,
+                    savesHook,
                     quickLoad,
-                    disableQuickLoad: O.isNone(saves.quickSave),
                     soundService,
                     currentNodeL,
                     showMainMenu,
@@ -155,12 +151,10 @@ const App: FunctionComponent = () => {
                 ref={viewKeyUpAble}
                 soundService={soundService}
                 history={historyFromState(gameState)}
-                saves={saves.slots}
+                savesHook={savesHook}
                 loadSave={loadSave}
-                deleteSave={deleteSave}
                 hideGameMenu={hideGameMenu}
                 showMainMenu={showMainMenu}
-                save={save}
                 confirmYesNo={confirmYesNo}
                 selectedBtn={selectedBtn}
             />
@@ -317,17 +311,6 @@ const App: FunctionComponent = () => {
         dispatchGameHistoryAction({ type: 'REDO' })
     }
 
-    function emptySaves() {
-        dispatchSavesAction('EMPTY')
-    }
-
-    function deleteSave(slot: number) {
-        console.warn(
-            `Save slot ${slot} was deleted because it couldn't be restored.`
-        )
-        dispatchSavesAction({ type: 'DELETE', slot })
-    }
-
     function loadSave(save: QuickSave) {
         pipe(
             loadAction(context.firstNode, save),
@@ -340,20 +323,11 @@ const App: FunctionComponent = () => {
         )
     }
 
-    function save(slot: number) {
-        dispatchSavesAction(saveAction(gameState, slot))
-    }
-
     function quickLoad() {
         pipe(
             saves.quickSave,
             O.map(loadSave)
         )
-    }
-
-    function quickSave() {
-        dispatchSavesAction(saveAction(gameState))
-        notify(context.transl.armless.saved)
     }
 
     function confirmAudio(okAction: () => void) {

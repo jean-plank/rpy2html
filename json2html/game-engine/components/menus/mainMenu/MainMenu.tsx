@@ -11,6 +11,7 @@ import {
     useImperativeHandle
 } from 'react'
 
+import { SavesHook } from '../../../hooks/useSaves'
 import Obj from '../../../Obj'
 import QuickSave from '../../../saves/QuickSave'
 import Save from '../../../saves/Save'
@@ -27,10 +28,8 @@ import Memory from './Memory'
 interface Props {
     soundService: SoundService
     startGame: () => void
-    saves: O.Option<Save>[]
-    emptySaves: () => void
+    savesHook: SavesHook
     loadSave: (save: QuickSave) => void
-    deleteSave: (slot: number) => void
     confirmYesNo: (
         message: string,
         actionYes: () => void,
@@ -42,10 +41,8 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     {
         soundService,
         startGame,
-        saves,
-        emptySaves,
+        savesHook: { saves, emptySaves, deleteSave },
         loadSave,
-        deleteSave,
         confirmYesNo
     },
     ref
@@ -81,7 +78,7 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
     function getLoad(): JSX.Element {
         return (
             <SaveSlots
-                saves={saves}
+                saves={saves.slots}
                 onClick={onClick}
                 deleteSave={deleteSave}
                 disabledIfEmpty={true}

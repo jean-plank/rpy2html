@@ -4,6 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
 import { style, transl } from '../../context'
+import { SavesHook } from '../../hooks/useSaves'
 import { mediaQuery } from '../../utils/styles'
 import withStopPropagation from '../../utils/withStopPropagation'
 import GuiButton from '../GuiButton'
@@ -29,9 +30,8 @@ export interface ArmlessWankerMenuProps {
     undo: () => void
     disableUndo: boolean
     skip: () => void
-    quickSave: () => void
+    savesHook: SavesHook
     quickLoad: () => void
-    disableQuickLoad: boolean
 }
 
 const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
@@ -39,9 +39,8 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
     undo,
     disableUndo,
     skip,
-    quickSave,
-    quickLoad,
-    disableQuickLoad
+    savesHook: { quickSave, noQuickSave },
+    quickLoad
 }) => {
     return (
         <div css={styles.armlessWankerMenu}>
@@ -61,7 +60,7 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
             </AWButton>
             <AWButton
                 onClick={withStopPropagation(quickLoad)}
-                disabled={disableQuickLoad}
+                disabled={noQuickSave}
             >
                 {transl.armless.qLoad}
             </AWButton>

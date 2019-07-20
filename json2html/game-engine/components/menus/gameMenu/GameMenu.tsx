@@ -12,6 +12,7 @@ import {
 } from 'react'
 
 import { transl } from '../../../context'
+import { SavesHook } from '../../../hooks/useSaves'
 import AstNode from '../../../nodes/AstNode'
 import Obj from '../../../Obj'
 import QuickSave from '../../../saves/QuickSave'
@@ -28,12 +29,10 @@ import History from './History'
 interface Props {
     soundService: SoundService
     history: AstNode[]
-    saves: O.Option<Save>[]
+    savesHook: SavesHook
     loadSave: (save: QuickSave) => void
-    deleteSave: (slot: number) => void
     hideGameMenu: () => void
     showMainMenu: () => void
-    save: (slot: number) => void
     confirmYesNo: (
         msg: string,
         actionYes: () => void,
@@ -46,12 +45,10 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     {
         soundService,
         history,
-        saves,
+        savesHook: { saves, deleteSave, save },
         loadSave,
-        deleteSave,
         hideGameMenu,
         showMainMenu,
-        save,
         confirmYesNo,
         selectedBtn = O.none
     },
@@ -91,7 +88,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     function getSave(): JSX.Element {
         return (
             <SaveSlots
-                saves={saves}
+                saves={saves.slots}
                 onClick={onClick}
                 deleteSave={deleteSave}
             />
@@ -111,7 +108,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     function getLoad(): JSX.Element {
         return (
             <SaveSlots
-                saves={saves}
+                saves={saves.slots}
                 onClick={onClick}
                 deleteSave={deleteSave}
                 disabledIfEmpty={true}
