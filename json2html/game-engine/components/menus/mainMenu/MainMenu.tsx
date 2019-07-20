@@ -11,9 +11,9 @@ import {
     useImperativeHandle
 } from 'react'
 
+import { HistoryHook } from '../../../hooks/useHistory'
 import { SavesHook } from '../../../hooks/useSaves'
 import Obj from '../../../Obj'
-import QuickSave from '../../../saves/QuickSave'
 import Save from '../../../saves/Save'
 import SoundService from '../../../sound/SoundService'
 import { getBgOrElse } from '../../../utils/styles'
@@ -29,7 +29,7 @@ interface Props {
     soundService: SoundService
     startGame: () => void
     savesHook: SavesHook
-    loadSave: (save: QuickSave) => void
+    historyHook: HistoryHook
     confirmYesNo: (
         message: string,
         actionYes: () => void,
@@ -42,7 +42,7 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
         soundService,
         startGame,
         savesHook: { saves, emptySaves, deleteSave },
-        loadSave,
+        historyHook: { loadSave },
         confirmYesNo
     },
     ref

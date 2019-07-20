@@ -29,7 +29,7 @@ const statesFromHistRec = (
     currentProps: GameProps,
     currentBlock: AstNode[],
     previousWasStopping: boolean,
-    acc: [GameProps, AstNode[]][]
+    acc: GameState[]
 ): E.Either<string, GameState[]> => {
     const maybeId = A.head(history)
 

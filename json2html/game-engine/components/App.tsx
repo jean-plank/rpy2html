@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { css, Global, jsx } from '@emotion/core'
-import { Do } from 'fp-ts-contrib/lib/Do'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
@@ -10,7 +9,6 @@ import {
     FunctionComponent,
     useEffect,
     useMemo,
-    useReducer,
     useRef,
     useState
 } from 'react'
@@ -18,18 +16,13 @@ import {
 import { transl } from '../context'
 import * as context from '../context'
 import Font from '../Font'
-import gameHistoryReducer, {
-    emptyGameHistoryState
-} from '../history/gameHistoryReducer'
-import GameProps from '../history/GameProps'
-import historyFromState from '../history/historyFromState'
-import loadAction from '../history/loadAction'
+import { GameState } from '../history/gameStateReducer'
 import useAppKeyUpAbles from '../hooks/useAppKeyUpAbles'
+import useHistory from '../hooks/useHistory'
 import useKeyUp from '../hooks/useKeyUp'
 import useSaves from '../hooks/useSaves'
 import AstNode, { AppData } from '../nodes/AstNode'
 import Menu from '../nodes/Menu'
-import QuickSave from '../saves/QuickSave'
 import SoundService from '../sound/SoundService'
 import {
     enterFullscreen,
@@ -68,11 +61,9 @@ const App: FunctionComponent = () => {
     const [view, setView] = useState<O.Option<View>>(O.none)
     const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
 
-    const [gameState, dispatchGameHistoryAction] = useReducer(
-        gameHistoryReducer,
-        emptyGameHistoryState
-    )
-    const savesHook = useSaves(gameState, notify)
+    const historyHook = useHistory(soundService, notify, showGame)
+
+    const savesHook = useSaves(historyHook.historyFromState, notify)
     const { saves } = savesHook
 
     useEffect(() => initAll(context), [])
@@ -102,7 +93,7 @@ const App: FunctionComponent = () => {
         if (view === 'MAIN_MENU') return O.some(mainMenuL())
         if (view === 'GAME') {
             return pipe(
-                gameState.present,
+                historyHook.present,
                 O.map(getGame)
             )
         }
@@ -116,29 +107,25 @@ const App: FunctionComponent = () => {
                 soundService={soundService}
                 startGame={startGame}
                 savesHook={savesHook}
-                loadSave={loadSave}
+                historyHook={historyHook}
                 confirmYesNo={confirmYesNo}
             />
         )
     }
 
-    function getGame([gameProps]: [GameProps, AstNode[]]): JSX.Element {
+    function getGame([gameProps]: GameState): JSX.Element {
         return (
             <Game
                 ref={viewKeyUpAble}
                 gameProps={gameProps}
                 armlessWankerMenuProps={{
                     showGameMenu,
-                    undo,
-                    disableUndo: A.isEmpty(gameState.past),
+                    quickLoad,
                     skip,
                     savesHook,
-                    quickLoad,
+                    historyHook,
                     soundService,
-                    currentNodeL,
                     showMainMenu,
-                    addBlock,
-                    redo,
                     onVideoEnded
                 }}
             />
@@ -150,11 +137,10 @@ const App: FunctionComponent = () => {
             <GameMenu
                 ref={viewKeyUpAble}
                 soundService={soundService}
-                history={historyFromState(gameState)}
-                savesHook={savesHook}
-                loadSave={loadSave}
                 hideGameMenu={hideGameMenu}
                 showMainMenu={showMainMenu}
+                savesHook={savesHook}
+                historyHook={historyHook}
                 confirmYesNo={confirmYesNo}
                 selectedBtn={selectedBtn}
             />
@@ -216,8 +202,8 @@ const App: FunctionComponent = () => {
     }
 
     function startGame() {
-        dispatchGameHistoryAction({ type: 'EMPTY' })
-        addBlock([
+        historyHook.empty()
+        historyHook.addBlock([
             context.firstNode,
             ...pipe(
                 context.firstNode.followingBlock(),
@@ -232,7 +218,7 @@ const App: FunctionComponent = () => {
     }
 
     function onVideoEnded(execNextIfNotMenu: () => void) {
-        A.isEmpty(gameState.future) ? execNextIfNotMenu() : redo()
+        historyHook.noFuture() ? execNextIfNotMenu() : historyHook.redo()
     }
 
     function showGameMenu(selectedBtn: O.Option<MenuBtn> = O.none) {
@@ -247,12 +233,14 @@ const App: FunctionComponent = () => {
 
     function skip() {
         pipe(
-            currentNodeL(),
+            historyHook.currentNode(),
             O.map(currentNode => {
                 if (!(currentNode instanceof Menu)) {
                     pipe(
                         skipFromNode(currentNode),
-                        O.map<AstNode[][], void>(_ => _.map(addBlock)),
+                        O.map(_ => {
+                            _.map(historyHook.addBlock)
+                        }),
                         O.getOrElse(showMainMenu)
                     )
                 }
@@ -292,41 +280,10 @@ const App: FunctionComponent = () => {
         }
     }
 
-    function addBlock(block: AstNode[]) {
-        dispatchGameHistoryAction({ type: 'ADD_BLOCK', block })
-    }
-
-    function currentNodeL(): O.Option<AstNode> {
-        return Do(O.option)
-            .bind('present', gameState.present)
-            .bindL('currentNode', ({ present: [, block] }) => A.last(block))
-            .return(({ currentNode }) => currentNode)
-    }
-
-    function undo() {
-        dispatchGameHistoryAction({ type: 'UNDO' })
-    }
-
-    function redo() {
-        dispatchGameHistoryAction({ type: 'REDO' })
-    }
-
-    function loadSave(save: QuickSave) {
-        pipe(
-            loadAction(context.firstNode, save),
-            O.map(_ => {
-                soundService.stopChannels()
-                dispatchGameHistoryAction(_)
-                showGame()
-            }),
-            O.getOrElse(() => notify("Couldn't restore save"))
-        )
-    }
-
     function quickLoad() {
         pipe(
             saves.quickSave,
-            O.map(loadSave)
+            O.map(historyHook.loadSave)
         )
     }
 

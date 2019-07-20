@@ -12,10 +12,9 @@ import {
 } from 'react'
 
 import { transl } from '../../../context'
+import { HistoryHook } from '../../../hooks/useHistory'
 import { SavesHook } from '../../../hooks/useSaves'
-import AstNode from '../../../nodes/AstNode'
 import Obj from '../../../Obj'
-import QuickSave from '../../../saves/QuickSave'
 import Save from '../../../saves/Save'
 import SoundService from '../../../sound/SoundService'
 import { KeyUpAble } from '../../App'
@@ -28,11 +27,10 @@ import History from './History'
 
 interface Props {
     soundService: SoundService
-    history: AstNode[]
-    savesHook: SavesHook
-    loadSave: (save: QuickSave) => void
     hideGameMenu: () => void
     showMainMenu: () => void
+    savesHook: SavesHook
+    historyHook: HistoryHook
     confirmYesNo: (
         msg: string,
         actionYes: () => void,
@@ -44,10 +42,9 @@ interface Props {
 const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     {
         soundService,
-        history,
-        savesHook: { saves, deleteSave, save },
-        loadSave,
         hideGameMenu,
+        savesHook: { saves, deleteSave, save },
+        historyHook: { historyFromState, loadSave },
         showMainMenu,
         confirmYesNo,
         selectedBtn = O.none
@@ -77,7 +74,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
     )
 
     function submenu(btn: MenuBtn): JSX.Element | null {
-        if (btn === 'HISTORY') return <History nodes={history} />
+        if (btn === 'HISTORY') return <History nodes={historyFromState()} />
         if (btn === 'SAVE') return getSave()
         if (btn === 'LOAD') return getLoad()
         if (btn === 'PREFS') return <Preferences soundService={soundService} />

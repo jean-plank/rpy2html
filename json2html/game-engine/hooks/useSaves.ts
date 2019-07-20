@@ -2,10 +2,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useReducer } from 'react'
 
 import { transl } from '../context'
-import GameProps from '../history/GameProps'
-import { HistoryState } from '../history/historiable'
 import AstNode from '../nodes/AstNode'
-import saveAction from '../saves/saveAction'
 import Saves from '../saves/Saves'
 import savesReducer from '../saves/savesReducer'
 
@@ -15,11 +12,11 @@ export interface SavesHook {
     deleteSave: (slot: number) => void
     save: (slot: number) => void
     quickSave: () => void
-    noQuickSave: boolean
+    noQuickSave: () => boolean
 }
 
 const useSaves = (
-    gameState: HistoryState<[GameProps, AstNode[]]>,
+    historyFromState: () => AstNode[],
     notify: (message: string) => void
 ): SavesHook => {
     const [saves, dispatchSavesAction] = useReducer(
@@ -37,14 +34,21 @@ const useSaves = (
     }
 
     const save = (slot: number) =>
-        dispatchSavesAction(saveAction(gameState, slot))
+        dispatchSavesAction({
+            type: 'SAVE',
+            history: historyFromState(),
+            slot
+        })
 
     const quickSave = () => {
-        dispatchSavesAction(saveAction(gameState))
+        dispatchSavesAction({
+            type: 'QUICK_SAVE',
+            history: historyFromState()
+        })
         notify(transl.armless.saved)
     }
 
-    const noQuickSave = O.isNone(saves.quickSave)
+    const noQuickSave = () => O.isNone(saves.quickSave)
 
     return { saves, emptySaves, deleteSave, save, quickSave, noQuickSave }
 }

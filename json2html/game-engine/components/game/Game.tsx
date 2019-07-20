@@ -40,10 +40,7 @@ interface Props {
 
 type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
     soundService: SoundService;
-    currentNodeL: () => O.Option<AstNode>;
     showMainMenu: () => void;
-    addBlock: (block: AstNode[]) => void;
-    redo: () => void;
     onVideoEnded: (execNextIfNotMenu: () => void) => void;
 }
 
@@ -157,8 +154,8 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
             Enter: execNextIfNotMenu,
             Control: () => {},
             Tab: () => {},
-            PageUp: ifArgsExists(({ undo }) => undo()),
-            PageDown: ifArgsExists(({ redo }) => redo()),
+            PageUp: ifArgsExists(({ historyHook: { undo } }) => undo()),
+            PageDown: ifArgsExists(({ historyHook: { redo } }) => redo()),
             h: () => {},
             v: () => {},
             s: ifArgsExists(({ savesHook: { quickSave } }) => quickSave()),
@@ -188,12 +185,12 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
         if (e.deltaY < 0) {
             pipe(
                 args,
-                O.map(({ undo }) => undo())
+                O.map(({ historyHook: { undo } }) => undo())
             )
         } else if (e.deltaY > 0) {
             pipe(
                 args,
-                O.map(({ redo }) => redo())
+                O.map(({ historyHook: { redo } }) => redo())
             )
         }
     }
@@ -213,9 +210,9 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
     function execNextIfNotMenu() {
         pipe(
             args,
-            O.map(({ currentNodeL }) =>
+            O.map(({ historyHook: { currentNode } }) =>
                 pipe(
-                    currentNodeL(),
+                    currentNode(),
                     O.map(node => {
                         if (!(node instanceof Menu)) {
                             execute(node.followingBlock())
@@ -229,7 +226,7 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
     function execute(maybeBlock: O.Option<AstNode[]>) {
         pipe(
             args,
-            O.map(({ showMainMenu, addBlock }) =>
+            O.map(({ showMainMenu, historyHook: { addBlock } }) =>
                 pipe(
                     maybeBlock,
                     O.fold(showMainMenu, block => {

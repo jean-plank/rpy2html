@@ -4,6 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 import { FunctionComponent } from 'react'
 
 import { style, transl } from '../../context'
+import { HistoryHook } from '../../hooks/useHistory'
 import { SavesHook } from '../../hooks/useSaves'
 import { mediaQuery } from '../../utils/styles'
 import withStopPropagation from '../../utils/withStopPropagation'
@@ -27,27 +28,22 @@ const AWButton: FunctionComponent<BtnProps> = ({
 
 export interface ArmlessWankerMenuProps {
     showGameMenu: (btn?: O.Option<MenuBtn>) => void
-    undo: () => void
-    disableUndo: boolean
+    quickLoad: () => void
     skip: () => void
     savesHook: SavesHook
-    quickLoad: () => void
+    historyHook: HistoryHook
 }
 
 const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
     showGameMenu,
-    undo,
-    disableUndo,
+    quickLoad,
     skip,
     savesHook: { quickSave, noQuickSave },
-    quickLoad
+    historyHook: { undo, noPast }
 }) => {
     return (
         <div css={styles.armlessWankerMenu}>
-            <AWButton
-                onClick={withStopPropagation(undo)}
-                disabled={disableUndo}
-            >
+            <AWButton onClick={withStopPropagation(undo)} disabled={noPast()}>
                 {transl.armless.back}
             </AWButton>
             {showGameMenuBtn('HISTORY')}
@@ -60,7 +56,7 @@ const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
             </AWButton>
             <AWButton
                 onClick={withStopPropagation(quickLoad)}
-                disabled={noQuickSave}
+                disabled={noQuickSave()}
             >
                 {transl.armless.qLoad}
             </AWButton>
