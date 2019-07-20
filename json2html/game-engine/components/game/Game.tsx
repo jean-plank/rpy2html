@@ -18,7 +18,7 @@ import Menu from '../../nodes/Menu'
 import Obj from '../../Obj'
 import SoundService from '../../sound/SoundService'
 import withStopPropagation from '../../utils/withStopPropagation'
-import { GameAble, KeyUpAble } from '../App'
+import { KeyUpAble } from '../App'
 import ArmlessWankerMenu, { ArmlessWankerMenuProps } from './ArmlessWankerMenu'
 import Choices from './Choices'
 import Cutscene from './Cutscene'
@@ -47,7 +47,7 @@ type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
     onVideoEnded: (execNextIfNotMenu: () => void) => void;
 }
 
-const Game: RefForwardingComponent<GameAble, Props> = (
+const Game: RefForwardingComponent<KeyUpAble, Props> = (
     {
         gameProps,
         isSaveSlot = false,
@@ -57,8 +57,7 @@ const Game: RefForwardingComponent<GameAble, Props> = (
     ref
 ) => {
     useImperativeHandle(ref, () => ({
-        onKeyUp,
-        execThenExecNext
+        onKeyUp
     }))
 
     const args = O.fromNullable(armlessWankerMenuProps)

@@ -17,8 +17,8 @@ export default abstract class NodeWithChar extends AstNode {
         super(idNexts, true)
     }
 
-    init({ id, data, execThenExecNext }: InitArgs) {
-        super.init({ id, data, execThenExecNext })
+    init({ id, data }: InitArgs) {
+        super.init({ id, data })
         this.who = pipe(
             this.whosName,
             O.chain(name => {

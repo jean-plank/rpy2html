@@ -13,7 +13,6 @@ import Obj from '../Obj'
 export interface InitArgs {
     id: string
     data: AppData
-    execThenExecNext: (node: AstNode) => () => void
 }
 
 export interface AppData {
@@ -28,7 +27,6 @@ export default abstract class AstNode {
     id: string
 
     protected _nexts: O.Option<AstNode[]> = O.none
-    protected execThenExecNext: (node: AstNode) => () => void = () => () => {}
 
     // _nexts will be set in init when all nodes are created
     constructor(
@@ -38,11 +36,10 @@ export default abstract class AstNode {
 
     abstract toString(): string
 
-    init({ id, data, execThenExecNext }: InitArgs) {
+    init({ id, data }: InitArgs) {
         this._nexts = O.some(
             A.filterMap((_: string) => R.lookup(_, data.nodes))(this.idNexts)
         )
-        this.execThenExecNext = execThenExecNext
         this.id = id
     }
 

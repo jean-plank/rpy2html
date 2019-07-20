@@ -29,8 +29,8 @@ export default abstract class NodeWithMedia<T extends Media> extends AstNode {
         )
     }
 
-    init({ id, data, execThenExecNext }: InitArgs) {
-        super.init({ id, data, execThenExecNext })
+    init({ id, data }: InitArgs) {
+        super.init({ id, data })
         this.media = this.fromData(data, this.mediaName)
         if (O.isNone(this.media)) {
             console.warn(

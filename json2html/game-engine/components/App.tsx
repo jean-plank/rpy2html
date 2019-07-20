@@ -22,7 +22,9 @@ import gameHistoryReducer, {
     emptyGameHistoryState
 } from '../history/gameHistoryReducer'
 import GameProps from '../history/GameProps'
-import AstNode from '../nodes/AstNode'
+import useAppKeyUpAbles from '../hooks/useAppKeyUpAbles'
+import useKeyUp from '../hooks/useKeyUp'
+import AstNode, { AppData } from '../nodes/AstNode'
 import Menu from '../nodes/Menu'
 import QuickSave from '../saves/QuickSave'
 import Saves from '../saves/Saves'
@@ -46,10 +48,6 @@ export interface KeyUpAble {
     onKeyUp: (e: KeyboardEvent) => void
 }
 
-export type GameAble = KeyUpAble & {
-    execThenExecNext: (node: AstNode) => void;
-}
-
 type View =
     | 'MAIN_MENU'
     | 'GAME'
@@ -59,18 +57,13 @@ const App: FunctionComponent = () => {
     const confirmAudioShown = useRef(false)
     const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
-    const viewKeyUpAble = createRef<KeyUpAble>()
-    const gameAble = createRef<GameAble>()
     const notifiable = createRef<Notifiable>()
-    const confirmKeyUpAble = createRef<KeyUpAble>()
 
-    const topKeyUpAble = useRef<O.Option<KeyUpAble>>(O.none)
-    useEffect(() => {
-        topKeyUpAble.current = pipe(
-            [confirmKeyUpAble, gameAble, viewKeyUpAble],
-            A.findFirstMap(_ => O.fromNullable(_.current))
-        )
-    })
+    const {
+        topKeyUpAble,
+        viewKeyUpAble,
+        confirmKeyUpAble
+    } = useAppKeyUpAbles()
 
     const [view, setView] = useState<O.Option<View>>(O.none)
     const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
@@ -83,9 +76,9 @@ const App: FunctionComponent = () => {
         emptyGameHistoryState
     )
 
-    const data = context
+    useEffect(() => initAll(context), [])
 
-    useEffect(initAll, [])
+    useKeyUp(onKeyUp)
 
     return (
         <div css={styles.container}>
@@ -135,7 +128,7 @@ const App: FunctionComponent = () => {
     function getGame([gameProps]: [GameProps, AstNode[]]): JSX.Element {
         return (
             <Game
-                ref={gameAble}
+                ref={viewKeyUpAble}
                 gameProps={gameProps}
                 armlessWankerMenuProps={{
                     showGameMenu,
@@ -187,24 +180,22 @@ const App: FunctionComponent = () => {
         }
 
         pipe(
-            topKeyUpAble.current,
+            topKeyUpAble(),
             O.map(_ => _.onKeyUp(e))
         )
     }
 
-    function initAll(): () => void {
+    function initAll(data: AppData) {
+        initDom()
         pipe(
             context.nodes,
-            R.mapWithIndex((id, node) =>
-                node.init({ id, data, execThenExecNext })
-            )
+            R.mapWithIndex((id, node) => node.init({ id, data }))
         )
         context.firstNode.loadBlock()
         showMainMenu()
-        return initDom()
     }
 
-    function initDom(): () => void {
+    function initDom() {
         document.title = context.gameName
         pipe(
             R.lookup('game_icon', context.images),
@@ -223,9 +214,6 @@ const App: FunctionComponent = () => {
                     ).href = icon.file)
             )
         )
-
-        document.addEventListener('keyup', onKeyUp)
-        return () => document.removeEventListener('keyup', onKeyUp)
     }
 
     function showMainMenu() {
@@ -261,14 +249,6 @@ const App: FunctionComponent = () => {
     function hideGameMenu() {
         soundService.resumeChannels()
         showGame()
-    }
-
-    function execThenExecNext(node: AstNode): () => void {
-        return () =>
-            pipe(
-                O.fromNullable(gameAble.current),
-                O.map(_ => _.execThenExecNext(node))
-            )
     }
 
     function skip() {
