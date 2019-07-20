@@ -39,11 +39,15 @@ const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
                 }}
             />
             <div css={styles.games}>
-                {gameElts.length > 0 ? gameElts : transl.memory.noGamesYet}
+                {gameElts.length > 0 ? gameElts : noGamesYet()}
             </div>
             {gameElts.length > 0 ? footer() : null}
         </div>
     )
+
+    function noGamesYet(): JSX.Element {
+        return <div css={styles.noGamesYet}>{transl.memory.noGamesYet}</div>
+    }
 
     function footer(): JSX.Element {
         return (
@@ -125,6 +129,10 @@ const styles = {
         flexGrow: 1,
         overflowY: 'auto',
         padding: '1.33em 0'
+    }),
+
+    noGamesYet: css({
+        padding: '0 3em'
     }),
 
     footer: css({
