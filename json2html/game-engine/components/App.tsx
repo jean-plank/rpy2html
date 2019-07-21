@@ -3,12 +3,12 @@ import { css, Global, jsx } from '@emotion/core'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
-import { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react'
+import { FunctionComponent, useEffect, useMemo, useState } from 'react'
 
-import { transl } from '../context'
 import * as context from '../context'
 import Font from '../Font'
 import { GameState } from '../history/gameStateReducer'
+import useConfirm from '../hooks/useConfirm'
 import useHistory from '../hooks/useHistory'
 import useKeyUp from '../hooks/useKeyUp'
 import useKeyUpAbles from '../hooks/useKeyUpAbles'
@@ -22,7 +22,6 @@ import {
     isFullscreen
 } from '../utils/fullscreen'
 import { mediaQuery } from '../utils/styles'
-import Confirm, { ConfirmProps } from './Confirm'
 import Game from './game/Game'
 import GameMenu from './menus/gameMenu/GameMenu'
 import MainMenu from './menus/mainMenu/MainMenu'
@@ -40,13 +39,15 @@ type View =
 const App: FunctionComponent = () => {
     useEffect(() => initAll(context), [])
 
-    const confirmAudioShown = useRef(false)
+    const { topKeyUpAble, viewKeyUpAble, confirmKeyUpAble } = useKeyUpAbles()
+
+    const { confirm, confirmAudio, confirmYesNo } = useConfirm(
+        confirmKeyUpAble
+    )
+
     const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
     const [view, setView] = useState<O.Option<View>>(O.none)
-    const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
-
-    const { topKeyUpAble, viewKeyUpAble, confirmKeyUpAble } = useKeyUpAbles()
 
     const { notifications, notify } = useNotify()
 
@@ -72,11 +73,7 @@ const App: FunctionComponent = () => {
                     O.toNullable
                 )}
                 {notifications}
-                {pipe(
-                    confirm,
-                    O.map(getConfirm),
-                    O.toNullable
-                )}
+                {confirm}
             </div>
         </div>
     )
@@ -135,10 +132,6 @@ const App: FunctionComponent = () => {
                 selectedBtn={selectedBtn}
             />
         )
-    }
-
-    function getConfirm(iConfirm: ConfirmProps): JSX.Element {
-        return <Confirm ref={confirmKeyUpAble} {...iConfirm} />
     }
 
     function onKeyUp(e: KeyboardEvent) {
@@ -219,44 +212,6 @@ const App: FunctionComponent = () => {
     function hideGameMenu() {
         soundService.resumeChannels()
         showGame()
-    }
-
-    function confirmAudio(okAction: () => void) {
-        if (!confirmAudioShown.current) {
-            confirmAudioShown.current = true
-            setConfirm(
-                O.some({
-                    hideConfirm,
-                    message: transl.confirm.audio,
-                    buttons: [
-                        { text: transl.confirm.audioBtn, onClick: okAction }
-                    ],
-                    escapeAction: okAction
-                })
-            )
-        }
-    }
-
-    function confirmYesNo(
-        message: string,
-        actionYes: () => void,
-        actionNo?: () => void
-    ) {
-        setConfirm(
-            O.some({
-                hideConfirm,
-                message,
-                buttons: [
-                    { text: transl.confirm.yes, onClick: actionYes },
-                    { text: transl.confirm.no, onClick: actionNo }
-                ],
-                escapeAction: actionNo
-            })
-        )
-    }
-
-    function hideConfirm() {
-        setConfirm(O.none)
     }
 }
 export default App
