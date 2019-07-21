@@ -112,8 +112,7 @@ const App: FunctionComponent = () => {
                     savesHook,
                     historyHook,
                     soundService,
-                    showMainMenu,
-                    onVideoEnded
+                    showMainMenu
                 }}
             />
         )
@@ -198,10 +197,6 @@ const App: FunctionComponent = () => {
 
     function showGame() {
         setView(O.some('GAME'))
-    }
-
-    function onVideoEnded(execNextIfNotMenu: () => void) {
-        historyHook.noFuture() ? execNextIfNotMenu() : historyHook.redo()
     }
 
     function showGameMenu(selectedBtn: O.Option<MenuBtn> = O.none) {

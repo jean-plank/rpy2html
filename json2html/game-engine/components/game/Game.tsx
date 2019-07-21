@@ -41,7 +41,6 @@ interface Props {
 type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
     soundService: SoundService;
     showMainMenu: () => void;
-    onVideoEnded: (execNextIfNotMenu: () => void) => void;
 }
 
 const Game: RefForwardingComponent<KeyUpAble, Props> = (
@@ -65,8 +64,10 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
             O.map(video =>
                 pipe(
                     args,
-                    O.map(({ onVideoEnded }) =>
-                        video.onEnded(() => onVideoEnded(execNextIfNotMenu))
+                    O.map(({ historyHook: { noFuture, redo } }) =>
+                        video.onEnded(() =>
+                            noFuture() ? execNextIfNotMenu() : redo()
+                        )
                     )
                 )
             )
