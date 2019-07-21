@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { css, Global, jsx } from '@emotion/core'
-import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
@@ -15,8 +14,7 @@ import useHistory from '../hooks/useHistory'
 import useKeyUp from '../hooks/useKeyUp'
 import useNotify from '../hooks/useNotify'
 import useSaves from '../hooks/useSaves'
-import AstNode, { AppData } from '../nodes/AstNode'
-import Menu from '../nodes/Menu'
+import { AppData } from '../nodes/AstNode'
 import SoundService from '../sound/SoundService'
 import {
     enterFullscreen,
@@ -54,7 +52,12 @@ const App: FunctionComponent = () => {
 
     const { notifications, notify } = useNotify()
 
-    const historyHook = useHistory(soundService, notify, showGame)
+    const historyHook = useHistory(
+        soundService,
+        notify,
+        showGame,
+        showMainMenu
+    )
 
     const savesHook = useSaves(historyHook.historyFromState, notify)
     const { saves } = savesHook
@@ -114,7 +117,6 @@ const App: FunctionComponent = () => {
                 armlessWankerMenuProps={{
                     showGameMenu,
                     quickLoad,
-                    skip,
                     savesHook,
                     historyHook,
                     soundService,
@@ -222,55 +224,6 @@ const App: FunctionComponent = () => {
     function hideGameMenu() {
         soundService.resumeChannels()
         showGame()
-    }
-
-    function skip() {
-        pipe(
-            historyHook.currentNode(),
-            O.map(currentNode => {
-                if (!(currentNode instanceof Menu)) {
-                    pipe(
-                        skipFromNode(currentNode),
-                        O.map(_ => {
-                            _.map(historyHook.addBlock)
-                        }),
-                        O.getOrElse(showMainMenu)
-                    )
-                }
-            })
-        )
-
-        function skipFromNode(node: AstNode): O.Option<AstNode[][]> {
-            return pipe(
-                node.followingBlock(),
-                O.chain(block =>
-                    pipe(
-                        A.last(block),
-                        O.map(skipRec([block]))
-                    )
-                )
-            )
-        }
-
-        function skipRec(acc: AstNode[][]): (node: AstNode) => AstNode[][] {
-            return node => {
-                if (node instanceof Menu) return acc
-                return pipe(
-                    node.followingBlock(),
-                    O.fold(
-                        () => acc,
-                        block => {
-                            const newAcc = [...acc, block]
-                            return pipe(
-                                A.last(block),
-                                O.map(skipRec(newAcc)),
-                                O.getOrElse(() => newAcc)
-                            )
-                        }
-                    )
-                )
-            }
-        }
     }
 
     function quickLoad() {

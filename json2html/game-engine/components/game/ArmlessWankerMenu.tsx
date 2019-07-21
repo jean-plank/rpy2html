@@ -29,7 +29,6 @@ const AWButton: FunctionComponent<BtnProps> = ({
 export interface ArmlessWankerMenuProps {
     showGameMenu: (btn?: O.Option<MenuBtn>) => void
     quickLoad: () => void
-    skip: () => void
     savesHook: SavesHook
     historyHook: HistoryHook
 }
@@ -37,9 +36,8 @@ export interface ArmlessWankerMenuProps {
 const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
     showGameMenu,
     quickLoad,
-    skip,
     savesHook: { quickSave, noQuickSave },
-    historyHook: { undo, noPast }
+    historyHook: { undo, noPast, skip }
 }) => {
     return (
         <div css={styles.armlessWankerMenu}>

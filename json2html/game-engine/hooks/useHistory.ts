@@ -5,7 +5,6 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { useReducer } from 'react'
 
-import SoundService from 'game-engine/sound/SoundService'
 import * as context from '../context'
 import gameHistoryReducer, {
     emptyGameHistoryState
@@ -14,7 +13,9 @@ import { GameState } from '../history/gameStateReducer'
 import { HistoryAction } from '../history/historiable'
 import statesFromHistory from '../history/statesFromHistory'
 import AstNode from '../nodes/AstNode'
+import Menu from '../nodes/Menu'
 import QuickSave from '../saves/QuickSave'
+import SoundService from '../sound/SoundService'
 
 export interface HistoryHook {
     present: O.Option<GameState>
@@ -27,12 +28,14 @@ export interface HistoryHook {
     noFuture: () => boolean
     historyFromState: () => AstNode[]
     loadSave: (save: QuickSave) => void
+    skip: () => void
 }
 
 const useHistory = (
     soundService: SoundService,
     notify: (message: string) => void,
-    showGame: () => void
+    showGame: () => void,
+    showMainMenu: () => void
 ): HistoryHook => {
     const [{ past, present, future }, dispatchGameHistoryAction] = useReducer(
         gameHistoryReducer,
@@ -79,6 +82,23 @@ const useHistory = (
             O.getOrElse(() => notify("Couldn't restore save"))
         )
 
+    const skip = () => {
+        pipe(
+            currentNode(),
+            O.map(currentNode => {
+                if (!(currentNode instanceof Menu)) {
+                    pipe(
+                        skipFromNode(currentNode),
+                        O.map(_ => {
+                            _.map(addBlock)
+                        }),
+                        O.getOrElse(showMainMenu)
+                    )
+                }
+            })
+        )
+    }
+
     return {
         present,
         empty,
@@ -89,7 +109,8 @@ const useHistory = (
         noPast,
         noFuture,
         historyFromState,
-        loadSave
+        loadSave,
+        skip
     }
 }
 export default useHistory
@@ -118,3 +139,34 @@ const loadAction = (
             ),
             present
         }))
+
+const skipFromNode = (node: AstNode): O.Option<AstNode[][]> =>
+    pipe(
+        node.followingBlock(),
+        O.chain(block =>
+            pipe(
+                A.last(block),
+                O.map(skipRec([block]))
+            )
+        )
+    )
+
+const skipRec = (
+    acc: AstNode[][]
+): ((node: AstNode) => AstNode[][]) => node => {
+    if (node instanceof Menu) return acc
+    return pipe(
+        node.followingBlock(),
+        O.fold(
+            () => acc,
+            block => {
+                const newAcc = [...acc, block]
+                return pipe(
+                    A.last(block),
+                    O.map(skipRec(newAcc)),
+                    O.getOrElse(() => newAcc)
+                )
+            }
+        )
+    )
+}
