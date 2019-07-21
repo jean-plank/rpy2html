@@ -1,25 +1,38 @@
 import { css, keyframes } from '@emotion/core'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
-import { FunctionComponent } from 'react'
+import { createRef, FunctionComponent } from 'react'
 
+import useAnimation from '../../hooks/useAnimation'
 import Image from '../../medias/Image'
+
+const durationMs: number = 1000
 
 interface Props {
     image: O.Option<Image>
     animated?: boolean
 }
 
-const LayerScene: FunctionComponent<Props> = ({ image, animated = true }) =>
-    pipe(
-        image,
-        O.map(_ =>
-            _.elt({
-                css: [styles.base, animated ? styles.animated : null]
-            })
+const LayerScene: FunctionComponent<Props> = ({ image, animated = true }) => {
+    const ref = createRef<HTMLImageElement>()
+    useAnimation(
+        ref,
+        pipe(
+            image,
+            O.map(_ => _.name),
+            O.getOrElse(() => '')
         ),
+        styles.animated,
+        durationMs,
+        animated
+    )
+
+    return pipe(
+        image,
+        O.map(_ => _.elt({ ref, css: styles.base })),
         O.toNullable
     )
+}
 
 export default LayerScene
 
@@ -34,7 +47,7 @@ const styles = {
     }),
 
     animated: css({
-        animation: `${fadeIn()} 1s forwards`
+        animation: `${fadeIn()} ${durationMs / 1000}s forwards`
     })
 }
 
