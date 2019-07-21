@@ -28,10 +28,12 @@ export interface HistoryHook {
     noFuture: () => boolean
     historyFromState: () => AstNode[]
     loadSave: (save: QuickSave) => void
+    quickLoad: () => void
     skip: () => void
 }
 
 const useHistory = (
+    quickSave: () => O.Option<QuickSave>,
     soundService: SoundService,
     notify: (message: string) => void,
     showGame: () => void,
@@ -82,6 +84,13 @@ const useHistory = (
             O.getOrElse(() => notify("Couldn't restore save"))
         )
 
+    const quickLoad = () => {
+        pipe(
+            quickSave(),
+            O.map(loadSave)
+        )
+    }
+
     const skip = () => {
         pipe(
             currentNode(),
@@ -110,6 +119,7 @@ const useHistory = (
         noFuture,
         historyFromState,
         loadSave,
+        quickLoad,
         skip
     }
 }

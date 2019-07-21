@@ -53,6 +53,7 @@ const App: FunctionComponent = () => {
     const { notifications, notify } = useNotify()
 
     const historyHook = useHistory(
+        () => savesHook.saves.quickSave,
         soundService,
         notify,
         showGame,
@@ -60,7 +61,6 @@ const App: FunctionComponent = () => {
     )
 
     const savesHook = useSaves(historyHook.historyFromState, notify)
-    const { saves } = savesHook
 
     useEffect(() => initAll(context), [])
 
@@ -116,7 +116,6 @@ const App: FunctionComponent = () => {
                 gameProps={gameProps}
                 armlessWankerMenuProps={{
                     showGameMenu,
-                    quickLoad,
                     savesHook,
                     historyHook,
                     soundService,
@@ -224,13 +223,6 @@ const App: FunctionComponent = () => {
     function hideGameMenu() {
         soundService.resumeChannels()
         showGame()
-    }
-
-    function quickLoad() {
-        pipe(
-            saves.quickSave,
-            O.map(historyHook.loadSave)
-        )
     }
 
     function confirmAudio(okAction: () => void) {

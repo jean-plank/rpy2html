@@ -159,7 +159,7 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
             h: () => {},
             v: () => {},
             s: ifArgsExists(({ savesHook: { quickSave } }) => quickSave()),
-            l: ifArgsExists(({ quickLoad }) => quickLoad())
+            l: ifArgsExists(({ historyHook: { quickLoad } }) => quickLoad())
         }
         pipe(
             R.lookup(e.key, keyEvents),
