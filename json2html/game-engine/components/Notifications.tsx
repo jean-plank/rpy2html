@@ -1,52 +1,30 @@
 /** @jsx jsx */
 import { css, jsx, keyframes } from '@emotion/core'
-import {
-    forwardRef,
-    RefForwardingComponent,
-    useImperativeHandle,
-    useState
-} from 'react'
+import { FunctionComponent } from 'react'
 
 import { style } from '../context'
 import { mediaQuery } from '../utils/styles'
 
-export interface Notifiable {
-    notify: (message: string) => void
+interface Props {
+    notifs: Notification[]
+    durationMs: number
 }
 
-interface Notification {
+export interface Notification {
     key: number
     message: string
 }
 
-const duration: number = 2000 // ms
-
-const Notifications: RefForwardingComponent<Notifiable, {}> = (_, ref) => {
-    const [notifs, setNotifs] = useState<Notification[]>([])
-
-    useImperativeHandle(ref, () => ({
-        notify: (message: string) => {
-            const key = Date.now()
-            setNotifs(_ => [..._, { key, message }])
-            setTimeout(removeNotif(key), duration)
-        }
-    }))
-
-    return (
-        <div css={styles.notifications}>
-            {notifs.map(({ key, message }) => (
-                <div key={key} css={styles.notification}>
-                    {message}
-                </div>
-            ))}
-        </div>
-    )
-
-    function removeNotif(key: number): () => void {
-        return () => setNotifs(_ => _.filter(_ => _.key !== key))
-    }
-}
-export default forwardRef<Notifiable>(Notifications)
+const Notifications: FunctionComponent<Props> = ({ notifs, durationMs }) => (
+    <div css={styles.notifications}>
+        {notifs.map(({ key, message }) => (
+            <div key={key} css={styles.notification(durationMs)}>
+                {message}
+            </div>
+        ))}
+    </div>
+)
+export default Notifications
 
 const styles = {
     notifications: css({
@@ -61,13 +39,14 @@ const styles = {
         }
     }),
 
-    notification: css({
-        boxSizing: 'content-box',
-        display: 'inline-block',
-        padding: '1em',
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        animation: `${fadeOut()} ${duration / 1000}s linear forwards`
-    })
+    notification: (durationMs: number) =>
+        css({
+            boxSizing: 'content-box',
+            display: 'inline-block',
+            padding: '1em',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            animation: `${fadeOut()} ${durationMs / 1000}s linear forwards`
+        })
 }
 
 function fadeOut() {

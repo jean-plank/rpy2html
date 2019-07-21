@@ -5,11 +5,13 @@ import { createRef, RefObject } from 'react'
 
 import { KeyUpAble } from '../components/App'
 
-const useAppKeyUpAbles = (): {
-    topKeyUpAble: () => O.Option<KeyUpAble>;
-    viewKeyUpAble: RefObject<KeyUpAble>;
-    confirmKeyUpAble: RefObject<KeyUpAble>;
-} => {
+interface AppKeyUpAblesHook {
+    topKeyUpAble: () => O.Option<KeyUpAble>
+    viewKeyUpAble: RefObject<KeyUpAble>
+    confirmKeyUpAble: RefObject<KeyUpAble>
+}
+
+const useAppKeyUpAbles = (): AppKeyUpAblesHook => {
     const viewKeyUpAble = createRef<KeyUpAble>()
     const confirmKeyUpAble = createRef<KeyUpAble>()
 

@@ -4,14 +4,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
-import {
-    createRef,
-    FunctionComponent,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from 'react'
+import { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react'
 
 import { transl } from '../context'
 import * as context from '../context'
@@ -20,6 +13,7 @@ import { GameState } from '../history/gameStateReducer'
 import useAppKeyUpAbles from '../hooks/useAppKeyUpAbles'
 import useHistory from '../hooks/useHistory'
 import useKeyUp from '../hooks/useKeyUp'
+import useNotify from '../hooks/useNotify'
 import useSaves from '../hooks/useSaves'
 import AstNode, { AppData } from '../nodes/AstNode'
 import Menu from '../nodes/Menu'
@@ -35,7 +29,6 @@ import Game from './game/Game'
 import GameMenu from './menus/gameMenu/GameMenu'
 import MainMenu from './menus/mainMenu/MainMenu'
 import MenuBtn from './menus/MenuBtn'
-import Notifications, { Notifiable } from './Notifications'
 
 export interface KeyUpAble {
     onKeyUp: (e: KeyboardEvent) => void
@@ -50,7 +43,8 @@ const App: FunctionComponent = () => {
     const confirmAudioShown = useRef(false)
     const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
-    const notifiable = createRef<Notifiable>()
+    const [view, setView] = useState<O.Option<View>>(O.none)
+    const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
 
     const {
         topKeyUpAble,
@@ -58,8 +52,7 @@ const App: FunctionComponent = () => {
         confirmKeyUpAble
     } = useAppKeyUpAbles()
 
-    const [view, setView] = useState<O.Option<View>>(O.none)
-    const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
+    const { notifications, notify } = useNotify()
 
     const historyHook = useHistory(soundService, notify, showGame)
 
@@ -79,7 +72,7 @@ const App: FunctionComponent = () => {
                     O.chain(getView),
                     O.toNullable
                 )}
-                {<Notifications ref={notifiable} />}
+                {notifications}
                 {pipe(
                     confirm,
                     O.map(getConfirm),
@@ -323,13 +316,6 @@ const App: FunctionComponent = () => {
 
     function hideConfirm() {
         setConfirm(O.none)
-    }
-
-    function notify(message: string) {
-        pipe(
-            O.fromNullable(notifiable.current),
-            O.map(_ => _.notify(message))
-        )
     }
 }
 export default App
