@@ -9,9 +9,9 @@ import { transl } from '../context'
 import * as context from '../context'
 import Font from '../Font'
 import { GameState } from '../history/gameStateReducer'
-import useAppKeyUpAbles from '../hooks/useAppKeyUpAbles'
 import useHistory from '../hooks/useHistory'
 import useKeyUp from '../hooks/useKeyUp'
+import useKeyUpAbles from '../hooks/useKeyUpAbles'
 import useNotify from '../hooks/useNotify'
 import useSaves from '../hooks/useSaves'
 import { AppData } from '../nodes/AstNode'
@@ -38,17 +38,15 @@ type View =
     | { type: 'GAME_MENU'; selectedBtn: O.Option<MenuBtn> }
 
 const App: FunctionComponent = () => {
+    useEffect(() => initAll(context), [])
+
     const confirmAudioShown = useRef(false)
     const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
     const [view, setView] = useState<O.Option<View>>(O.none)
     const [confirm, setConfirm] = useState<O.Option<ConfirmProps>>(O.none)
 
-    const {
-        topKeyUpAble,
-        viewKeyUpAble,
-        confirmKeyUpAble
-    } = useAppKeyUpAbles()
+    const { topKeyUpAble, viewKeyUpAble, confirmKeyUpAble } = useKeyUpAbles()
 
     const { notifications, notify } = useNotify()
 
@@ -61,8 +59,6 @@ const App: FunctionComponent = () => {
     )
 
     const savesHook = useSaves(historyHook.historyFromState, notify)
-
-    useEffect(() => initAll(context), [])
 
     useKeyUp(onKeyUp)
 
