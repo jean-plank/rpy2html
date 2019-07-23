@@ -1,19 +1,26 @@
 /** @jsx jsx */
-import { css, jsx, SerializedStyles } from '@emotion/core'
+import { css, jsx, keyframes, SerializedStyles } from '@emotion/core'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import {
+    CSSProperties,
     forwardRef,
+    FunctionComponent,
     RefForwardingComponent,
     useImperativeHandle,
+    useMemo,
     useState
 } from 'react'
+import { TransitionStatus } from 'react-transition-group/Transition'
 
 import { style, transl } from '../../context'
 import { getBgOrElse, ifOldStyle, mediaQuery } from '../../utils/styles'
+import AnimateWithDep from '../AnimateWithDep'
 import GuiButton from '../GuiButton'
 import SelectableButton from '../SelectableButton'
 import MenuBtn, { menuBtnLabel } from './MenuBtn'
+
+const durationMs: number = 100
 
 export interface MenuAble {
     selectedBtn: O.Option<MenuBtn>
@@ -57,6 +64,10 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
         propsSelectedBtn
     )
 
+    const dep = useMemo(() => O.getOrElse(() => 'NONE')(selectedBtn), [
+        selectedBtn
+    ])
+
     return (
         <div css={[styles.menu, stylesOverride]}>
             <div className={overlayClassName} />
@@ -64,8 +75,20 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
                 {buttons.map(menuBtn)}
                 {returnBtn()}
             </div>
-            <div css={styles.submenuTitle}>{ifSelectedBtn(menuBtnLabel)}</div>
-            <div css={styles.submenu}>{ifSelectedBtn(submenu)}</div>
+            <AnimatedDiv
+                dep={dep}
+                animation={animations.leftToRight}
+                styles={styles.submenuTitle}
+            >
+                {ifSelectedBtn(menuBtnLabel)}
+            </AnimatedDiv>
+            <AnimatedDiv
+                dep={dep}
+                animation={animations.rightToLeft}
+                styles={styles.submenu}
+            >
+                {ifSelectedBtn(submenu)}
+            </AnimatedDiv>
         </div>
     )
 
@@ -127,6 +150,39 @@ const Menu: RefForwardingComponent<MenuAble, Props> = (
     }
 }
 export default forwardRef<MenuAble, Props>(Menu)
+
+const AnimatedDiv: FunctionComponent<{
+    dep?: string | number;
+    animation: {
+        initial: SerializedStyles;
+        animation: SerializedStyles;
+    };
+    styles: SerializedStyles;
+}> = ({ dep, animation, styles: containerStyles, children }) => (
+    <AnimateWithDep dep={dep} durationMs={durationMs} styles={containerStyles}>
+        {status => (
+            <div
+                css={[
+                    styles.full,
+                    animation.initial,
+                    stylesFromStatus(animation.animation)(status)
+                ]}
+            >
+                {children}
+            </div>
+        )}
+    </AnimateWithDep>
+)
+
+function stylesFromStatus(
+    style: SerializedStyles
+): (status: TransitionStatus) => SerializedStyles | undefined {
+    return status => {
+        if (status === 'entering') return style
+        if (status === 'entered') return styles.noTransform
+        return undefined
+    }
+}
 
 export enum MenuOverlay {
     MainMenu = 'main-menu-overlay',
@@ -205,5 +261,49 @@ const styles = {
         [mediaQuery(style)]: {
             fontSize: `${style.guibtn_fsize_v}vw`
         }
+    }),
+
+    full: css({
+        width: '100%',
+        height: '100%'
+    }),
+
+    noTransform: css({
+        transform: 'none'
     })
+}
+
+const animations = {
+    topToBottom: animation({
+        from: { transform: 'translateY(-100%)' },
+        to: { transform: 'translateY(0)' }
+    }),
+
+    leftToRight: animation({
+        from: { transform: 'translateX(-100%)' },
+        to: { transform: 'translateX(0)' }
+    }),
+
+    rightToLeft: animation({
+        from: { transform: 'translateX(100%)' },
+        to: { transform: 'translateX(0)' }
+    })
+}
+
+function animation({
+    from,
+    to
+}: {
+    from: CSSProperties;
+    to: CSSProperties;
+}): { initial: SerializedStyles; animation: SerializedStyles } {
+    return {
+        initial: css({ ...from }),
+        animation: css({
+            animation: `${keyframes({
+                from: { ...from },
+                to: { ...to }
+            })} ${durationMs}ms forwards`
+        })
+    }
 }
