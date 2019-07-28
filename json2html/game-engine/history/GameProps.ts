@@ -8,6 +8,7 @@ import Sound from '../medias/Sound'
 import Video from '../medias/Video'
 import MenuItem from '../nodes/MenuItem'
 import Obj from '../Obj'
+import * as SA from '../sound/SoundAction'
 
 export default class GameProps {
     sceneImg: O.Option<Image>
@@ -18,7 +19,7 @@ export default class GameProps {
     textboxText: string
     choices: MenuItem[]
     video: O.Option<Video>
-    sounds: Obj<O.Option<Sound>> // key chanName
+    sounds: Obj<SA.SoundAction> // key chanName
     audios: Sound[]
 
     static empty: GameProps = {
@@ -41,9 +42,11 @@ export default class GameProps {
         video: O.none,
         sounds: pipe(
             props.sounds,
-            R.mapWithIndex((chanName, sound) =>
-                chanName === 'music' ? sound : O.none
-            )
+            R.mapWithIndex((chanName, soundAction) => {
+                if (chanName === 'music') return soundAction
+                if (chanName === 'voice') return SA.stop
+                return SA.playing
+            })
         ),
         audios: []
     })
@@ -67,12 +70,7 @@ export default class GameProps {
                     ...acc,
                     sounds: pipe(
                         props.sounds,
-                        R.map(_ =>
-                            pipe(
-                                _,
-                                O.map(_ => _.toString())
-                            ).toString()
-                        )
+                        R.map(SA.toString)
                     )
                 }
             }

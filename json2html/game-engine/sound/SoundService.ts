@@ -6,6 +6,7 @@ import { sounds } from '../context'
 import Sound from '../medias/Sound'
 import Obj from '../Obj'
 import Channel from './Channel'
+import * as SA from './SoundAction'
 import Volumes from './Volumes'
 
 export default class SoundService {
@@ -55,24 +56,28 @@ export default class SoundService {
             R.map(_ => _.resume())
         )
 
-    applySounds = (sounds: Obj<O.Option<Sound>>) =>
+    applySounds = (sounds: Obj<SA.SoundAction>) =>
         pipe(
             sounds,
-            R.mapWithIndex((chanName, sound) =>
+            R.mapWithIndex((chanName, soundAction) =>
                 pipe(
                     R.lookup(chanName, this.channels),
                     O.alt(() =>
-                        O.isSome(sound)
+                        SA.isPlay(soundAction)
                             ? O.some(this.newChannel(chanName))
                             : O.none
                     ),
                     O.map(channel =>
                         pipe(
-                            sound,
-                            O.fold(
-                                channel.stop,
-                                this.playIfNotMusicAndAlready(chanName, channel)
-                            )
+                            soundAction,
+                            SA.fold({
+                                onStop: channel.stop,
+                                onPlaying: () => {},
+                                onPlay: this.playIfNotMusicAndAlready(
+                                    chanName,
+                                    channel
+                                )
+                            })
                         )
                     )
                 )

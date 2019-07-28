@@ -86,7 +86,7 @@ export default class Channel {
             )
         )
 
-    private onEnded = () => {
+    private onEnded = () =>
         pipe(
             A.head(this.pending),
             O.map(h => {
@@ -106,5 +106,4 @@ export default class Channel {
                 else this.currentlyPlaying = O.none
             })
         )
-    }
 }
