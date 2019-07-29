@@ -12,8 +12,6 @@ import Scene from '../game-engine/nodes/Scene'
 import Show from '../game-engine/nodes/Show'
 
 describe(statesFromHistory, () => {
-    const execThenExecNext = () => () => {}
-
     it('should return empty array for node without nexts', () => {
         const node = new Show('', [])
         expect(statesFromHistory(node, [])).toEqual(E.right([]))
@@ -26,7 +24,7 @@ describe(statesFromHistory, () => {
             nodes: { '0': node },
             images: { toto: new Image('toto', 'totoFile') }
         } as unknown) as AppData
-        node.init({ id: '0', data, execThenExecNext })
+        node.init({ id: '0', data })
 
         const props: GameProps = {
             ...GameProps.empty,
@@ -55,9 +53,7 @@ describe(statesFromHistory, () => {
         } as unknown) as AppData
         pipe(
             data.nodes,
-            R.mapWithIndex((id, node) =>
-                node.init({ id, data, execThenExecNext })
-            )
+            R.mapWithIndex((id, node) => node.init({ id, data }))
         )
 
         const props: GameProps = {
@@ -94,9 +90,7 @@ describe(statesFromHistory, () => {
         } as unknown) as AppData
         pipe(
             data.nodes,
-            R.mapWithIndex((id, node) =>
-                node.init({ id, data, execThenExecNext })
-            )
+            R.mapWithIndex((id, node) => node.init({ id, data }))
         )
 
         const props1: GameProps = {
@@ -138,9 +132,7 @@ describe(statesFromHistory, () => {
         } as unknown) as AppData
         pipe(
             data.nodes,
-            R.mapWithIndex((id, node) =>
-                node.init({ id, data, execThenExecNext })
-            )
+            R.mapWithIndex((id, node) => node.init({ id, data }))
         )
 
         const props0: GameProps = {

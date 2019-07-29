@@ -12,6 +12,4 @@
 
 * cutscene before main menu
 
-* jp2 (ne pas oublier la boule de soumission)
-
 * jp3: kick lee sound, zhonya sound

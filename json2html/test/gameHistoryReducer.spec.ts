@@ -13,8 +13,6 @@ import Play from '../game-engine/nodes/Play'
 import Show from '../game-engine/nodes/Show'
 
 describe(gameHistoryReducer, () => {
-    const execThenExecNext = () => () => {}
-
     it('should empty', () => {
         const empty = gameHistoryReducer({} as HistoryState<GameState>, {
             type: 'EMPTY'
@@ -42,9 +40,7 @@ describe(gameHistoryReducer, () => {
     const node4 = new Show('titi', [])
     const block1: AstNode[] = [node1, node2]
     const block2: AstNode[] = [node3, node4];
-    [block1, block2].map(_ =>
-        _.map(_ => _.init({ id: '', data, execThenExecNext }))
-    )
+    [block1, block2].map(_ => _.map(_ => _.init({ id: '', data })))
 
     const block1Props = {
         ...GameProps.empty,

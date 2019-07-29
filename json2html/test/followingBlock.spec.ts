@@ -6,8 +6,6 @@ import Say from '../game-engine/nodes/Say'
 import Show from '../game-engine/nodes/Show'
 
 describe('AstNode.followingBlock', () => {
-    const execThenExecNext = () => () => {}
-
     it('should return none for node without nexts', () => {
         const node = new Show('', [])
         expect(node.followingBlock()).toEqual(O.none)
@@ -23,9 +21,7 @@ describe('AstNode.followingBlock', () => {
             nodes: { node1, node2, node3 },
             images: { toto: new Image('toto', 'fileToto') }
         } as unknown) as AppData;
-        [node, node1, node2, node3].map(_ =>
-            _.init({ id: '', data, execThenExecNext })
-        )
+        [node, node1, node2, node3].map(_ => _.init({ id: '', data }))
 
         expect(node.followingBlock()).toEqual(O.some([node1, node2]))
     })
@@ -38,7 +34,7 @@ describe('AstNode.followingBlock', () => {
             nodes: { node1 },
             images: { toto: new Image('toto', 'fileToto') }
         } as unknown) as AppData;
-        [node, node1].map(_ => _.init({ id: '', data, execThenExecNext }))
+        [node, node1].map(_ => _.init({ id: '', data }))
 
         expect(node.followingBlock()).toEqual(O.some([node1]))
     })
@@ -52,9 +48,7 @@ describe('AstNode.followingBlock', () => {
             nodes: { node1, node2 },
             images: { toto: new Image('toto', 'fileToto') }
         } as unknown) as AppData;
-        [node, node1, node2].map(_ =>
-            _.init({ id: '', data, execThenExecNext })
-        )
+        [node, node1, node2].map(_ => _.init({ id: '', data }))
 
         expect(() => node.followingBlock()).toThrow(
             EvalError('Node Show("toto") has more than one next node')
