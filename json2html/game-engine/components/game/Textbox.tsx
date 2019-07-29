@@ -1,48 +1,60 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { SerializedStyles } from '@emotion/core';
-import { TextAlignProperty } from 'csstype';
-import { Option } from 'fp-ts/lib/Option';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import { SerializedStyles } from '@emotion/core'
+import { TextAlignProperty } from 'csstype'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import { FunctionComponent } from 'react'
 
-import { style } from '../../context';
-import Char from '../../models/Char';
-import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles';
+import Char from '../../Char'
+import { style } from '../../context'
+import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
 interface Props {
-    hide: boolean;
-    char: Option<Char>;
-    styleOverload?: {
+    hide: boolean
+    char: O.Option<Char>
+    styles?: {
         namebox?: SerializedStyles;
         dialog?: SerializedStyles;
-    };
+    }
 }
 
 const Textbox: FunctionComponent<Props> = ({
     hide,
     char,
-    styleOverload = {},
+    styles: stylesOverride = {},
     children
 }) => {
-    const textboxStyle = hide ? { display: 'none' } : {};
-    const charStyle = char
-        .chain<React.CSSProperties>(_ => _.color.map(_ => ({ color: _ })))
-        .getOrElse({});
-    const charName = char.map(_ => _.name).getOrElse('');
+    const textboxStyle = hide ? { display: 'none' } : undefined
+    const charStyle: React.CSSProperties = pipe(
+        char,
+        O.chain(_ =>
+            pipe(
+                _.color,
+                O.map(_ => ({ color: _ }))
+            )
+        ),
+        O.getOrElse(() => ({}))
+    )
+    const charName = pipe(
+        char,
+        O.map(_ => _.name),
+        O.getOrElse(() => '')
+    )
 
     return (
         <div css={styles.textbox} style={textboxStyle}>
             <div
-                css={[styles.namebox, styleOverload.namebox]}
+                css={[styles.namebox, stylesOverride.namebox]}
                 style={charStyle}
             >
                 {charName}
             </div>
-            <div css={[styles.dialog, styleOverload.dialog]}>{children}</div>
+            <div css={[styles.dialog, stylesOverride.dialog]}>{children}</div>
         </div>
-    );
-};
-export default Textbox;
+    )
+}
+export default Textbox
 
 const styles = {
     textbox: css({
@@ -86,4 +98,4 @@ const styles = {
             fontSize: `${style.dialog_fsize_v}vw`
         }
     })
-};
+}

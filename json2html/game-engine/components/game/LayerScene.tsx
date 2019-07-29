@@ -1,42 +1,70 @@
 /** @jsx jsx */
-import { css, CSSObject, jsx, keyframes } from '@emotion/core';
-import { Option } from 'fp-ts/lib/Option';
-import { FunctionComponent } from 'react';
+import { css, jsx, keyframes, SerializedStyles } from '@emotion/core'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import { FunctionComponent } from 'react'
+import { TransitionStatus } from 'react-transition-group/Transition'
 
-import Image from '../../models/Image';
+import Image from '../../medias/Image'
+import AnimateWithDep from '../AnimateWithDep'
+
+const durationMs: number = 1000
 
 interface Props {
-    image: Option<Image>;
+    image: O.Option<Image>
+    animate?: boolean
 }
 
-const LayerScene: FunctionComponent<Props> = ({ image }) => (
-    <div css={layerSceneStyles}>{image.map(_ => _.elt()).toNullable()}</div>
-);
-export default LayerScene;
+const LayerScene: FunctionComponent<Props> = ({ image, animate = true }) => {
+    const key = pipe(
+        image,
+        O.map(_ => _.name),
+        O.getOrElse(() => '')
+    )
 
-const layerSceneStyles = css({
-    ...common(),
+    return (
+        <AnimateWithDep key={key} durationMs={durationMs} animate={animate}>
+            {status =>
+                pipe(
+                    image,
+                    O.map(_ =>
+                        _.elt({ css: [styles.base, stylesFromStatus(status)] })
+                    ),
+                    O.toNullable
+                )
+            }
+        </AnimateWithDep>
+    )
+}
+export default LayerScene
 
-    '& > img': {
-        ...common(),
+const stylesFromStatus = (
+    status: TransitionStatus
+): SerializedStyles | undefined => {
+    if (status === 'entering') return styles.entering
+    if (status === 'entered') return styles.entered
+    return undefined
+}
+
+const styles = {
+    base: css({
         top: '0',
         left: '0',
-        objectFit: 'contain',
-        animation: `${fadeIn()} 1s forwards`
-    }
-});
-
-function common(): CSSObject {
-    return {
         position: 'absolute',
         height: '100%',
-        width: '100%'
-    };
-}
+        width: '100%',
+        objectFit: 'contain',
+        opacity: 0
+    }),
 
-function fadeIn() {
-    return keyframes({
-        from: { opacity: 0 },
-        to: { opacity: 1 }
-    });
+    entering: css({
+        animation: `${keyframes({
+            from: { opacity: 0 },
+            to: { opacity: 1 }
+        })} ${durationMs}ms forwards`
+    }),
+
+    entered: css({
+        opacity: 1
+    })
 }

@@ -1,27 +1,34 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { fromNullable } from 'fp-ts/lib/Option';
-import { insert, StrMap, toArray } from 'fp-ts/lib/StrMap';
-import { FunctionComponent, useState } from 'react';
+import { css, jsx } from '@emotion/core'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
+import { FunctionComponent, useState } from 'react'
 
-import { storageKey, storagePrefix, style, transl } from '../../../context';
-import MemoryGame from './MemoryGame';
+import { storageKey, storagePrefix, style, transl } from '../../../context'
+import Obj from '../../../Obj'
+import MemoryGame from './MemoryGame'
 
 interface Props {
-    emptySaves: () => void;
+    emptySaves: () => void
+    confirmYesNo: (
+        message: string,
+        actionYes: () => void,
+        actionNo?: () => void
+    ) => void
 }
 
-const Memory: FunctionComponent<Props> = ({ emptySaves }) => {
-    const [games, setGames] = useState<StrMap<number>>(allJPGamesStorages);
+const Memory: FunctionComponent<Props> = ({ emptySaves, confirmYesNo }) => {
+    const [games, setGames] = useState<Obj<number>>(allJPGamesStorages)
 
-    const gameElts = toArray(games).map(([key, bytes], i) => (
+    const gameElts = R.toArray(games).map(([key, bytes], i) => (
         <MemoryGame
             key={i}
             storageKey={key}
             bytes={bytes}
-            deleteStorage={deleteStorage(key)}
+            deleteStorage={deleteStorageWithConfirm(key)}
         />
-    ));
+    ))
 
     return (
         <div css={styles.memory}>
@@ -32,60 +39,77 @@ const Memory: FunctionComponent<Props> = ({ emptySaves }) => {
                 }}
             />
             <div css={styles.games}>
-                <div>{gameElts.length > 0 ? gameElts : transl.noGamesYet}</div>
+                {gameElts.length > 0 ? gameElts : noGamesYet()}
             </div>
             {gameElts.length > 0 ? footer() : null}
         </div>
-    );
+    )
+
+    function noGamesYet(): JSX.Element {
+        return <div css={styles.noGamesYet}>{transl.memory.noGamesYet}</div>
+    }
 
     function footer(): JSX.Element {
         return (
             <div css={styles.footer}>
                 <MemoryGame
                     storageKey={transl.memory.total}
-                    bytes={games.reduce(0, (a, b) => a + b)}
+                    bytes={pipe(
+                        games,
+                        R.reduce(0, (a, b) => a + b)
+                    )}
                     deleteStorage={deleteAll}
                     deleteAll={true}
                 />
             </div>
-        );
+        )
     }
 
-    function allJPGamesStorages(): StrMap<number> {
+    function allJPGamesStorages(): Obj<number> {
         return Object.keys(localStorage)
             .filter(key => key.startsWith(storagePrefix))
-            .reduce(
+            .reduce<Obj<number>>(
                 (acc, key) =>
-                    fromNullable(localStorage.getItem(key))
-                        .map(_ =>
-                            insert(
+                    pipe(
+                        O.fromNullable(localStorage.getItem(key)),
+                        O.map(_ =>
+                            R.insertAt(
                                 key.replace(storagePrefix, ''),
-                                byteCount(_),
-                                acc
-                            )
-                        )
-                        .getOrElse(acc),
-                new StrMap<number>({})
-            );
+                                byteCount(_)
+                            )(acc)
+                        ),
+                        O.getOrElse(() => acc)
+                    ),
+                {}
+            )
     }
 
     function deleteStorage(key: string): () => void {
         return () => {
-            const keyWithPrefix = storagePrefix + key;
-            localStorage.removeItem(keyWithPrefix);
-            if (keyWithPrefix === storageKey) emptySaves();
-            setGames(allJPGamesStorages());
-        };
+            const keyWithPrefix = storagePrefix + key
+            localStorage.removeItem(keyWithPrefix)
+            if (keyWithPrefix === storageKey) emptySaves()
+            setGames(allJPGamesStorages())
+        }
+    }
+
+    function deleteStorageWithConfirm(key: string): () => void {
+        return () => confirmYesNo(transl.confirm.delete, deleteStorage(key))
     }
 
     function deleteAll() {
-        games.mapWithKey(key => deleteStorage(key)());
+        confirmYesNo(transl.confirm.deleteAll, () =>
+            pipe(
+                games,
+                R.mapWithIndex(_ => deleteStorage(_)())
+            )
+        )
     }
-};
-export default Memory;
+}
+export default Memory
 
 const byteCount = (str: string): number =>
-    encodeURI(str).split(/%..|./).length - 1;
+    encodeURI(str).split(/%..|./).length - 1
 
 const styles = {
     memory: css({
@@ -102,16 +126,13 @@ const styles = {
     }),
 
     games: css({
-        overflowY: 'auto',
         flexGrow: 1,
+        overflowY: 'auto',
+        padding: '1.33em 0'
+    }),
 
-        '& > div': {
-            minHeight: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center'
-        }
+    noGamesYet: css({
+        padding: '0 3em'
     }),
 
     footer: css({
@@ -119,4 +140,4 @@ const styles = {
         margin: '0 2em',
         padding: '0 1em'
     })
-};
+}

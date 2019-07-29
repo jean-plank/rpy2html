@@ -1,39 +1,33 @@
-import { none, Option } from 'fp-ts/lib/Option';
-import { lookup } from 'fp-ts/lib/StrMap';
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 
-import AstNode, { InitArgs } from './AstNode';
+import AstNode, { InitArgs } from './AstNode'
 
-import Char from '../models/Char';
-
-interface Args {
-    idNexts?: string[];
-}
+import Char from '../Char'
 
 export default abstract class NodeWithChar extends AstNode {
-    who: Option<Char>;
-    what: string;
-
-    private whosName: Option<string>;
+    who: O.Option<Char> = O.none
 
     constructor(
-        whosName: Option<string>,
-        what: string,
-        { idNexts = [] }: Args = {}
+        private whosName: O.Option<string>,
+        public what: string,
+        idNexts: string[]
     ) {
-        super({ idNexts, stopExecution: true });
-        this.who = none;
-        this.what = what;
-        this.whosName = whosName;
+        super(idNexts, true)
     }
 
-    init({ id, data, execThenExecNext }: InitArgs) {
-        super.init({ id, data, execThenExecNext });
-        this.who = this.whosName.chain(name => {
-            const res = lookup(name, data.chars);
-            if (res.isNone()) {
-                console.warn(`Say: invalid character name: ${name}`);
-            }
-            return res;
-        });
+    init({ id, data }: InitArgs) {
+        super.init({ id, data })
+        this.who = pipe(
+            this.whosName,
+            O.chain(name => {
+                const res = R.lookup(name, data.chars)
+                if (O.isNone(res)) {
+                    console.warn(`Say: invalid character name: ${name}`)
+                }
+                return res
+            })
+        )
     }
 }

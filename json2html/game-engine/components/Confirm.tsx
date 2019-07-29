@@ -1,34 +1,37 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
-import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react';
+import { css, jsx } from '@emotion/core'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
+import { forwardRef, RefForwardingComponent, useImperativeHandle } from 'react'
 
-import { style } from '../context';
-import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles';
-import withStopPropagation from '../utils/withStopPropagation';
-import { KeyUpAble } from './App';
-import Button from './Button';
+import { style } from '../context'
+import Obj from '../Obj'
+import { getBgOrElse, ifOldStyle, mediaQuery } from '../utils/styles'
+import withStopPropagation from '../utils/withStopPropagation'
+import { KeyUpAble } from './App'
+import GuiButton from './GuiButton'
 
-export interface IButton {
-    text: string;
-    onClick?: () => void;
-    selected?: boolean;
-    disabled?: boolean;
+interface Button {
+    text: string
+    onClick?: () => void
+    selected?: boolean
+    disabled?: boolean
 }
 
-interface Props {
-    hideConfirm: () => void;
-    message: string;
-    buttons: IButton[];
-    escapeAction?: () => void;
+export interface ConfirmProps {
+    hideConfirm: () => void
+    message: string
+    buttons: Button[]
+    escapeAction?: () => void
 }
 
 // hideConfirm will always be called after escapeAction
-const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
+const RawConfirm: RefForwardingComponent<KeyUpAble, ConfirmProps> = (
     { hideConfirm, message, buttons, escapeAction },
     ref
 ) => {
-    useImperativeHandle(ref, () => ({ onKeyUp }));
+    useImperativeHandle(ref, () => ({ onKeyUp }))
 
     return (
         <div css={styles.confirm} onClick={onClickBg}>
@@ -40,42 +43,51 @@ const RawConfirm: RefForwardingComponent<KeyUpAble, Props> = (
                 <div css={styles.items}>{buttonsElts()}</div>
             </div>
         </div>
-    );
+    )
 
     function buttonsElts(): JSX.Element[] {
-        return buttons.map((btn: IButton, i: number) => (
-            <Button
+        return buttons.map((btn: Button, i: number) => (
+            <GuiButton
                 key={i}
                 onClick={withStopPropagation(() => {
-                    if (btn.onClick !== undefined) btn.onClick();
-                    hideConfirm();
+                    pipe(
+                        O.fromNullable(btn.onClick),
+                        O.map(_ => _())
+                    )
+                    hideConfirm()
                 })}
             >
                 {btn.text}
-            </Button>
-        ));
+            </GuiButton>
+        ))
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
+    function onKeyUp(e: KeyboardEvent) {
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             Escape: onClickBg
-        });
-        lookup(e.key, keyEvents).map(_ => _(e));
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(_ => _(e))
+        )
     }
 
-    function onClickBg(e: React.SyntheticEvent) {
+    function onClickBg(e: React.SyntheticEvent | Event) {
         withStopPropagation(() => {
-            if (escapeAction !== undefined) escapeAction();
-            hideConfirm();
-        })(e);
+            pipe(
+                O.fromNullable(escapeAction),
+                O.map(_ => _())
+            )
+            hideConfirm()
+        })(e)
     }
 
     function stopPropagation(e: React.MouseEvent) {
-        e.stopPropagation();
+        e.stopPropagation()
     }
-};
-const Confirm = forwardRef<KeyUpAble, Props>(RawConfirm);
-export default Confirm;
+}
+const Confirm = forwardRef<KeyUpAble, ConfirmProps>(RawConfirm)
+export default Confirm
 
 const styles = {
     confirm: css({
@@ -114,4 +126,4 @@ const styles = {
         justifyContent: 'space-around',
         marginTop: '1.67em'
     })
-};
+}

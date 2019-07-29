@@ -1,36 +1,40 @@
 /** @jsx jsx */
-import { css, jsx, SerializedStyles } from '@emotion/core';
-import { TextAlignProperty } from 'csstype';
-import { FunctionComponent } from 'react';
+import { css, jsx, SerializedStyles } from '@emotion/core'
+import { TextAlignProperty } from 'csstype'
+import { FunctionComponent } from 'react'
 
-import { style } from '../../context';
-import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles';
+import { style } from '../../context'
+import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
 interface Props {
-    choices: Choice[];
-    styleOverload?: {
+    choices: Choice[]
+    styles?: {
         choice?: SerializedStyles;
-    };
+    }
 }
 
 interface Choice {
-    text: string;
-    onClick: (e: React.MouseEvent) => void;
+    text: string
+    onClick: (e: React.MouseEvent) => void
 }
 
-const Choices: FunctionComponent<Props> = ({ choices, styleOverload = {} }) => {
-    const choicesElts = choices.map((choice, i) => (
-        <button
-            key={i}
-            css={[styles.choice, styleOverload.choice]}
-            onClick={choice.onClick}
-        >
-            {choice.text}
-        </button>
-    ));
-    return <div css={styles.choices}>{choicesElts}</div>;
-};
-export default Choices;
+const Choices: FunctionComponent<Props> = ({
+    choices,
+    styles: stylesOverride = {}
+}) => (
+    <div css={styles.choices}>
+        {choices.map((choice, i) => (
+            <button
+                key={i}
+                css={[styles.choice, stylesOverride.choice]}
+                onClick={choice.onClick}
+            >
+                {choice.text}
+            </button>
+        ))}
+    </div>
+)
+export default Choices
 
 const styles = {
     choices: css({
@@ -54,15 +58,15 @@ const styles = {
         textAlign: style.choicebtn_txtalign as TextAlignProperty,
         ...styleFrom(style.choicebtn_bgtile),
         ...getBgOrElse('choice_btn_bg', 'rgba(0, 0, 0, 0.75)'),
+        [mediaQuery(style)]: {
+            fontSize: `${style.choicebtn_fsize_v}vw`
+        },
         ':hover': {
             color: style.choicebtn_color_hover,
             ...getBgOrElse('choice_btn_hover', 'rgba(0, 153, 204, 0.75)')
         },
         ':disabled': {
             color: style.disabledbtn_color
-        },
-        [mediaQuery(style)]: {
-            fontSize: `${style.choicebtn_fsize_v}vw`
         }
     })
-};
+}

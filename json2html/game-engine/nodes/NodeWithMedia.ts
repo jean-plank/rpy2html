@@ -1,47 +1,41 @@
-import { none, Option } from 'fp-ts/lib/Option';
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
 
-import Image from '../models/Image';
-import Media from '../models/medias/Media';
-import AstNode, { AppData, InitArgs } from './AstNode';
+import Media from '../medias/Media'
+import AstNode, { AppData, InitArgs } from './AstNode'
 
-interface Args {
-    idNexts?: string[];
-    stopExecution?: boolean;
-}
-
-export default abstract class NodeWithMedia<
-    T extends Media | Image
-> extends AstNode {
-    protected mediaName: string;
-    protected media: Option<T> = none;
-
-    private fromData: (data: AppData, mediaName: string) => Option<T>;
+export default abstract class NodeWithMedia<T extends Media> extends AstNode {
+    protected media: O.Option<T> = O.none
 
     constructor(
-        fromData: (data: AppData, mediaName: string) => Option<T>,
-        mediaName: string,
-        { idNexts = [], stopExecution = false }: Args = {}
+        private fromData: (data: AppData, mediaName: string) => O.Option<T>,
+        public mediaName: string,
+        idNexts: string[],
+        stopExecution = false
     ) {
-        super({ idNexts, stopExecution });
-        this.fromData = fromData;
-        this.mediaName = mediaName;
+        super(idNexts, stopExecution)
     }
 
     toString(): string {
-        return `${this.constructor.name}("${this.mediaName}")`;
+        return `${this.constructor.name}("${this.mediaName}")`
     }
 
-    load() {
-        this.media.map(_ => _.load());
+    protected load() {
+        super.load()
+        if (__DEV) console.log(`%cloading ${this}`, 'color: #bada55')
+        pipe(
+            this.media,
+            O.map(_ => _.load())
+        )
     }
 
-    init({ id, data, execThenExecNext }: InitArgs) {
-        super.init({ id, data, execThenExecNext });
-        this.media = this.fromData(data, this.mediaName);
-        if (this.media.isNone()) {
+    init({ id, data }: InitArgs) {
+        super.init({ id, data })
+        this.media = this.fromData(data, this.mediaName)
+        if (O.isNone(this.media)) {
             console.warn(
                 `${this.constructor.name}: invalid name: ${this.mediaName}`
-            );
+            )
         }
     }
 }

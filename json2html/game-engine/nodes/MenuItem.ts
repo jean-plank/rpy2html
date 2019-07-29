@@ -1,31 +1,30 @@
-import { Either } from 'fp-ts/lib/Either';
-import * as t from 'io-ts';
+import * as E from 'fp-ts/lib/Either'
+import { identity } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as t from 'io-ts'
 
-import convertToJs from '../utils/convertToJs';
-
-import AstNode from './AstNode';
-
-interface Args {
-    condition?: string;
-    idNexts?: string[];
-}
+import convertToJs from '../utils/convertToJs'
+import AstNode from './AstNode'
 
 export default class MenuItem extends AstNode {
-    text: string;
-    condition: boolean;
+    condition: boolean
 
-    constructor(text: string, condition: string, { idNexts = [] }: Args = {}) {
-        super({ idNexts });
-        this.text = text;
-        this.condition = eval(convertToJs(condition)) === true;
+    constructor(public text: string, condition: string, idNexts: string[]) {
+        super(idNexts)
+        this.condition = eval(convertToJs(condition)) === true
     }
 
-    toString = (): string => `MenuItem("${this.text}")`;
+    toString = (): string => `MenuItem("${this.text}")`
 
-    static decode = (menuItem: unknown): Either<t.Errors, MenuItem> =>
-        MenuItemType.decode(menuItem).map(
-            ({ arguments: [imgName, condition, idNexts] }) =>
-                new MenuItem(imgName, condition, { idNexts })
+    reduce = identity
+
+    static decode = (menuItem: unknown): E.Either<t.Errors, MenuItem> =>
+        pipe(
+            MenuItemType.decode(menuItem),
+            E.map(
+                ({ arguments: [imgName, condition, idNexts] }) =>
+                    new MenuItem(imgName, condition, idNexts)
+            )
         )
 }
 
@@ -34,4 +33,4 @@ const MenuItemType = t.exact(
         class_name: t.literal('MenuItem'),
         arguments: t.tuple([t.string, t.string, t.array(t.string)])
     })
-);
+)

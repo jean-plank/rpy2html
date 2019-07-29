@@ -1,131 +1,125 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { none, Option, some } from 'fp-ts/lib/Option';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
+import { css, jsx } from '@emotion/core'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
 import {
+    createRef,
     forwardRef,
-    KeyboardEvent,
     RefForwardingComponent,
-    useImperativeHandle,
-    useState
-} from 'react';
+    RefObject,
+    useImperativeHandle
+} from 'react'
 
-import { transl } from '../../../context';
-import QuickSave from '../../../storage/QuickSave';
-import Save from '../../../storage/Save';
-import { getBgOrElse } from '../../../utils/styles';
-import { KeyUpAble } from '../../App';
-import Help from '../Help';
-import MenuButton from '../MenuButton';
-import menuStyles, { gameMenuOverlay, mainMenuOverlay } from '../menuStyles';
-import SaveSlots from '../SaveSlots';
-import Memory from './Memory';
-
-enum Btn {
-    None,
-    Load,
-    Memory,
-    Help
-}
+import { HistoryHook } from '../../../hooks/useHistory'
+import { SavesHook } from '../../../hooks/useSaves'
+import Obj from '../../../Obj'
+import Save from '../../../saves/Save'
+import SoundService from '../../../sound/SoundService'
+import { getBgOrElse } from '../../../utils/styles'
+import { KeyUpAble } from '../../App'
+import Help from '../Help'
+import Menu, { MenuAble, MenuOverlay } from '../Menu'
+import MenuBtn from '../MenuBtn'
+import Preferences from '../Preferences'
+import SaveSlots from '../SaveSlots'
+import Memory from './Memory'
 
 interface Props {
-    startGame: () => void;
-    saves: Array<Option<Save>>;
-    emptySaves: () => void;
-    loadSave: (save: QuickSave) => void;
+    soundService: SoundService
+    startGame: () => void
+    savesHook: SavesHook
+    historyHook: HistoryHook
+    confirmYesNo: (
+        message: string,
+        actionYes: () => void,
+        actionNo?: () => void
+    ) => void
 }
 
 const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
-    { startGame, saves, emptySaves, loadSave },
+    {
+        soundService,
+        startGame,
+        savesHook: { saves, emptySaves, deleteSave },
+        historyHook: { loadSave },
+        confirmYesNo
+    },
     ref
 ) => {
-    useImperativeHandle(ref, () => ({ onKeyUp }));
+    const menuAble: RefObject<MenuAble> = createRef()
 
-    const [overlayClassName, setOverlay] = useState<string>(mainMenuOverlay);
-    const [selectedBtn, setSelectedBtn] = useState<Btn>(Btn.None);
-    const [submenu, setSubmenu] = useState<Option<JSX.Element>>(none);
+    useImperativeHandle(ref, () => ({ onKeyUp }))
 
     return (
-        <div css={[menuStyles.menu, mainMenuStyles]}>
-            <div className={overlayClassName} />
-            <div css={menuStyles.menuBar}>
-                <MenuButton onClick={startGame}>{transl.menu.start}</MenuButton>
-                <MenuButton
-                    onClick={showLoad}
-                    selected={selectedBtn === Btn.Load}
-                >
-                    {transl.menu.load}
-                </MenuButton>
-                <MenuButton
-                    onClick={showMemory}
-                    selected={selectedBtn === Btn.Memory}
-                >
-                    {transl.menu.memory}
-                </MenuButton>
-                <MenuButton
-                    onClick={showHelp}
-                    selected={selectedBtn === Btn.Help}
-                >
-                    {transl.menu.help}
-                </MenuButton>
-            </div>
-            <div css={menuStyles.submenuTitle}>{submenuTitle()}</div>
-            <div css={menuStyles.submenu}>{submenu.toNullable()}</div>
-        </div>
-    );
+        <Menu
+            ref={menuAble}
+            overlay={MenuOverlay.MainMenu}
+            buttons={[
+                { btn: 'START', specialAction: O.some(startGame) },
+                { btn: 'LOAD' },
+                { btn: 'PREFS' },
+                { btn: 'MEMORY' },
+                { btn: 'HELP' }
+            ]}
+            submenu={submenu}
+            styles={styles}
+        />
+    )
 
-    function submenuTitle(): string {
-        switch (selectedBtn) {
-            case Btn.Load:
-                return transl.menu.load;
-            case Btn.Memory:
-                return transl.menu.memory;
-            case Btn.Help:
-                return transl.menu.help;
-            case Btn.None:
-                return '';
+    function submenu(btn: MenuBtn): JSX.Element | null {
+        if (btn === 'LOAD') return getLoad()
+        if (btn === 'PREFS') return <Preferences soundService={soundService} />
+        if (btn === 'MEMORY') return getMemory()
+        if (btn === 'HELP') return <Help />
+        return null
+    }
+
+    function getLoad(): JSX.Element {
+        return (
+            <SaveSlots
+                saves={saves.slots}
+                onClick={onClick}
+                deleteSave={deleteSave}
+                disabledIfEmpty={true}
+            />
+        )
+
+        function onClick(_: number, save: O.Option<Save>) {
+            pipe(
+                save,
+                O.map(loadSave)
+            )
         }
     }
 
-    function showLoad() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Load);
-        setSubmenu(some(<SaveSlots {...{ saves, onClick }} />));
-
-        function onClick(_: number, save: Option<Save>) {
-            save.map(loadSave);
-        }
-    }
-
-    function showMemory() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Memory);
-        setSubmenu(some(<Memory emptySaves={emptySaves} />));
-    }
-
-    function showHelp() {
-        setOverlay(gameMenuOverlay);
-        setSelectedBtn(Btn.Help);
-        setSubmenu(some(<Help />));
+    function getMemory(): JSX.Element {
+        return <Memory emptySaves={emptySaves} confirmYesNo={confirmYesNo} />
     }
 
     function onKeyUp(e: KeyboardEvent) {
-        const keyEvents = new StrMap<(e: KeyboardEvent) => void>({
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             Escape: e => {
-                if (selectedBtn !== Btn.None) {
-                    e.stopPropagation();
-                    setOverlay(mainMenuOverlay);
-                    setSubmenu(none);
-                    setSelectedBtn(Btn.None);
-                }
+                pipe(
+                    O.fromNullable(menuAble.current),
+                    O.map(({ selectedBtn, setSelectedBtn, setOverlay }) => {
+                        if (O.isSome(selectedBtn)) {
+                            e.stopPropagation()
+                            setSelectedBtn(O.none)
+                            setOverlay(MenuOverlay.MainMenu)
+                        }
+                    })
+                )
             }
-        });
-        lookup(e.key, keyEvents).map(_ => _(e));
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(_ => _(e))
+        )
     }
-};
-export default forwardRef<KeyUpAble, Props>(MainMenu);
+}
+export default forwardRef<KeyUpAble, Props>(MainMenu)
 
-const mainMenuStyles = css({
-    fontSize: 'inherit',
+const styles = css({
     ...getBgOrElse('main_menu_bg', '#5f777f')
-});
+})

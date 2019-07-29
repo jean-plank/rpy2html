@@ -1,37 +1,33 @@
-import { Either } from 'fp-ts/lib/Either';
-import { none } from 'fp-ts/lib/Option';
-import { insert } from 'fp-ts/lib/StrMap';
-import * as t from 'io-ts';
+import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import AstNode from './AstNode';
-
-interface Arg {
-    idNexts?: string[];
-}
+import GameProps from '../history/GameProps'
+import * as SA from '../sound/SoundAction'
+import AstNode from './AstNode'
 
 export default class Stop extends AstNode {
-    private chanName: string;
-
-    constructor(chanName: string, { idNexts = [] }: Arg = {}) {
-        super({ idNexts });
-        this.chanName = chanName;
+    constructor(private chanName: string, idNexts: string[]) {
+        super(idNexts)
     }
 
-    toString = (): string => `Stop("${this.chanName}")`;
+    toString = (): string => `Stop("${this.chanName}")`
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
-        return {
-            ...res,
-            sounds: insert(this.chanName, none, gameProps.sounds)
-        };
-    }
+    reduce = (gameProps: GameProps): GameProps => ({
+        ...gameProps,
+        sounds: {
+            ...gameProps.sounds,
+            [this.chanName]: SA.stop
+        }
+    })
 
-    static decode = (hide: unknown): Either<t.Errors, Stop> =>
-        StopType.decode(hide).map(
-            ({ arguments: [chanName, idNexts] }) =>
-                new Stop(chanName, { idNexts })
+    static decode = (hide: unknown): E.Either<t.Errors, Stop> =>
+        pipe(
+            StopType.decode(hide),
+            E.map(
+                ({ arguments: [chanName, idNexts] }) =>
+                    new Stop(chanName, idNexts)
+            )
         )
 }
 
@@ -40,4 +36,4 @@ const StopType = t.exact(
         class_name: t.literal('Stop'),
         arguments: t.tuple([t.string, t.array(t.string)])
     })
-);
+)

@@ -59,7 +59,7 @@ def label_by_name(renpy_nodes, renpy_Label, name):
 
 
 def show_unknown_node_warning(node):
-    print('[WARNING] unknown node %s found, didn\'t continue this branch.' % (node.diff_info(), ))
+    print('[WARNING] unknown node {}: {}'.format(type(node).__name__, node.diff_info()))
 
 
 # adds node converted to acc['nodes']
@@ -81,10 +81,10 @@ def parse_node(renpy_nodes, renpy_ast, node, acc):
     elif isinstance(node, renpy_ast.Hide):
         return hide_to_str(renpy_nodes, renpy_ast, node, acc)
     elif isinstance(node, renpy_ast.UserStatement):
-        return play_stop_to_str(renpy_nodes, renpy_ast, node, acc)
+        return user_statement_to_str(renpy_nodes, renpy_ast, node, acc)
     else:
         show_unknown_node_warning(node)
-        return []
+        return [real_next(renpy_nodes, renpy_ast, node.next)]
 
 
 def real_next(renpy_nodes, renpy_ast, node):
@@ -264,51 +264,66 @@ def hide_to_str(renpy_nodes, renpy_ast, node, acc):
 
 WORD = re.compile(r'([\w.]+|".*?")')
 
-def play_stop_to_str(renpy_nodes, renpy_ast, node, acc):
+def user_statement_to_str(renpy_nodes, renpy_ast, node, acc):
     cmd = re.findall(WORD, node.line)
 
     next = real_next(renpy_nodes, renpy_ast, node.next)
     id_nexts = [str(id(next))] if next else []
 
     if  cmd[0] == 'play' and len(cmd) >= 3:
-        channel = cmd[1]
-        file = cmd[2][1:-1]
-        snd_name = remove_invalid_chars(file)
-        acc['sounds'][snd_name] = file
-        acc['nodes'][id(node)] = {
-            'class_name': 'Play',
-            'arguments': [
-                channel,
-                snd_name,
-                id_nexts
-            ]
-        }
-        return [next]
-
+        play_to_str(cmd, node, id_nexts, acc, cmd[2][1:-1], cmd[1])
     elif cmd[0] == 'voice' and len(cmd) >= 2:
-        file = cmd[1][1:-1]
-        snd_name = remove_invalid_chars(file)
-        acc['sounds'][snd_name] = file
-        acc['nodes'][id(node)] = {
-            'class_name': 'Play',
-            'arguments': [
-                'voice',
-                snd_name,
-                id_nexts
-            ]
-        }
-        return [next]
-
+        play_to_str(cmd, node, id_nexts, acc, cmd[1][1:-1], 'voice')
     elif cmd[0] == 'stop' and len(cmd) >= 2:
-        channel = cmd[1]
+        stop_to_str(cmd, node, id_nexts, acc)
+    elif cmd[0] == 'window' and len(cmd) >= 2:
+        window_to_str(cmd, node, id_nexts, acc)
+    elif cmd[0] == 'pause' and len(cmd) >= 1:
+        pause_to_str(cmd, node, id_nexts, acc)
+    else:
+        print('[WARNING] unrecognized UserStatement: %s' % node.line)
+
+    return [next]
+
+def play_to_str(cmd, node, id_nexts, acc, file, channel):
+    snd_name = remove_invalid_chars(file)
+    acc['sounds'][snd_name] = file
+    acc['nodes'][id(node)] = {
+        'class_name': 'Play',
+        'arguments': [
+            channel,
+            snd_name,
+            id_nexts
+        ]
+    }
+
+def stop_to_str(cmd, node, id_nexts, acc):
+    channel = cmd[1]
+    acc['nodes'][id(node)] = {
+        'class_name': 'Stop',
+        'arguments': [
+            channel,
+            id_nexts
+        ]
+    }
+
+def window_to_str(cmd, node, id_nexts, acc):
+    show = True if cmd[1] == 'show' else False if cmd[1] == 'hide' else None
+    if isinstance(show, bool):
         acc['nodes'][id(node)] = {
-            'class_name': 'Stop',
+            'class_name': 'ShowWindow',
             'arguments': [
-                channel,
+                show,
                 id_nexts
             ]
         }
-        return [next]
-
     else:
-        print('[WARNING] unrecognized UserStatement: %s, didn\'t continue this branch.' % node.line)
+        print('[WARNING] unrecognized window option: {}'.format(cmd[1]))
+
+def pause_to_str(cmd, node, id_nexts, acc):
+    acc['nodes'][id(node)] = {
+        'class_name': 'Pause',
+        'arguments': [
+            id_nexts
+        ]
+    }

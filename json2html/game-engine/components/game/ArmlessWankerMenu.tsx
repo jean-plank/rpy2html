@@ -1,16 +1,19 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core';
-import { FunctionComponent } from 'react';
+import { css, jsx } from '@emotion/core'
+import * as O from 'fp-ts/lib/Option'
+import { FunctionComponent } from 'react'
 
-import { style, transl } from '../../context';
-import { mediaQuery } from '../../utils/styles';
-import withStopPropagation from '../../utils/withStopPropagation';
-import Button from '../Button';
-import GameMenuBtn from '../menus/gameMenu/GameMenuBtn';
+import { style, transl } from '../../context'
+import { HistoryHook } from '../../hooks/useHistory'
+import { SavesHook } from '../../hooks/useSaves'
+import { mediaQuery } from '../../utils/styles'
+import withStopPropagation from '../../utils/withStopPropagation'
+import GuiButton from '../GuiButton'
+import MenuBtn, { menuBtnLabel } from '../menus/MenuBtn'
 
 interface BtnProps {
-    onClick: (e: React.MouseEvent) => void;
-    disabled?: boolean;
+    onClick: (e: React.MouseEvent) => void
+    disabled?: boolean
 }
 
 const AWButton: FunctionComponent<BtnProps> = ({
@@ -18,60 +21,56 @@ const AWButton: FunctionComponent<BtnProps> = ({
     disabled,
     children
 }) => (
-    <Button {...{ onClick, disabled }} css={styles.button}>
+    <GuiButton {...{ onClick, disabled }} css={styles.button}>
         {children}
-    </Button>
-);
+    </GuiButton>
+)
 
 export interface ArmlessWankerMenuProps {
-    showGameMenu: (btn?: GameMenuBtn) => void;
-    undo: () => void;
-    disableUndo: boolean;
-    quickSave: () => void;
-    quickLoad: () => void;
-    disableQuickLoad: boolean;
+    showGameMenu: (btn?: O.Option<MenuBtn>) => void
+    savesHook: SavesHook
+    historyHook: HistoryHook
 }
 
 const ArmlessWankerMenu: FunctionComponent<ArmlessWankerMenuProps> = ({
     showGameMenu,
-    disableUndo,
-    undo,
-    quickSave,
-    quickLoad,
-    disableQuickLoad
+    savesHook: { quickSave, noQuickSave },
+    historyHook: { undo, noPast, quickLoad, skip }
 }) => {
     return (
         <div css={styles.armlessWankerMenu}>
-            <AWButton
-                onClick={withStopPropagation(undo)}
-                disabled={disableUndo}
-            >
-                {transl.menu.back}
+            <AWButton onClick={withStopPropagation(undo)} disabled={noPast()}>
+                {transl.armless.back}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP('HISTORY')}>
-                {transl.menu.history}
+            {showGameMenuBtn('HISTORY')}
+            <AWButton onClick={withStopPropagation(skip)}>
+                {transl.armless.skip}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP('SAVE')}>
-                {transl.menu.save}
-            </AWButton>
+            {showGameMenuBtn('SAVE')}
             <AWButton onClick={withStopPropagation(quickSave)}>
-                {transl.menu.qSave}
+                {transl.armless.qSave}
             </AWButton>
             <AWButton
                 onClick={withStopPropagation(quickLoad)}
-                disabled={disableQuickLoad}
+                disabled={noQuickSave()}
             >
-                {transl.menu.qLoad}
+                {transl.armless.qLoad}
             </AWButton>
-            <AWButton onClick={showGameMenuWSP()}>{transl.menu.pause}</AWButton>
+            {showGameMenuBtn('PREFS')}
         </div>
-    );
+    )
 
-    function showGameMenuWSP(btn?: GameMenuBtn): (e: React.MouseEvent) => void {
-        return withStopPropagation(() => showGameMenu(btn));
+    function showGameMenuBtn(btn: MenuBtn): JSX.Element {
+        return (
+            <AWButton
+                onClick={withStopPropagation(() => showGameMenu(O.some(btn)))}
+            >
+                {menuBtnLabel(btn)}
+            </AWButton>
+        )
     }
-};
-export default ArmlessWankerMenu;
+}
+export default ArmlessWankerMenu
 
 const styles = {
     armlessWankerMenu: css({
@@ -81,14 +80,14 @@ const styles = {
         height: 'auto',
         bottom: 0,
         position: 'absolute',
-        width: '100%',
-        fontSize: `${style.quickbtn_fsize_h}vh`
+        width: '100%'
     }),
 
     button: css({
         margin: '0 1em',
+        fontSize: `${style.quickbtn_fsize_h}vh`,
         [mediaQuery(style)]: {
             fontSize: `${style.quickbtn_fsize_v}vw`
         }
     })
-};
+}

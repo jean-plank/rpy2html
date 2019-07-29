@@ -1,98 +1,122 @@
 /** @jsx jsx */
-import { css, jsx, SerializedStyles } from '@emotion/core';
-import { isEmpty } from 'fp-ts/lib/Array';
-import { fromNullable, Option } from 'fp-ts/lib/Option';
-import { lookup, StrMap } from 'fp-ts/lib/StrMap';
+import { css, jsx, SerializedStyles } from '@emotion/core'
+import * as A from 'fp-ts/lib/Array'
+import * as O from 'fp-ts/lib/Option'
+import * as R from 'fp-ts/lib/Record'
 import {
     forwardRef,
     RefForwardingComponent,
     useEffect,
     useImperativeHandle
-} from 'react';
+} from 'react'
 
-import GameProps from '../../gameHistory/GameProps';
-import Video from '../../models/medias/Video';
-import AstNode from '../../nodes/AstNode';
-import Menu from '../../nodes/Menu';
-import SoundService from '../../SoundService';
-import withStopPropagation from '../../utils/withStopPropagation';
-import { GameAble, KeyUpAble } from '../App';
-import ArmlessWankerMenu, { ArmlessWankerMenuProps } from './ArmlessWankerMenu';
-import Choices from './Choices';
-import Cutscene from './Cutscene';
-import LayerImages from './LayerImages';
-import LayerScene from './LayerScene';
-import Textbox from './Textbox';
+import { pipe } from 'fp-ts/lib/pipeable'
+import GameProps from '../../history/GameProps'
+import Video from '../../medias/Video'
+import AstNode from '../../nodes/AstNode'
+import Menu from '../../nodes/Menu'
+import Obj from '../../Obj'
+import SoundService from '../../sound/SoundService'
+import withStopPropagation from '../../utils/withStopPropagation'
+import { KeyUpAble } from '../App'
+import ArmlessWankerMenu, { ArmlessWankerMenuProps } from './ArmlessWankerMenu'
+import Choices from './Choices'
+import Cutscene from './Cutscene'
+import LayerImages from './LayerImages'
+import LayerScene from './LayerScene'
+import Textbox from './Textbox'
 
 interface Props {
-    gameProps: GameProps;
-    armlessWankerMenuProps?: ExtendedArmlessWankerProps;
-    styleOverload?: {
+    gameProps: GameProps
+    isSaveSlot?: boolean
+    armlessWankerMenuProps?: ExtendedArmlessWankerProps
+    styles?: {
         container?: SerializedStyles;
         namebox?: SerializedStyles;
         dialog?: SerializedStyles;
         choice?: SerializedStyles;
-    };
+    }
 }
 
 type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
     soundService: SoundService;
-    currentNode: Option<AstNode>;
     showMainMenu: () => void;
-    addBlock: (block: AstNode[]) => void;
-    redo: () => void;
-    onVideoEnded: (execNextIfNotMenu: () => void) => void;
-};
+}
 
-const Game: RefForwardingComponent<GameAble, Props> = (
-    { gameProps, armlessWankerMenuProps, styleOverload = {} },
+const Game: RefForwardingComponent<KeyUpAble, Props> = (
+    {
+        gameProps,
+        isSaveSlot = false,
+        armlessWankerMenuProps,
+        styles: stylesOverride = {}
+    },
     ref
 ) => {
     useImperativeHandle(ref, () => ({
-        onKeyUp,
-        execThenExecNext
-    }));
+        onKeyUp
+    }))
 
-    const args = fromNullable(armlessWankerMenuProps);
+    const args = O.fromNullable(armlessWankerMenuProps)
 
     useEffect(() => {
-        gameProps.video.map(video =>
-            args.map(({ onVideoEnded }) =>
-                video.onEnded(() => onVideoEnded(execNextIfNotMenu))
+        pipe(
+            gameProps.video,
+            O.map(video =>
+                pipe(
+                    args,
+                    O.map(({ historyHook: { noFuture, redo } }) =>
+                        video.onEnded(() =>
+                            noFuture() ? execNextIfNotMenu() : redo()
+                        )
+                    )
+                )
             )
-        );
-    }, [gameProps.video]);
-    useEffect(() => {
-        args.map(_ => _.soundService.applyProps(gameProps.sounds));
-    }, [gameProps.sounds]);
+        )
+    }, [gameProps.video])
 
-    return gameProps.video
-        .map(_ => cutsceneLayout(_))
-        .getOrElseL(defaultLayout);
+    useEffect(() => {
+        pipe(
+            args,
+            O.map(_ => _.soundService.applySounds(gameProps.sounds))
+        )
+    }, [gameProps.sounds])
+
+    useEffect(() => {
+        pipe(
+            args,
+            O.map(_ => _.soundService.applyAudios(gameProps.audios))
+        )
+    }, [gameProps.audios])
+
+    return pipe(
+        gameProps.video,
+        O.map(_ => cutsceneLayout(_)),
+        O.getOrElse(defaultLayout)
+    )
 
     function cutsceneLayout(video: Video): JSX.Element {
         return (
             <div
-                css={[gameStyles, styleOverload.container]}
+                css={[gameStyles, stylesOverride.container]}
                 {...{ onClick, onWheel }}
             >
-                <Cutscene video={video} />
+                <Cutscene video={video} autoPlay={!isSaveSlot} />
             </div>
-        );
+        )
     }
 
     function defaultLayout(): JSX.Element {
         return (
             <div
                 {...{ onClick, onWheel }}
-                css={[gameStyles, styleOverload.container]}
+                css={[gameStyles, stylesOverride.container]}
             >
-                <LayerScene image={gameProps.sceneImg} />
+                <LayerScene image={gameProps.sceneImg} animate={!isSaveSlot} />
                 <LayerImages images={gameProps.charImgs} />
                 <Textbox
                     hide={gameProps.textboxHide}
                     char={gameProps.textboxChar}
-                    styleOverload={styleOverload}
+                    styles={stylesOverride}
                 >
                     {gameProps.textboxText.split('\n').map((line, i) => (
                         <div key={i}>{line}</div>
@@ -105,19 +129,23 @@ const Game: RefForwardingComponent<GameAble, Props> = (
                             execThenExecNext(choice)
                         )
                     }))}
-                    styleOverload={styleOverload}
+                    styles={stylesOverride}
                 />
-                {args.map(armlessWankerMenu).toNullable()}
+                {pipe(
+                    args,
+                    O.map(armlessWankerMenu),
+                    O.toNullable
+                )}
             </div>
-        );
+        )
     }
 
     function armlessWankerMenu(props: ArmlessWankerMenuProps) {
-        return <ArmlessWankerMenu {...props} />;
+        return <ArmlessWankerMenu {...props} />
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        const keyEvents = new StrMap<(e: React.KeyboardEvent) => void>({
+    function onKeyUp(e: KeyboardEvent) {
+        const keyEvents: Obj<(e: KeyboardEvent) => void> = {
             ArrowUp: () => {},
             ArrowDown: () => {},
             ArrowLeft: () => {},
@@ -127,61 +155,108 @@ const Game: RefForwardingComponent<GameAble, Props> = (
             Enter: execNextIfNotMenu,
             Control: () => {},
             Tab: () => {},
-            PageUp: ifArgsExists(({ undo }) => undo()),
-            PageDown: ifArgsExists(({ redo }) => redo()),
+            PageUp: ifArgsExists(({ historyHook: { undo } }) => undo()),
+            PageDown: ifArgsExists(({ historyHook: { redo } }) => redo()),
             h: () => {},
             v: () => {},
-            s: ifArgsExists(({ quickSave }) => quickSave()),
-            l: ifArgsExists(({ quickLoad }) => quickLoad())
-        });
-        lookup(e.key, keyEvents).map(action => {
-            e.preventDefault();
-            e.stopPropagation();
-            action(e);
-        });
+            s: ifArgsExists(({ savesHook: { quickSave } }) => quickSave()),
+            l: ifArgsExists(({ historyHook: { quickLoad } }) => quickLoad())
+        }
+        pipe(
+            R.lookup(e.key, keyEvents),
+            O.map(action => {
+                e.preventDefault()
+                e.stopPropagation()
+                action(e)
+            })
+        )
     }
 
     function onClick(e: React.MouseEvent) {
-        if (e.button === 0) execNextIfNotMenu();
-        else if (e.button === 1) args.map(({ showGameMenu }) => showGameMenu());
+        if (e.button === 0) execNextIfNotMenu()
+        else if (e.button === 1) {
+            pipe(
+                args,
+                O.map(({ showGameMenu }) => showGameMenu())
+            )
+        }
     }
 
     function onWheel(e: React.WheelEvent) {
-        if (e.deltaY < 0) args.map(({ undo }) => undo());
-        else if (e.deltaY > 0) args.map(({ redo }) => redo());
+        if (e.deltaY < 0) {
+            pipe(
+                args,
+                O.map(({ historyHook: { undo } }) => undo())
+            )
+        } else if (e.deltaY > 0) {
+            pipe(
+                args,
+                O.map(({ historyHook: { redo } }) => redo())
+            )
+        }
     }
 
     function execThenExecNext(node: AstNode) {
-        execute([node, ...node.followingBlock()]);
+        execute(
+            O.some([
+                node,
+                ...pipe(
+                    node.followingBlock(),
+                    O.getOrElse(() => [])
+                )
+            ])
+        )
     }
 
     function execNextIfNotMenu() {
-        args.map(({ currentNode }) =>
-            currentNode.map(node => {
-                if (!(node instanceof Menu)) execute(node.followingBlock());
-            })
-        );
+        pipe(
+            args,
+            O.map(({ historyHook: { currentNode } }) =>
+                pipe(
+                    currentNode(),
+                    O.map(node => {
+                        if (!(node instanceof Menu)) {
+                            execute(node.followingBlock())
+                        }
+                    })
+                )
+            )
+        )
     }
 
-    function execute(block: AstNode[]) {
-        args.map(({ currentNode, showMainMenu, addBlock }) =>
-            currentNode.exists(_ => isEmpty(_.nexts()))
-                ? showMainMenu()
-                : addBlock(block)
-        );
+    function execute(maybeBlock: O.Option<AstNode[]>) {
+        pipe(
+            args,
+            O.map(({ showMainMenu, historyHook: { addBlock } }) =>
+                pipe(
+                    maybeBlock,
+                    O.fold(showMainMenu, block => {
+                        pipe(
+                            A.last(block),
+                            O.map(_ => _.nexts().forEach(_ => _.loadBlock()))
+                        )
+                        addBlock(block)
+                    })
+                )
+            )
+        )
     }
 
     function ifArgsExists(
         f: (args: ExtendedArmlessWankerProps) => void
     ): () => void {
-        return () => args.map(_ => f(_));
+        return () =>
+            pipe(
+                args,
+                O.map(_ => f(_))
+            )
     }
-};
-export default forwardRef<KeyUpAble, Props>(Game);
+}
+export default forwardRef<KeyUpAble, Props>(Game)
 
 const gameStyles = css({
     position: 'absolute',
     outline: 'none',
     height: '100%',
     width: '100%'
-});
+})

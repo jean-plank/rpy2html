@@ -1,316 +1,215 @@
 /** @jsx jsx */
-import { css, Global, jsx } from '@emotion/core';
-import { Do } from 'fp-ts-contrib/lib/Do';
-import { isEmpty, last } from 'fp-ts/lib/Array';
-import { fromNullable, none, Option, option, some } from 'fp-ts/lib/Option';
-import { lookup, toArray } from 'fp-ts/lib/StrMap';
-import {
-    createRef,
-    FunctionComponent,
-    RefObject,
-    useEffect,
-    useReducer,
-    useRef,
-    useState
-} from 'react';
+import { css, Global, jsx } from '@emotion/core'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
+import { FunctionComponent, useEffect, useMemo, useState } from 'react'
 
+import * as context from '../context'
+import Font from '../Font'
+import { GameState } from '../history/gameStateReducer'
+import useConfirm from '../hooks/useConfirm'
+import useHistory from '../hooks/useHistory'
+import useKeyUp from '../hooks/useKeyUp'
+import useKeyUpAbles from '../hooks/useKeyUpAbles'
+import useNotify from '../hooks/useNotify'
+import useSaves from '../hooks/useSaves'
+import { AppData } from '../nodes/AstNode'
+import SoundService from '../sound/SoundService'
 import {
-    chars,
-    firstNode,
-    fonts,
-    gameName,
-    images,
-    nodes,
-    sounds,
-    style,
-    transl,
-    videos
-} from '../context';
-import gameHistoryReducer, {
-    emptyGameHistoryState
-} from '../gameHistory/gameHistoryReducer';
-import Font from '../models/Font';
-import AstNode from '../nodes/AstNode';
-import SoundService from '../SoundService';
-import QuickSave from '../storage/QuickSave';
-import Saves from '../storage/Saves';
-import savesReducer from '../storage/savesReducer';
-import { historyFromState, loadAction, saveAction } from '../utils/saveLoad';
-import { mediaQuery } from '../utils/styles';
-import Confirm from './Confirm';
-import Game from './game/Game';
-import GameMenu from './menus/gameMenu/GameMenu';
-import GameMenuBtn from './menus/gameMenu/GameMenuBtn';
-import MainMenu from './menus/mainMenu/MainMenu';
-import Notifications, { Notifiable } from './Notifications';
+    enterFullscreen,
+    exitFullscreen,
+    isFullscreen
+} from '../utils/fullscreen'
+import { mediaQuery } from '../utils/styles'
+import Game from './game/Game'
+import GameMenu from './menus/gameMenu/GameMenu'
+import MainMenu from './menus/mainMenu/MainMenu'
+import MenuBtn from './menus/MenuBtn'
 
 export interface KeyUpAble {
-    onKeyUp: (e: React.KeyboardEvent) => void;
+    onKeyUp: (e: KeyboardEvent) => void
 }
 
-export type GameAble = KeyUpAble & {
-    execThenExecNext: (node: AstNode) => void;
-};
-
 type View =
-    | 'NONE'
     | 'MAIN_MENU'
     | 'GAME'
-    | { type: 'GAME_MENU'; selectedBtn: GameMenuBtn };
+    | { type: 'GAME_MENU'; selectedBtn: O.Option<MenuBtn> }
 
 const App: FunctionComponent = () => {
-    const confirmAudioShown = useRef(false);
-    const soundService = new SoundService(confirmAudio);
+    useEffect(() => initAll(context), [])
 
-    const viewKeyUpAble: RefObject<KeyUpAble> = createRef();
-    const gameAble: RefObject<GameAble> = createRef();
-    const notifiable: RefObject<Notifiable> = createRef();
-    const confirmKeyUpAble: RefObject<KeyUpAble> = createRef();
+    const { topKeyUpAble, viewKeyUpAble, confirmKeyUpAble } = useKeyUpAbles()
 
-    const [view, setView] = useState<View>('NONE');
-    const [confirm, setConfirm] = useState<Option<JSX.Element>>(none);
-    const [saves, dispatchSavesAction] = useReducer(
-        savesReducer,
-        Saves.fromStorage()
-    );
-    const [gameState, dispatchGameHistoryAction] = useReducer(
-        gameHistoryReducer,
-        emptyGameHistoryState
-    );
+    const { confirm, confirmAudio, confirmYesNo } = useConfirm(
+        confirmKeyUpAble
+    )
 
-    const data = { nodes, chars, sounds, videos, images };
+    const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
-    useEffect(() => {
-        nodes.mapWithKey((id, node) =>
-            node.init({ id, data, execThenExecNext })
-        );
-        firstNode.loadBlock();
-        initDom();
-        showMainMenu();
-    }, []);
+    const [view, setView] = useState<O.Option<View>>(O.none)
+
+    const { notifications, notify } = useNotify()
+
+    const historyHook = useHistory(
+        () => savesHook.saves.quickSave,
+        soundService,
+        notify,
+        showGame,
+        showMainMenu
+    )
+
+    const savesHook = useSaves(historyHook.historyFromState, notify)
+
+    useKeyUp(onKeyUp)
 
     return (
-        <div tabIndex={0} onKeyUp={onKeyUp} css={styles.container}>
+        <div css={styles.container}>
             <Global styles={globalStyles} />
-            <div css={styles.view}>{getView(view)}</div>
-            {<Notifications ref={notifiable} />}
-            {confirm.toNullable()}
+            <div css={styles.view}>
+                {pipe(
+                    view,
+                    O.chain(getView),
+                    O.toNullable
+                )}
+                {notifications}
+                {confirm}
+            </div>
         </div>
-    );
+    )
 
-    function getView(view: View): JSX.Element | null {
-        if (view === 'NONE') return null;
-        if (view === 'MAIN_MENU') {
-            return (
-                <MainMenu
-                    ref={viewKeyUpAble}
-                    startGame={startGame}
-                    saves={saves.slots}
-                    emptySaves={emptySaves}
-                    loadSave={loadSave}
-                />
-            );
-        }
+    function getView(view: View): O.Option<JSX.Element> {
+        if (view === 'MAIN_MENU') return O.some(mainMenuL())
         if (view === 'GAME') {
-            return gameState.present
-                .map(([gameProps]) => (
-                    // tslint:disable-next-line: jsx-key
-                    <Game
-                        ref={gameAble}
-                        gameProps={gameProps}
-                        armlessWankerMenuProps={{
-                            showGameMenu,
-                            undo,
-                            disableUndo: isEmpty(gameState.past),
-                            quickSave,
-                            quickLoad,
-                            disableQuickLoad: saves.quickSave.isNone(),
-                            soundService,
-                            currentNode: currentNode(),
-                            showMainMenu,
-                            addBlock,
-                            redo,
-                            onVideoEnded
-                        }}
-                    />
-                ))
-                .toNullable();
+            return pipe(
+                historyHook.present,
+                O.map(getGame)
+            )
         }
-        if (view.type === 'GAME_MENU') {
-            return (
-                <GameMenu
-                    ref={viewKeyUpAble}
-                    history={historyFromState(gameState)}
-                    saves={saves.slots}
-                    loadSave={loadSave}
-                    hideGameMenu={hideGameMenu}
-                    showMainMenu={showMainMenu}
-                    save={save}
-                    confirmYesNo={confirmYesNo}
-                    selectedBtn={view.selectedBtn}
-                />
-            );
-        }
-        return null;
+        return O.some(getGameMenu(view.selectedBtn))
     }
 
-    function onKeyUp(e: React.KeyboardEvent) {
-        confirm
-            .map<void>(_ =>
-                fromNullable(confirmKeyUpAble.current).map(_ => _.onKeyUp(e))
+    function mainMenuL(): JSX.Element {
+        return (
+            <MainMenu
+                ref={viewKeyUpAble}
+                soundService={soundService}
+                startGame={startGame}
+                savesHook={savesHook}
+                historyHook={historyHook}
+                confirmYesNo={confirmYesNo}
+            />
+        )
+    }
+
+    function getGame([gameProps]: GameState): JSX.Element {
+        return (
+            <Game
+                ref={viewKeyUpAble}
+                gameProps={gameProps}
+                armlessWankerMenuProps={{
+                    showGameMenu,
+                    savesHook,
+                    historyHook,
+                    soundService,
+                    showMainMenu
+                }}
+            />
+        )
+    }
+
+    function getGameMenu(selectedBtn: O.Option<MenuBtn>): JSX.Element {
+        return (
+            <GameMenu
+                ref={viewKeyUpAble}
+                soundService={soundService}
+                hideGameMenu={hideGameMenu}
+                showMainMenu={showMainMenu}
+                savesHook={savesHook}
+                historyHook={historyHook}
+                confirmYesNo={confirmYesNo}
+                selectedBtn={selectedBtn}
+            />
+        )
+    }
+
+    function onKeyUp(e: KeyboardEvent) {
+        if (e.key === 'f') return toggleFullscreen()
+
+        function toggleFullscreen() {
+            if (isFullscreen()) exitFullscreen()
+            else enterFullscreen()
+        }
+
+        pipe(
+            topKeyUpAble(),
+            O.map(_ => _.onKeyUp(e))
+        )
+    }
+
+    function initAll(data: AppData) {
+        initDom()
+        pipe(
+            context.nodes,
+            R.mapWithIndex((id, node) => node.init({ id, data }))
+        )
+        context.firstNode.loadBlock()
+        showMainMenu()
+    }
+
+    function initDom() {
+        document.title = context.gameName
+        pipe(
+            R.lookup('game_icon', context.images),
+            O.map(
+                icon =>
+                    (pipe(
+                        O.fromNullable(document.querySelector(
+                            'link[rel*="icon"]'
+                        ) as HTMLLinkElement),
+                        O.getOrElse(() => {
+                            const link = document.createElement('link')
+                            link.rel = 'shortcut icon'
+                            document.head.appendChild(link)
+                            return link
+                        })
+                    ).href = icon.file)
             )
-            .orElse(() => fromNullable(gameAble.current).map(_ => _.onKeyUp(e)))
-            .orElse(() =>
-                fromNullable(viewKeyUpAble.current).map(_ => _.onKeyUp(e))
-            );
+        )
     }
 
     function showMainMenu() {
-        soundService.playMainMenuMusic();
-        setView('MAIN_MENU');
+        soundService.playMainMenuMusic()
+        setView(O.some('MAIN_MENU'))
     }
 
     function startGame() {
-        dispatchGameHistoryAction({ type: 'EMPTY' });
-        dispatchGameHistoryAction({
-            type: 'ADD_BLOCK',
-            block: [firstNode, ...firstNode.followingBlock()]
-        });
-        showGame();
+        historyHook.empty()
+        historyHook.addBlock([
+            context.firstNode,
+            ...pipe(
+                context.firstNode.followingBlock(),
+                O.getOrElse(() => [])
+            )
+        ])
+        showGame()
     }
 
     function showGame() {
-        setView('GAME');
+        setView(O.some('GAME'))
     }
 
-    function onVideoEnded(execNextIfNotMenu: () => void) {
-        isEmpty(gameState.future) ? execNextIfNotMenu() : redo();
-    }
-
-    function showGameMenu(selectedBtn: GameMenuBtn = 'NONE') {
-        soundService.pauseChannels();
-        setView({ type: 'GAME_MENU', selectedBtn });
+    function showGameMenu(selectedBtn: O.Option<MenuBtn> = O.none) {
+        soundService.pauseChannels()
+        setView(O.some({ type: 'GAME_MENU', selectedBtn }))
     }
 
     function hideGameMenu() {
-        soundService.resumeChannels();
-        showGame();
+        soundService.resumeChannels()
+        showGame()
     }
-
-    function execThenExecNext(node: AstNode): () => void {
-        return () =>
-            fromNullable(gameAble.current).map(_ => _.execThenExecNext(node));
-    }
-
-    function addBlock(block: AstNode[]) {
-        dispatchGameHistoryAction({ type: 'ADD_BLOCK', block });
-    }
-
-    function currentNode(): Option<AstNode> {
-        return Do(option)
-            .bind('present', gameState.present)
-            .bindL('currentNode', ({ present: [, block] }) => last(block))
-            .return(({ currentNode }) => currentNode);
-    }
-
-    function undo() {
-        dispatchGameHistoryAction({ type: 'UNDO' });
-    }
-
-    function redo() {
-        dispatchGameHistoryAction({ type: 'REDO' });
-    }
-
-    function emptySaves() {
-        dispatchSavesAction('EMPTY');
-    }
-
-    function loadSave(save: QuickSave) {
-        loadAction(firstNode, save)
-            .map(_ => {
-                dispatchGameHistoryAction(_);
-                showGame();
-            })
-            .getOrElseL(() => notify("Couldn't restore save"));
-    }
-
-    function save(slot: number) {
-        dispatchSavesAction(saveAction(gameState, slot));
-    }
-
-    function quickLoad() {
-        saves.quickSave.map(loadSave);
-    }
-
-    function quickSave() {
-        dispatchSavesAction(saveAction(gameState));
-        notify(transl.menu.saved);
-    }
-
-    function confirmAudio(okAction: () => void) {
-        if (!confirmAudioShown.current) {
-            confirmAudioShown.current = true;
-            setConfirm(
-                some(
-                    <Confirm
-                        ref={confirmKeyUpAble}
-                        hideConfirm={hideConfirm}
-                        message={transl.confirm.audio}
-                        buttons={[
-                            { text: transl.confirm.audioBtn, onClick: okAction }
-                        ]}
-                        escapeAction={okAction}
-                    />
-                )
-            );
-        }
-    }
-
-    function confirmYesNo(
-        message: string,
-        actionYes: () => void,
-        actionNo?: () => void
-    ) {
-        setConfirm(
-            some(
-                <Confirm
-                    ref={confirmKeyUpAble}
-                    hideConfirm={hideConfirm}
-                    message={message}
-                    buttons={[
-                        { text: transl.confirm.yes, onClick: actionYes },
-                        { text: transl.confirm.no, onClick: actionNo }
-                    ]}
-                    escapeAction={actionNo}
-                />
-            )
-        );
-    }
-
-    function hideConfirm() {
-        setConfirm(none);
-    }
-
-    function notify(message: string) {
-        fromNullable(notifiable.current).map(_ => _.notify(message));
-    }
-};
-export default App;
-
-const initDom = () => {
-    document.title = gameName;
-    lookup('game_icon', images).map(
-        icon =>
-            (fromNullable(document.querySelector(
-                'link[rel*="icon"]'
-            ) as HTMLLinkElement).getOrElseL(() => {
-                const link = document.createElement('link');
-                link.rel = 'shortcut icon';
-                document.head.appendChild(link);
-                return link;
-            }).href = icon.file)
-    );
-};
+}
+export default App
 
 const globalStyles = css(
     {
@@ -338,18 +237,20 @@ const globalStyles = css(
             fontSize: '1em',
             padding: 0,
             textOverflow: 'unset',
-            whiteSpace: 'nowrap'
+            '&:not([disabled])': {
+                cursor: 'pointer'
+            }
         }
     },
     ...getFonts()
-);
+)
 
 function getFonts() {
-    return toArray(fonts).map(([name, font]) =>
+    return R.toArray(context.fonts).map(([name, font]) =>
         name === 'dejavusans_bold_ttf'
             ? Font.face('dejavusans_ttf', font)
             : Font.face(name, font)
-    );
+    )
 }
 
 const styles = {
@@ -358,7 +259,7 @@ const styles = {
         justifyContent: 'center',
         width: '100vw',
         height: '100vh',
-        [mediaQuery(style)]: {
+        [mediaQuery(context.style)]: {
             flexDirection: 'column'
         },
 
@@ -371,10 +272,12 @@ const styles = {
         height: '100vh',
         overflow: 'hidden',
         position: 'relative',
-        width: `${(100 * style.game_width) / style.game_height}vh`,
-        [mediaQuery(style)]: {
+        width: `${(100 * context.style.game_width) /
+            context.style.game_height}vh`,
+        [mediaQuery(context.style)]: {
             width: '100vw',
-            height: `${(100 * style.game_height) / style.game_width}vw`
+            height: `${(100 * context.style.game_height) /
+                context.style.game_width}vw`
         }
     })
-};
+}

@@ -1,43 +1,60 @@
-import { Either } from 'fp-ts/lib/Either';
-import { insert, lookup } from 'fp-ts/lib/StrMap';
-import * as t from 'io-ts';
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as R from 'fp-ts/lib/Record'
+import * as t from 'io-ts'
 
-import GameProps from '../gameHistory/GameProps';
-import Sound from '../models/medias/Sound';
-import NodeWithMedia from './NodeWithMedia';
-
-interface Args {
-    idNexts?: string[];
-}
+import GameProps from '../history/GameProps'
+import Sound from '../medias/Sound'
+import * as SA from '../sound/SoundAction'
+import NodeWithMedia from './NodeWithMedia'
 
 export default class Play extends NodeWithMedia<Sound> {
-    private chanName: string;
-
-    constructor(
-        chanName: string,
-        sndName: string,
-        { idNexts = [] }: Args = {}
-    ) {
-        super((data, sndName) => lookup(sndName, data.sounds), sndName, {
+    constructor(private chanName: string, sndName: string, idNexts: string[]) {
+        super(
+            (data, sndName) => R.lookup(sndName, data.sounds),
+            sndName,
             idNexts
-        });
-        this.chanName = chanName;
+        )
     }
 
-    toString = (): string => `Play("${this.chanName}", "${this.mediaName}")`;
+    toString = (): string => `Play("${this.chanName}", "${this.mediaName}")`
 
-    reduce = (gameProps: GameProps): Partial<GameProps> => {
-        const res = super.reduce(gameProps);
-        return {
-            ...res,
-            sounds: insert(this.chanName, this.media, gameProps.sounds)
-        };
-    }
+    reduce = (gameProps: GameProps): GameProps =>
+        (this.chanName === 'audio' ? this.reduceAudio : this.reduceSounds)(
+            gameProps
+        )
 
-    static decode = (play: unknown): Either<t.Errors, Play> =>
-        PlayType.decode(play).map(
-            ({ arguments: [chanName, sndName, idNexts] }) =>
-                new Play(chanName, sndName, { idNexts })
+    private reduceAudio = (gameProps: GameProps): GameProps =>
+        pipe(
+            this.media,
+            O.map(audio => ({
+                ...gameProps,
+                audios: [...gameProps.audios, audio]
+            })),
+            O.getOrElse(() => gameProps)
+        )
+
+    private reduceSounds = (gameProps: GameProps): GameProps =>
+        pipe(
+            this.media,
+            O.map(audio => ({
+                ...gameProps,
+                sounds: {
+                    ...gameProps.sounds,
+                    [this.chanName]: SA.play(audio)
+                }
+            })),
+            O.getOrElse(() => gameProps)
+        )
+
+    static decode = (play: unknown): E.Either<t.Errors, Play> =>
+        pipe(
+            PlayType.decode(play),
+            E.map(
+                ({ arguments: [chanName, sndName, idNexts] }) =>
+                    new Play(chanName, sndName, idNexts)
+            )
         )
 }
 
@@ -46,4 +63,4 @@ const PlayType = t.exact(
         class_name: t.literal('Play'),
         arguments: t.tuple([t.string, t.string, t.array(t.string)])
     })
-);
+)

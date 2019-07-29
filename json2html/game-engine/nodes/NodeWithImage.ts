@@ -1,21 +1,15 @@
-import { lookup } from 'fp-ts/lib/StrMap';
+import * as R from 'fp-ts/lib/Record'
 
-import Image from '../models/Image';
-import NodeWithMedia from './NodeWithMedia';
+import Image from '../medias/Image'
+import NodeWithMedia from './NodeWithMedia'
 
-interface Args {
-    idNexts?: string[];
-    stopExecution?: boolean;
-}
-
-export default class NodeWithImage extends NodeWithMedia<Image> {
-    constructor(
-        imgName: string,
-        { idNexts = [], stopExecution = false }: Args = {}
-    ) {
-        super((data, imgName) => lookup(imgName, data.images), imgName, {
+export default abstract class NodeWithImage extends NodeWithMedia<Image> {
+    constructor(imgName: string, idNexts: string[], stopExecution = false) {
+        super(
+            (data, imgName) => R.lookup(imgName, data.images),
+            imgName,
             idNexts,
             stopExecution
-        });
+        )
     }
 }

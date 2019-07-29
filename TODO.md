@@ -1,11 +1,15 @@
-* Fix: menu with caption
-
-* Confirm memory deletion
-
 * `show left|right`
 
-* The `audio` channel supports playing back multiple audio files at one time, but does not support queueing sound or stopping playback.
+* get file name with renpy function (`renpy.display.image.ImageReference(imgname)._target().filename` for images)
 
-* no blinking sceneImgs
- 
-* splits `slots` and `quickSave` in `Saves`
+* UI arrow navigation
+
+* Slider and Radio styled from gui
+
+* load until next scene
+
+* animation on scene change: fade textbox
+
+* cutscene before main menu
+
+* jp3: kick lee sound, zhonya sound

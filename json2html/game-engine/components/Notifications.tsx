@@ -1,37 +1,30 @@
 /** @jsx jsx */
-import { css, jsx, keyframes } from '@emotion/core';
-import {
-    forwardRef,
-    RefForwardingComponent,
-    useImperativeHandle,
-    useState
-} from 'react';
+import { css, jsx, keyframes } from '@emotion/core'
+import { FunctionComponent } from 'react'
 
-import { style } from '../context';
-import { mediaQuery } from '../utils/styles';
+import { style } from '../context'
+import { mediaQuery } from '../utils/styles'
 
-export interface Notifiable {
-    notify: (message: string) => void;
+interface Props {
+    notifs: Notification[]
+    durationMs: number
 }
 
-const Notifications: RefForwardingComponent<Notifiable, {}> = (_, ref) => {
-    const [notifs, setNotifs] = useState<JSX.Element[]>([]);
+export interface Notification {
+    key: number
+    message: string
+}
 
-    useImperativeHandle(ref, () => ({
-        notify: (message: string) => {
-            const notif = (
-                <div key={Math.random()} css={styles.notification}>
-                    {message}
-                </div>
-            );
-            setNotifs([...notifs, notif]);
-            setTimeout(() => setNotifs(notifs.filter(_ => _ !== notif)), 2000);
-        }
-    }));
-
-    return <div css={styles.notifications}>{notifs}</div>;
-};
-export default forwardRef<Notifiable>(Notifications);
+const Notifications: FunctionComponent<Props> = ({ notifs, durationMs }) => (
+    <div css={styles.notifications}>
+        {notifs.map(({ key, message }) => (
+            <div key={key} css={styles.notification(durationMs)}>
+                {message}
+            </div>
+        ))}
+    </div>
+)
+export default Notifications
 
 const styles = {
     notifications: css({
@@ -46,39 +39,20 @@ const styles = {
         }
     }),
 
-    notification: css({
-        boxSizing: 'content-box',
-        display: 'inline-block',
-        padding: '1em',
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        animation: `${fadeOut()} 1.5s linear forwards`
-        // animation: `${reduce()} 1s linear 2s forwards`
-    })
-};
+    notification: (durationMs: number) =>
+        css({
+            boxSizing: 'content-box',
+            display: 'inline-block',
+            padding: '1em',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            animation: `${fadeOut()} ${durationMs / 1000}s linear forwards`
+        })
+}
 
 function fadeOut() {
     return keyframes({
-        from: { opacity: 1 },
-        to: { opacity: 0 }
-    });
+        '0%': { opacity: 0.9 },
+        '67%': { opacity: 0.9 },
+        '100%': { opacity: 0 }
+    })
 }
-
-// function reduce() {
-//     return keyframes({
-//         '0%': {
-//             opacity: 1,
-//             padding: '1em',
-//             height: '1em'
-//         },
-//         '50%': {
-//             opacity: 0,
-//             padding: '1em',
-//             height: '1em'
-//         },
-//         '100%': {
-//             opacity: 0,
-//             padding: '0 1em',
-//             height: 0
-//         }
-//     });
-// }
