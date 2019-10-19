@@ -2,15 +2,15 @@ import * as O from 'fp-ts/lib/Option'
 
 import gameHistoryReducer, {
     emptyGameHistoryState
-} from '../game-engine/history/gameHistoryReducer'
-import GameProps from '../game-engine/history/GameProps'
-import { GameState } from '../game-engine/history/gameStateReducer'
-import { HistoryState } from '../game-engine/history/historiable'
-import Image from '../game-engine/medias/Image'
-import Sound from '../game-engine/medias/Sound'
-import AstNode, { AppData } from '../game-engine/nodes/AstNode'
-import Play from '../game-engine/nodes/Play'
-import Show from '../game-engine/nodes/Show'
+} from '../weeb-engine/history/gameHistoryReducer'
+import GameProps from '../weeb-engine/history/GameProps'
+import { GameState } from '../weeb-engine/history/gameStateReducer'
+import { HistoryState } from '../weeb-engine/history/historiable'
+import Image from '../weeb-engine/medias/Image'
+import Sound from '../weeb-engine/medias/Sound'
+import AstNode, { AppData } from '../weeb-engine/nodes/AstNode'
+import Play from '../weeb-engine/nodes/Play'
+import Show from '../weeb-engine/nodes/Show'
 
 describe(gameHistoryReducer, () => {
     it('should empty', () => {

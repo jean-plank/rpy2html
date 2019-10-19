@@ -3,13 +3,13 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
-import GameProps from '../game-engine/history/GameProps'
-import statesFromHistory from '../game-engine/history/statesFromHistory'
-import Image from '../game-engine/medias/Image'
-import AstNode, { AppData } from '../game-engine/nodes/AstNode'
-import Say from '../game-engine/nodes/Say'
-import Scene from '../game-engine/nodes/Scene'
-import Show from '../game-engine/nodes/Show'
+import GameProps from '../weeb-engine/history/GameProps'
+import statesFromHistory from '../weeb-engine/history/statesFromHistory'
+import Image from '../weeb-engine/medias/Image'
+import AstNode, { AppData } from '../weeb-engine/nodes/AstNode'
+import Say from '../weeb-engine/nodes/Say'
+import Scene from '../weeb-engine/nodes/Scene'
+import Show from '../weeb-engine/nodes/Show'
 
 describe(statesFromHistory, () => {
     it('should return empty array for node without nexts', () => {

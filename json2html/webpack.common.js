@@ -3,7 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: path.resolve(__dirname, './game-engine/index.tsx'),
+    entry: path.resolve(__dirname, './weeb-engine/index.tsx'),
     output: {
         path: path.resolve(__dirname, '../dist/'),
         filename: 'bundle.js'
