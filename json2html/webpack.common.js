@@ -1,6 +1,6 @@
-const path = require('path');
+const path = require('path')
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
     entry: path.resolve(__dirname, './weeb-engine/index.tsx'),
@@ -59,7 +59,7 @@ module.exports = {
             },
             // videos
             {
-                test: /\.(webm)$/,
+                test: /\.(webm|ogv)$/,
                 use: [
                     {
                         loader: 'file-loader',
@@ -83,4 +83,4 @@ module.exports = {
             favicon: path.resolve(__dirname, 'templates/default.ico')
         })
     ]
-};
+}
