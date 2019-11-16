@@ -2,7 +2,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
-import Char from '../Char'
+import Char from '../../renpy-json-loader/Char'
 import Image from '../medias/Image'
 import Sound from '../medias/Sound'
 import Video from '../medias/Video'
@@ -68,10 +68,7 @@ export default class GameProps {
             if (key === 'sounds') {
                 return {
                     ...acc,
-                    sounds: pipe(
-                        props.sounds,
-                        R.map(SA.toString)
-                    )
+                    sounds: pipe(props.sounds, R.map(SA.toString))
                 }
             }
             return { ...acc, [key]: val }

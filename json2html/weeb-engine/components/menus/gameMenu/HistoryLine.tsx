@@ -4,7 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { CSSProperties, FunctionComponent } from 'react'
 
-import Char from '../../../Char'
+import Char from '../../../../renpy-json-loader/Char'
 
 interface Props {
     char: O.Option<Char>

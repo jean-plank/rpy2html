@@ -31,16 +31,16 @@ interface Props {
     isSaveSlot?: boolean
     armlessWankerMenuProps?: ExtendedArmlessWankerProps
     styles?: {
-        container?: SerializedStyles;
-        namebox?: SerializedStyles;
-        dialog?: SerializedStyles;
-        choice?: SerializedStyles;
+        container?: SerializedStyles
+        namebox?: SerializedStyles
+        dialog?: SerializedStyles
+        choice?: SerializedStyles
     }
 }
 
 type ExtendedArmlessWankerProps = ArmlessWankerMenuProps & {
-    soundService: SoundService;
-    showMainMenu: () => void;
+    soundService: SoundService
+    showMainMenu: () => void
 }
 
 const Game: RefForwardingComponent<KeyUpAble, Props> = (
@@ -131,11 +131,7 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
                     }))}
                     styles={stylesOverride}
                 />
-                {pipe(
-                    args,
-                    O.map(armlessWankerMenu),
-                    O.toNullable
-                )}
+                {pipe(args, O.map(armlessWankerMenu), O.toNullable)}
             </div>
         )
     }

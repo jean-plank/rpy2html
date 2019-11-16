@@ -4,9 +4,11 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 import * as t from 'io-ts'
 
-import RenpyJson, { RawNode, Style } from '../renpy-json-loader/RenpyJson'
-import Char from './Char'
-import Font from './Font'
+import Char from '../renpy-json-loader/Char'
+import Font from '../renpy-json-loader/Font'
+import Node from '../renpy-json-loader/Node'
+import RenpyJson from '../renpy-json-loader/RenpyJson'
+import Style from '../renpy-json-loader/Style'
 import Image from './medias/Image'
 import Sound from './medias/Sound'
 import Video from './medias/Video'
@@ -28,22 +30,16 @@ import Stop from './nodes/Stop'
 import Obj from './Obj'
 import translations, { Translation } from './translations'
 
-const json = require(`../renpy-json-loader/index!${__INPUT_JSON}`) as RenpyJson
+const json: RenpyJson = require(`../renpy-json-loader/dist/index!${__INPUT_JSON}`)
 
 export const nbSlots: number = 6
 export const storagePrefix: string = 'jpGame-'
 export const storageKey: string =
     storagePrefix + json.game_name + ` (${json.lang})`
 
-export const nodes: Obj<AstNode> = pipe(
-    json.nodes,
-    R.map(parseNode)
-)
+export const nodes: Obj<AstNode> = pipe(json.nodes, R.map(parseNode))
 
-export const chars: Obj<Char> = pipe(
-    json.characters,
-    R.map(Char.fromRawChar)
-)
+export const chars: Obj<Char> = json.characters
 
 export const sounds: Obj<Sound> = pipe(
     json.sounds,
@@ -76,7 +72,7 @@ export const firstNode: AstNode = pipe(
 )
 export const gameName: string = json.game_name
 
-function parseNode(rawNode: RawNode): AstNode {
+function parseNode(rawNode: Node): AstNode {
     const res = [
         E.alt(() => If.decode(rawNode)),
         E.alt(() => IfBlock.decode(rawNode)),
@@ -92,11 +88,7 @@ function parseNode(rawNode: RawNode): AstNode {
         E.alt(() => ShowWindow.decode(rawNode)),
         E.alt(() => Stop.decode(rawNode))
     ].reduce<E.Either<t.Errors, AstNode>>(
-        (acc, decode) =>
-            pipe(
-                acc,
-                decode
-            ),
+        (acc, decode) => pipe(acc, decode),
         Hide.decode(rawNode)
     )
 
