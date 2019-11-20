@@ -48,7 +48,7 @@ export const sounds: Obj<Sound> = pipe(
 
 export const videos: Obj<Video> = pipe(
     json.videos,
-    R.map(_ => new Video(_))
+    R.mapWithIndex((name, file) => new Video(name, file))
 )
 
 export const images: Obj<Image> = pipe(

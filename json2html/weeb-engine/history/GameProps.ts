@@ -11,8 +11,8 @@ import Obj from '../Obj'
 import * as SA from '../sound/SoundAction'
 
 export default class GameProps {
-    sceneImg: O.Option<Image>
-    charImgs: Image[]
+    scene: O.Option<Video | Image>
+    shown: (Video | Image)[]
     showWindow: boolean
     textboxHide: boolean
     textboxChar: O.Option<Char>
@@ -23,8 +23,8 @@ export default class GameProps {
     audios: Sound[]
 
     static empty: GameProps = {
-        sceneImg: O.none,
-        charImgs: [],
+        scene: O.none,
+        shown: [],
         showWindow: true,
         textboxHide: false,
         textboxChar: O.none,

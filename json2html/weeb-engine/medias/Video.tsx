@@ -1,23 +1,29 @@
 /** @jsx jsx */
-import { jsx, SerializedStyles } from '@emotion/core'
+import { InterpolationWithTheme, jsx } from '@emotion/core'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 
 import Media from './Media'
 
 interface Args {
-    autoPlay: boolean
-    css?: SerializedStyles
+    autoPlay?: boolean
+    key?: string | number
+    css?: InterpolationWithTheme<any>
 }
 
 export default class Video extends Media {
     private _elt: O.Option<HTMLVideoElement> = O.none
 
+    constructor(public name: string, file: string) {
+        super(file)
+    }
+
     private setElt = (elt: HTMLVideoElement | null) =>
         (this._elt = O.fromNullable(elt))
 
-    elt = ({ autoPlay, css }: Args): JSX.Element => (
+    elt = ({ key, autoPlay = true, css }: Args = {}): JSX.Element => (
         <video
+            key={key}
             ref={this.setElt}
             css={css}
             src={this.file}
