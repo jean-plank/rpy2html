@@ -271,9 +271,16 @@ def user_statement_to_str(GAME_BASE_DIR, renpy, node, res):
     return [next]
 
 
+VIDEO_EXTENSION = ['.webm', '.ogv']
+
+
 def play_to_str(GAME_BASE_DIR, cmd, node, id_nexts, res, file, channel):
     snd_name = remove_invalid_chars(file)
-    load_media(GAME_BASE_DIR, res, 'sounds', snd_name, file)
+
+    _, ext = path.splitext(file)
+    media_type = 'videos' if ext in VIDEO_EXTENSION else 'sounds'
+    load_media(GAME_BASE_DIR, res, media_type, snd_name, file)
+
     res['nodes'][id(node)] = {
         'class_name': 'Play',
         'arguments': [
