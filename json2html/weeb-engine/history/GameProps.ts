@@ -3,24 +3,23 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
 import Char from '../../renpy-json-loader/Char'
-import Image from '../medias/Image'
-import Sound from '../medias/Sound'
+import { Displayable, Listenable } from '../medias/Media'
 import Video from '../medias/Video'
 import MenuItem from '../nodes/MenuItem'
 import Obj from '../Obj'
 import * as SA from '../sound/SoundAction'
 
 export default class GameProps {
-    scene: O.Option<Video | Image>
-    shown: (Video | Image)[]
+    scene: O.Option<Displayable>
+    shown: Displayable[]
     showWindow: boolean
     textboxHide: boolean
     textboxChar: O.Option<Char>
     textboxText: string
     choices: MenuItem[]
     video: O.Option<Video>
-    sounds: Obj<SA.SoundAction> // key chanName
-    audios: Sound[]
+    sounds: Obj<SA.SoundAction<Listenable>> // key chanName
+    audios: Listenable[]
 
     static empty: GameProps = {
         scene: O.none,

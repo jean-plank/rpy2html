@@ -3,7 +3,8 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
 import { sounds } from '../context'
-import Sound from '../medias/Sound'
+import { Listenable } from '../medias/Media'
+import SoundElement from '../medias/SoundElement'
 import Obj from '../Obj'
 import Channel from './Channel'
 import * as SA from './SoundAction'
@@ -13,7 +14,7 @@ export default class SoundService {
     volumes: Volumes = Volumes.fromStorage()
 
     private channels: Obj<Channel>
-    private mainMenuMusic: O.Option<Sound>
+    private mainMenuMusic: O.Option<Listenable>
 
     constructor(private confirmAudio: (okAction: () => void) => void) {
         this.channels = {
@@ -56,7 +57,7 @@ export default class SoundService {
             R.map(_ => _.resume())
         )
 
-    applySounds = (sounds: Obj<SA.SoundAction>) =>
+    applySounds = (sounds: Obj<SA.SoundAction<Listenable>>) =>
         pipe(
             sounds,
             R.mapWithIndex((chanName, soundAction) =>
@@ -97,15 +98,15 @@ export default class SoundService {
     }
 
     private playIfNotMusicAndAlready = (chanName: string, channel: Channel) => (
-        sound: Sound
+        sound: Listenable
     ): void => {
         if (!(chanName === 'music' && channel.isAlreadyPlaying(sound))) {
             channel.play(sound)
         }
     }
 
-    applyAudios = (audios: Sound[]) =>
-        audios.map(_ => Sound.play(_.elt(this.volumes.sound)))
+    applyAudios = (audios: Listenable[]) =>
+        audios.map(_ => SoundElement.play(_.soundElt(this.volumes.sound)))
 
     setVolume = (chanName: keyof Volumes, volume: number) => {
         this.volumes[chanName] = volume

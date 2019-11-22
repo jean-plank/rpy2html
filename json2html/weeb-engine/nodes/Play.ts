@@ -5,15 +5,24 @@ import * as R from 'fp-ts/lib/Record'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
+import { Listenable } from '../medias/Media'
 import Sound from '../medias/Sound'
 import * as SA from '../sound/SoundAction'
 import NodeWithMedia from './NodeWithMedia'
 
 export default class Play extends NodeWithMedia<Sound> {
-    constructor(private chanName: string, sndName: string, idNexts: string[]) {
+    constructor(
+        private chanName: string,
+        mediaName: string,
+        idNexts: string[]
+    ) {
         super(
-            (data, sndName) => R.lookup(sndName, data.sounds),
-            sndName,
+            (data, mediaName) =>
+                pipe(
+                    R.lookup<Listenable>(mediaName, data.sounds),
+                    O.alt(() => R.lookup(mediaName, data.videos))
+                ),
+            mediaName,
             idNexts
         )
     }

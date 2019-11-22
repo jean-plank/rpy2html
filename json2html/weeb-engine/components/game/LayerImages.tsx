@@ -2,16 +2,15 @@
 import { css, CSSObject, jsx } from '@emotion/core'
 import { FunctionComponent } from 'react'
 
-import Image from '../../medias/Image'
-import Video from '../../medias/Video'
+import { Displayable } from '../../medias/Media'
 
 interface Props {
-    medias: (Video | Image)[]
+    medias: Displayable[]
 }
 
 const LayerImages: FunctionComponent<Props> = ({ medias }) => (
     <div css={styles.container}>
-        {medias.map(med => med.elt({ key: med.name, css: styles.img }))}
+        {medias.map(med => med.reactNode({ key: med.name, css: styles.img }))}
     </div>
 )
 export default LayerImages

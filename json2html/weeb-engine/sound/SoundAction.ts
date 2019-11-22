@@ -1,8 +1,6 @@
-import Sound from '../medias/Sound'
-
-export interface Play {
+export interface Play<A> {
     readonly _tag: 'Play'
-    readonly value: Sound
+    readonly value: A
 }
 
 export interface Playing {
@@ -13,34 +11,35 @@ export interface Stop {
     readonly _tag: 'Stop'
 }
 
-export type SoundAction = Play | Playing | Stop
+export type SoundAction<A> = Play<A> | Playing | Stop
 
-export const play = (value: Sound): Play => ({
+export const play = <A>(value: A): SoundAction<A> => ({
     _tag: 'Play',
     value
 })
 
-export const playing: Playing = { _tag: 'Playing' }
+export const playing: SoundAction<never> = { _tag: 'Playing' }
 
-export const stop: Stop = { _tag: 'Stop' }
+export const stop: SoundAction<never> = { _tag: 'Stop' }
 
-export const toString = (sa: SoundAction): string =>
+export const toString = <A>(sa: SoundAction<A>): string =>
     fold({
         onStop: () => 'Stop',
         onPlaying: () => 'Playing',
         onPlay: sound => `Play(${sound})`
     })(sa)
 
-export const isPlay = (sa: SoundAction): sa is Play => sa._tag === 'Play'
+export const isPlay = <A>(sa: SoundAction<A>): sa is Play<A> =>
+    sa._tag === 'Play'
 
-interface FoldArgs<A> {
-    onStop: () => A
-    onPlaying: () => A
-    onPlay: (sound: Sound) => A
+interface FoldArgs<A, B> {
+    onStop: () => B
+    onPlaying: () => B
+    onPlay: (sound: A) => B
 }
-export const fold = <A>({ onStop, onPlaying, onPlay }: FoldArgs<A>) => (
-    sa: SoundAction
-): A => {
+export const fold = <A, B>({ onStop, onPlaying, onPlay }: FoldArgs<A, B>) => (
+    sa: SoundAction<A>
+): B => {
     switch (sa._tag) {
         case 'Stop':
             return onStop()

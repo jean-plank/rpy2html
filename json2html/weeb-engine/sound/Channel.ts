@@ -2,11 +2,12 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 
-import Sound from '../medias/Sound'
+import { Listenable } from '../medias/Media'
+import SoundElement from '../medias/SoundElement'
 
 export default class Channel {
     private currentlyPlaying: O.Option<HTMLAudioElement> = O.none
-    private pending: Sound[] = []
+    private pending: Listenable[] = []
 
     constructor(
         private confirmAudio: (okAction: () => void) => void,
@@ -27,62 +28,49 @@ export default class Channel {
         )
     }
 
-    isAlreadyPlaying = (sound: Sound): boolean =>
-        pipe(
-            this.currentlyPlaying,
-            O.exists(sound.hasSameName)
-        )
+    isAlreadyPlaying = (sound: Listenable): boolean =>
+        pipe(this.currentlyPlaying, O.exists(sound.hasSameName))
 
     // Stops current channel and plays sounds.
-    play = (...sounds: Sound[]) => {
+    play = (...sounds: Listenable[]) => {
         this.stop()
         pipe(
             A.head(sounds),
             O.map(h => {
                 this.playSound(h).catch(() =>
                     this.confirmAudio(() => this.play(...sounds))
-                );
-                [, ...this.pending] = sounds
+                )
+                ;[, ...this.pending] = sounds
             })
         )
     }
 
     // Plays immediatly sound but does nothing to the pending queue.
-    private playSound = (sound: Sound): Promise<void> =>
-        this.playElement(sound.elt(this.volume, this.onEnded))
+    private playSound = (sound: Listenable): Promise<void> =>
+        this.playElement(sound.soundElt(this.volume, this.onEnded))
 
     private playElement = (elt: HTMLAudioElement): Promise<void> => {
-        pipe(
-            this.currentlyPlaying,
-            O.map(Sound.stop)
-        )
+        pipe(this.currentlyPlaying, O.map(SoundElement.stop))
         this.currentlyPlaying = O.some(elt)
-        return Sound.play(elt)
+        return SoundElement.play(elt)
     }
 
     // Stops currently playing sound and empties pending queue.
     stop = () => {
-        pipe(
-            this.currentlyPlaying,
-            O.map(Sound.stop)
-        )
+        pipe(this.currentlyPlaying, O.map(SoundElement.stop))
         this.currentlyPlaying = O.none
         this.pending = []
     }
 
     // Pauses currently playing sound.
-    pause = () =>
-        pipe(
-            this.currentlyPlaying,
-            O.map(Sound.pause)
-        )
+    pause = () => pipe(this.currentlyPlaying, O.map(SoundElement.pause))
 
     // Resume after pause
     resume = () =>
         pipe(
             this.currentlyPlaying,
             O.map(_ =>
-                Sound.play(_).catch(() => this.confirmAudio(this.resume))
+                SoundElement.play(_).catch(() => this.confirmAudio(this.resume))
             )
         )
 
@@ -91,16 +79,13 @@ export default class Channel {
             A.head(this.pending),
             O.map(h => {
                 // if sounds in pending queue
-                this.playSound(h);
-                [, ...this.pending] = this.pending
+                this.playSound(h)
+                ;[, ...this.pending] = this.pending
             }),
             O.getOrElse(() => {
                 // if loop start over
                 if (this.loop) {
-                    pipe(
-                        this.currentlyPlaying,
-                        O.map(this.playElement)
-                    )
+                    pipe(this.currentlyPlaying, O.map(this.playElement))
                 }
                 // else nothing is playing anymore
                 else this.currentlyPlaying = O.none
