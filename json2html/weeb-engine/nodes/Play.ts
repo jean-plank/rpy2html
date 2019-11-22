@@ -14,6 +14,7 @@ export default class Play extends NodeWithMedia<Sound> {
     constructor(
         private chanName: string,
         mediaName: string,
+        _loop: boolean,
         idNexts: string[]
     ) {
         super(
@@ -61,8 +62,8 @@ export default class Play extends NodeWithMedia<Sound> {
         pipe(
             PlayType.decode(play),
             E.map(
-                ({ arguments: [chanName, sndName, idNexts] }) =>
-                    new Play(chanName, sndName, idNexts)
+                ({ arguments: [chanName, sndName, loop, idNexts] }) =>
+                    new Play(chanName, sndName, loop, idNexts)
             )
         )
 }
@@ -70,6 +71,6 @@ export default class Play extends NodeWithMedia<Sound> {
 const PlayType = t.exact(
     t.type({
         class_name: t.literal('Play'),
-        arguments: t.tuple([t.string, t.string, t.array(t.string)])
+        arguments: t.tuple([t.string, t.string, t.boolean, t.array(t.string)])
     })
 )

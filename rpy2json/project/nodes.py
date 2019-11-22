@@ -254,11 +254,12 @@ def user_statement_to_str(GAME_BASE_DIR, renpy, node, res):
     id_nexts = [str(id(next))] if next else []
 
     if cmd[0] == 'play' and len(cmd) >= 3:
+        loop = 'loop' in cmd[3:] if len(cmd) >= 4 else False
         play_to_str(GAME_BASE_DIR, cmd, node, id_nexts,
-                    res, cmd[2][1:-1], cmd[1])
+                    res, cmd[2][1:-1], cmd[1], loop)
     elif cmd[0] == 'voice' and len(cmd) >= 2:
         play_to_str(GAME_BASE_DIR, cmd, node, id_nexts,
-                    res, cmd[1][1:-1], 'voice')
+                    res, cmd[1][1:-1], 'voice', False)
     elif cmd[0] == 'stop' and len(cmd) >= 2:
         stop_to_str(cmd, node, id_nexts, res)
     elif cmd[0] == 'window' and len(cmd) >= 2:
@@ -274,7 +275,7 @@ def user_statement_to_str(GAME_BASE_DIR, renpy, node, res):
 VIDEO_EXTENSION = ['.webm', '.ogv']
 
 
-def play_to_str(GAME_BASE_DIR, cmd, node, id_nexts, res, file, channel):
+def play_to_str(GAME_BASE_DIR, cmd, node, id_nexts, res, file, channel, loop):
     snd_name = remove_invalid_chars(file)
 
     _, ext = path.splitext(file)
@@ -286,6 +287,7 @@ def play_to_str(GAME_BASE_DIR, cmd, node, id_nexts, res, file, channel):
         'arguments': [
             channel,
             snd_name,
+            loop,
             id_nexts
         ]
     }
