@@ -3,10 +3,10 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 
 import { Listenable } from '../medias/Media'
-import SoundElement from '../medias/SoundElement'
+import MediaElement from '../medias/MediaElement'
 
 export default class Channel {
-    private currentlyPlaying: O.Option<HTMLAudioElement> = O.none
+    private currentlyPlaying: O.Option<HTMLMediaElement> = O.none
     private pending: Listenable[] = []
 
     constructor(
@@ -22,10 +22,7 @@ export default class Channel {
 
     setVolume = (volume: number) => {
         this.volume = volume
-        pipe(
-            this.currentlyPlaying,
-            O.map(_ => (_.volume = volume))
-        )
+        pipe(this.currentlyPlaying, O.map(MediaElement.stop))
     }
 
     isAlreadyPlaying = (sound: Listenable): boolean =>
@@ -49,29 +46,27 @@ export default class Channel {
     private playSound = (sound: Listenable): Promise<void> =>
         this.playElement(sound.soundElt(this.volume, this.onEnded))
 
-    private playElement = (elt: HTMLAudioElement): Promise<void> => {
-        pipe(this.currentlyPlaying, O.map(SoundElement.stop))
+    private playElement = (elt: HTMLMediaElement): Promise<void> => {
+        pipe(this.currentlyPlaying, O.map(MediaElement.stop))
         this.currentlyPlaying = O.some(elt)
-        return SoundElement.play(elt)
+        return elt.play()
     }
 
     // Stops currently playing sound and empties pending queue.
     stop = () => {
-        pipe(this.currentlyPlaying, O.map(SoundElement.stop))
+        pipe(this.currentlyPlaying, O.map(MediaElement.stop))
         this.currentlyPlaying = O.none
         this.pending = []
     }
 
     // Pauses currently playing sound.
-    pause = () => pipe(this.currentlyPlaying, O.map(SoundElement.pause))
+    pause = () => pipe(this.currentlyPlaying, O.map(MediaElement.pause))
 
     // Resume after pause
     resume = () =>
         pipe(
             this.currentlyPlaying,
-            O.map(_ =>
-                SoundElement.play(_).catch(() => this.confirmAudio(this.resume))
-            )
+            O.map(_ => _.play().catch(() => this.confirmAudio(this.resume)))
         )
 
     private onEnded = () =>
@@ -85,7 +80,13 @@ export default class Channel {
             O.getOrElse(() => {
                 // if loop start over
                 if (this.loop) {
-                    pipe(this.currentlyPlaying, O.map(this.playElement))
+                    pipe(
+                        this.currentlyPlaying,
+                        O.map(elt => {
+                            elt.currentTime = 0
+                            this.playElement(elt)
+                        })
+                    )
                 }
                 // else nothing is playing anymore
                 else this.currentlyPlaying = O.none

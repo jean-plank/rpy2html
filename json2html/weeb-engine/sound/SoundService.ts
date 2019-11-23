@@ -4,7 +4,6 @@ import * as R from 'fp-ts/lib/Record'
 
 import { sounds } from '../context'
 import { Listenable } from '../medias/Media'
-import SoundElement from '../medias/SoundElement'
 import Obj from '../Obj'
 import Channel from './Channel'
 import * as SA from './SoundAction'
@@ -24,10 +23,7 @@ export default class SoundService {
     }
 
     playMainMenuMusic = () => {
-        pipe(
-            this.channels,
-            R.map(_ => _.stop())
-        )
+        this.stopChannels()
         pipe(
             this.mainMenuMusic,
             O.map(mainMenuMusic =>
@@ -106,7 +102,7 @@ export default class SoundService {
     }
 
     applyAudios = (audios: Listenable[]) =>
-        audios.map(_ => SoundElement.play(_.soundElt(this.volumes.sound)))
+        audios.map(_ => _.soundElt(this.volumes.sound).play())
 
     setVolume = (chanName: keyof Volumes, volume: number) => {
         this.volumes[chanName] = volume
