@@ -1,4 +1,8 @@
 export default class MediaElement {
+    static setVolume = (volume: number) => (elt: HTMLMediaElement) => {
+        elt.volume = volume
+    }
+
     static stop = (elt: HTMLMediaElement) => {
         elt.pause()
         elt.currentTime = 0

@@ -14,7 +14,7 @@ export default class Play extends NodeWithMedia<Sound> {
     constructor(
         private chanName: string,
         mediaName: string,
-        _loop: boolean,
+        private loop: boolean,
         idNexts: string[]
     ) {
         super(
@@ -48,11 +48,11 @@ export default class Play extends NodeWithMedia<Sound> {
     private reduceSounds = (gameProps: GameProps): GameProps =>
         pipe(
             this.media,
-            O.map(audio => ({
+            O.map<Sound, GameProps>(audio => ({
                 ...gameProps,
                 sounds: {
                     ...gameProps.sounds,
-                    [this.chanName]: SA.play(audio)
+                    [this.chanName]: SA.play([audio, this.loop])
                 }
             })),
             O.getOrElse(() => gameProps)

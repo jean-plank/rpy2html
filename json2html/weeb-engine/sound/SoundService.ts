@@ -53,7 +53,7 @@ export default class SoundService {
             R.map(_ => _.resume())
         )
 
-    applySounds = (sounds: Obj<SA.SoundAction<Listenable>>) =>
+    applySounds = (sounds: Obj<SA.SoundAction<[Listenable, boolean]>>) =>
         pipe(
             sounds,
             R.mapWithIndex((chanName, soundAction) =>
@@ -93,10 +93,12 @@ export default class SoundService {
         return channel
     }
 
-    private playIfNotMusicAndAlready = (chanName: string, channel: Channel) => (
-        sound: Listenable
-    ): void => {
+    private playIfNotMusicAndAlready = (
+        chanName: string,
+        channel: Channel
+    ) => ([sound, loop]: [Listenable, boolean]): void => {
         if (!(chanName === 'music' && channel.isAlreadyPlaying(sound))) {
+            channel.setLoop(loop)
             channel.play(sound)
         }
     }

@@ -18,7 +18,7 @@ export default class GameProps {
     textboxText: string
     choices: MenuItem[]
     video: O.Option<Video>
-    sounds: Obj<SA.SoundAction<Listenable>> // key chanName
+    sounds: Obj<SA.SoundAction<[Listenable, boolean]>> // key chanName, loop?
     audios: Listenable[]
 
     static empty: GameProps = {

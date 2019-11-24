@@ -22,11 +22,15 @@ export default class Channel {
 
     setVolume = (volume: number) => {
         this.volume = volume
-        pipe(this.currentlyPlaying, O.map(MediaElement.stop))
+        pipe(this.currentlyPlaying, O.map(MediaElement.setVolume(volume)))
     }
 
     isAlreadyPlaying = (sound: Listenable): boolean =>
         pipe(this.currentlyPlaying, O.exists(sound.hasSameName))
+
+    setLoop = (loop: boolean) => {
+        this.loop = loop
+    }
 
     // Stops current channel and plays sounds.
     play = (...sounds: Listenable[]) => {
@@ -80,13 +84,7 @@ export default class Channel {
             O.getOrElse(() => {
                 // if loop start over
                 if (this.loop) {
-                    pipe(
-                        this.currentlyPlaying,
-                        O.map(elt => {
-                            elt.currentTime = 0
-                            this.playElement(elt)
-                        })
-                    )
+                    pipe(this.currentlyPlaying, O.map(this.playElement))
                 }
                 // else nothing is playing anymore
                 else this.currentlyPlaying = O.none

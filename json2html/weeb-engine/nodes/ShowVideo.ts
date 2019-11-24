@@ -17,10 +17,8 @@ export default class ShowVideo extends AstNode {
     toString = (): string => `ShowVideo("${this.chanName}")`
 
     reduce = (gameProps: GameProps): GameProps => {
-        console.log('ShowVideo')
-        const onPlay = (media: Listenable): GameProps => {
+        const onPlay = ([media]: [Listenable, boolean]): GameProps => {
             if (isDisplayable(media) && !gameProps.shown.includes(media)) {
-                console.log('media =', media)
                 return {
                     ...gameProps,
                     shown: [...gameProps.shown, media]
