@@ -86,10 +86,7 @@ const MainMenu: RefForwardingComponent<KeyUpAble, Props> = (
         )
 
         function onClick(_: number, save: O.Option<Save>) {
-            pipe(
-                save,
-                O.map(loadSave)
-            )
+            pipe(save, O.map(loadSave))
         }
     }
 

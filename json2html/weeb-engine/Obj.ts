@@ -1,2 +1,3 @@
-type Obj<T> = Record<string, T>
+import Obj from '../renpy-json-loader/Obj'
+
 export default Obj

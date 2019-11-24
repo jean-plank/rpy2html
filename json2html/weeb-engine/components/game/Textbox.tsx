@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { FunctionComponent } from 'react'
 
-import Char from '../../Char'
+import Char from '../../../renpy-json-loader/Char'
 import { style } from '../../context'
 import { getBgOrElse, mediaQuery, styleFrom } from '../../utils/styles'
 
@@ -14,8 +14,8 @@ interface Props {
     hide: boolean
     char: O.Option<Char>
     styles?: {
-        namebox?: SerializedStyles;
-        dialog?: SerializedStyles;
+        namebox?: SerializedStyles
+        dialog?: SerializedStyles
     }
 }
 

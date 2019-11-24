@@ -3,7 +3,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
-import { Style } from '../../renpy-json-loader/RenpyJson'
+import Style from '../../renpy-json-loader/Style'
 import { images } from '../context'
 
 export const getBgOrElse = (
@@ -29,13 +29,19 @@ export const getBgOrElse = (
 export const ifOldStyle = (style: CSSObject): CSSObject | undefined =>
     pipe(
         R.lookup('main_menu_overlay', images),
-        O.fold(() => style, _ => undefined)
+        O.fold(
+            () => style,
+            _ => undefined
+        )
     )
 
 export const ifNoSlotBg = (style: CSSObject): CSSObject | undefined =>
     pipe(
         R.lookup('slot_bg', images),
-        O.fold(() => style, _ => undefined)
+        O.fold(
+            () => style,
+            _ => undefined
+        )
     )
 
 export const mediaQuery = (style: Style): string =>

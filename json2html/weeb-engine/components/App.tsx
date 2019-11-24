@@ -6,7 +6,6 @@ import * as R from 'fp-ts/lib/Record'
 import { FunctionComponent, useEffect, useMemo, useState } from 'react'
 
 import * as context from '../context'
-import Font from '../Font'
 import { GameState } from '../history/gameStateReducer'
 import useConfirm from '../hooks/useConfirm'
 import useHistory from '../hooks/useHistory'
@@ -16,6 +15,7 @@ import useNotify from '../hooks/useNotify'
 import useSaves from '../hooks/useSaves'
 import { AppData } from '../nodes/AstNode'
 import SoundService from '../sound/SoundService'
+import fontFace from '../utils/fontFace'
 import {
     enterFullscreen,
     exitFullscreen,
@@ -41,9 +41,7 @@ const App: FunctionComponent = () => {
 
     const { topKeyUpAble, viewKeyUpAble, confirmKeyUpAble } = useKeyUpAbles()
 
-    const { confirm, confirmAudio, confirmYesNo } = useConfirm(
-        confirmKeyUpAble
-    )
+    const { confirm, confirmAudio, confirmYesNo } = useConfirm(confirmKeyUpAble)
 
     const soundService = useMemo(() => new SoundService(confirmAudio), [])
 
@@ -67,11 +65,7 @@ const App: FunctionComponent = () => {
         <div css={styles.container}>
             <Global styles={globalStyles} />
             <div css={styles.view}>
-                {pipe(
-                    view,
-                    O.chain(getView),
-                    O.toNullable
-                )}
+                {pipe(view, O.chain(getView), O.toNullable)}
                 {notifications}
                 {confirm}
             </div>
@@ -81,10 +75,7 @@ const App: FunctionComponent = () => {
     function getView(view: View): O.Option<JSX.Element> {
         if (view === 'MAIN_MENU') return O.some(mainMenuL())
         if (view === 'GAME') {
-            return pipe(
-                historyHook.present,
-                O.map(getGame)
-            )
+            return pipe(historyHook.present, O.map(getGame))
         }
         return O.some(getGameMenu(view.selectedBtn))
     }
@@ -164,9 +155,11 @@ const App: FunctionComponent = () => {
             O.map(
                 icon =>
                     (pipe(
-                        O.fromNullable(document.querySelector(
-                            'link[rel*="icon"]'
-                        ) as HTMLLinkElement),
+                        O.fromNullable(
+                            document.querySelector(
+                                'link[rel*="icon"]'
+                            ) as HTMLLinkElement
+                        ),
                         O.getOrElse(() => {
                             const link = document.createElement('link')
                             link.rel = 'shortcut icon'
@@ -248,8 +241,8 @@ const globalStyles = css(
 function getFonts() {
     return R.toArray(context.fonts).map(([name, font]) =>
         name === 'dejavusans_bold_ttf'
-            ? Font.face('dejavusans_ttf', font)
-            : Font.face(name, font)
+            ? fontFace('dejavusans_ttf', font)
+            : fontFace(name, font)
     )
 }
 

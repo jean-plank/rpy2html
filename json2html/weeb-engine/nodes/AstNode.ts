@@ -3,7 +3,7 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
-import Char from '../Char'
+import Char from '../../renpy-json-loader/Char'
 import GameProps from '../history/GameProps'
 import Image from '../medias/Image'
 import Sound from '../medias/Sound'

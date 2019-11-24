@@ -117,10 +117,7 @@ const GameMenu: RefForwardingComponent<KeyUpAble, Props> = (
                 save,
                 O.map(_ =>
                     confirmYesNo(transl.confirm.unsaved, () =>
-                        pipe(
-                            save,
-                            O.map(loadSave)
-                        )
+                        pipe(save, O.map(loadSave))
                     )
                 )
             )
