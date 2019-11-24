@@ -61,7 +61,8 @@ def parse_node(GAME_BASE_DIR, renpy, node, res):
         return user_statement_to_str(GAME_BASE_DIR, renpy, node, res)
     else:
         show_unknown_node_warning(node)
-        return [real_next(renpy, node.next)]
+        next = real_next(renpy, node.next)
+        return [str(id(next))] if next else []
 
 
 def real_next(renpy, node):
