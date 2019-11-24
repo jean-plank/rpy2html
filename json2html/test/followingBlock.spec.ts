@@ -1,9 +1,9 @@
 import * as O from 'fp-ts/lib/Option'
 
-import Image from '../game-engine/medias/Image'
-import { AppData } from '../game-engine/nodes/AstNode'
-import Say from '../game-engine/nodes/Say'
-import Show from '../game-engine/nodes/Show'
+import Image from '../weeb-engine/medias/Image'
+import { AppData } from '../weeb-engine/nodes/AstNode'
+import Say from '../weeb-engine/nodes/Say'
+import Show from '../weeb-engine/nodes/Show'
 
 describe('AstNode.followingBlock', () => {
     it('should return none for node without nexts', () => {

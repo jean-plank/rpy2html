@@ -1,5 +1,5 @@
-import Font from '../game-engine/Font'
-import Obj from '../game-engine/Obj'
+import Font from '../weeb-engine/Font'
+import Obj from '../weeb-engine/Obj'
 
 // TypeScript version of the validation jsons.
 // If you add things below, don't forget to update the validation jsons.

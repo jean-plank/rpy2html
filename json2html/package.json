@@ -2,6 +2,7 @@
   "name": "json2html",
   "version": "1.1.0",
   "description": "Web visual novel game engine using a json.",
+  "homepage": "https://github.com/jean-plank/rpy2html/tree/master/json2html",
   "scripts": {
     "~compile": "tsc -w --pretty false",
     "start": "webpack-dev-server --config webpack.dev.js",
@@ -15,9 +16,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Grimalkin8675/rpy2html.git"
+    "url": "git+https://github.com/jean-plank/rpy2html.git"
   },
-  "author": "Grimalkin8675",
+  "author": "Gurimarukin",
   "license": "MIT",
   "dependencies": {
     "@emotion/core": "^10.0.14",

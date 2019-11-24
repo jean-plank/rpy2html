@@ -10,6 +10,4 @@
 
 * animation on scene change: fade textbox
 
-* cutscene before main menu
-
-* jp3: kick lee sound, zhonya sound
+* cutscene before main menu (https://www.renpy.org/doc/html/label.html)

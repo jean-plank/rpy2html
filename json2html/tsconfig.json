@@ -24,6 +24,6 @@
     "include": [
         "./renpy-json-loader/**/*",
         "../generated-json/**/*",
-        "./game-engine/**/*"
+        "./weeb-engine/**/*"
     ]
 }
