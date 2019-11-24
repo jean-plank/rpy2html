@@ -35,8 +35,8 @@ def label_by_name(renpy, name):
 
 
 def show_unknown_node_warning(node):
-    print('[WARNING] unknown node %s: %s' %
-          (type(node).__name__, node.diff_info()))
+    infos = node.diff_info() if hasattr(node, 'diff_info') else node
+    print('[WARNING] unknown node %s: %s' % (type(node).__name__, infos))
 
 
 # adds node converted to res['nodes']
@@ -82,10 +82,11 @@ def real_next(renpy, node):
             node = label_by_name(renpy, node.target)
         # ignore useless nodes
         elif (isinstance(node, renpy.ast.Label)
-                or isinstance(node, renpy.ast.Translate)
-                or isinstance(node, renpy.ast.EndTranslate)
-                or isinstance(node, renpy.ast.Pass)
-                or isinstance(node, renpy.ast.Return)):
+              or isinstance(node, renpy.ast.Translate)
+              or isinstance(node, renpy.ast.EndTranslate)
+              or isinstance(node, renpy.ast.Pass)
+              or isinstance(node, renpy.ast.Return)
+              or isinstance(node, renpy.ast.With)):
             node = node.next
         elif node != None:
             show_unknown_node_warning(node)
