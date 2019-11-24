@@ -9,8 +9,8 @@ import NodeWithImage from './NodeWithImage'
 export default class Scene extends NodeWithImage {
     reduce = (gameProps: GameProps): GameProps => ({
         ...gameProps,
-        sceneImg: this.media,
-        charImgs: [],
+        scene: this.media,
+        shown: [],
         textboxChar: O.none,
         textboxText: ''
     })

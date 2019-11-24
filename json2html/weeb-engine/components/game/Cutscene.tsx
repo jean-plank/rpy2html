@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { css } from '@emotion/core'
+import { Interpolation } from '@emotion/core'
 import { FunctionComponent } from 'react'
 
 import Video from '../../medias/Video'
@@ -10,12 +10,12 @@ export interface Props {
 }
 
 const Cutscene: FunctionComponent<Props> = ({ video, autoPlay }) =>
-    video.elt({ autoPlay, css: videoStyles })
+    video.reactNode({ autoPlay, css: videoStyles })
 export default Cutscene
 
-const videoStyles = css({
+const videoStyles: Interpolation = {
     position: 'absolute',
     width: '100%',
     height: '100%',
     objectFit: 'contain'
-})
+}

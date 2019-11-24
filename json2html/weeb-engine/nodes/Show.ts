@@ -10,10 +10,10 @@ export default class Show extends NodeWithImage {
     reduce = (gameProps: GameProps): GameProps =>
         pipe(
             this.media,
-            O.filter(_ => !gameProps.charImgs.includes(_)),
+            O.filter(_ => !gameProps.shown.includes(_)),
             O.map(_ => ({
                 ...gameProps,
-                charImgs: [...gameProps.charImgs, _]
+                shown: [...gameProps.shown, _]
             })),
             O.getOrElse(() => gameProps)
         )

@@ -12,7 +12,7 @@ export default class Hide extends NodeWithImage {
             this.media,
             O.map(image => ({
                 ...gameProps,
-                charImgs: gameProps.charImgs.filter(_ => _ !== image)
+                charImgs: gameProps.shown.filter(_ => _ !== image)
             })),
             O.getOrElse(() => gameProps)
         )

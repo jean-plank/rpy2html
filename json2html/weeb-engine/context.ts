@@ -25,6 +25,7 @@ import PyExpr from './nodes/PyExpr'
 import Say from './nodes/Say'
 import Scene from './nodes/Scene'
 import Show from './nodes/Show'
+import ShowVideo from './nodes/ShowVideo'
 import ShowWindow from './nodes/ShowWindow'
 import Stop from './nodes/Stop'
 import Obj from './Obj'
@@ -48,7 +49,7 @@ export const sounds: Obj<Sound> = pipe(
 
 export const videos: Obj<Video> = pipe(
     json.videos,
-    R.map(_ => new Video(_))
+    R.mapWithIndex((name, file) => new Video(name, file))
 )
 
 export const images: Obj<Image> = pipe(
@@ -85,6 +86,7 @@ function parseNode(rawNode: Node): AstNode {
         E.alt(() => Say.decode(rawNode)),
         E.alt(() => Scene.decode(rawNode)),
         E.alt(() => Show.decode(rawNode)),
+        E.alt(() => ShowVideo.decode(rawNode)),
         E.alt(() => ShowWindow.decode(rawNode)),
         E.alt(() => Stop.decode(rawNode))
     ].reduce<E.Either<t.Errors, AstNode>>(

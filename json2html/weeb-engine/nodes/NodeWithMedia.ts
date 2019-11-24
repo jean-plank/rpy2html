@@ -34,7 +34,7 @@ export default abstract class NodeWithMedia<T extends Media> extends AstNode {
         this.media = this.fromData(data, this.mediaName)
         if (O.isNone(this.media)) {
             console.warn(
-                `${this.constructor.name}: invalid name: ${this.mediaName}`
+                `${this.constructor.name}: media not found: ${this.mediaName}`
             )
         }
     }

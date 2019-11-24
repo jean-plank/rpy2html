@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
 
 import { sounds } from '../context'
-import Sound from '../medias/Sound'
+import { Listenable } from '../medias/Media'
 import Obj from '../Obj'
 import Channel from './Channel'
 import * as SA from './SoundAction'
@@ -13,7 +13,7 @@ export default class SoundService {
     volumes: Volumes = Volumes.fromStorage()
 
     private channels: Obj<Channel>
-    private mainMenuMusic: O.Option<Sound>
+    private mainMenuMusic: O.Option<Listenable>
 
     constructor(private confirmAudio: (okAction: () => void) => void) {
         this.channels = {
@@ -23,10 +23,7 @@ export default class SoundService {
     }
 
     playMainMenuMusic = () => {
-        pipe(
-            this.channels,
-            R.map(_ => _.stop())
-        )
+        this.stopChannels()
         pipe(
             this.mainMenuMusic,
             O.map(mainMenuMusic =>
@@ -56,7 +53,7 @@ export default class SoundService {
             R.map(_ => _.resume())
         )
 
-    applySounds = (sounds: Obj<SA.SoundAction>) =>
+    applySounds = (sounds: Obj<SA.SoundAction<[Listenable, boolean]>>) =>
         pipe(
             sounds,
             R.mapWithIndex((chanName, soundAction) =>
@@ -96,16 +93,18 @@ export default class SoundService {
         return channel
     }
 
-    private playIfNotMusicAndAlready = (chanName: string, channel: Channel) => (
-        sound: Sound
-    ): void => {
+    private playIfNotMusicAndAlready = (
+        chanName: string,
+        channel: Channel
+    ) => ([sound, loop]: [Listenable, boolean]): void => {
         if (!(chanName === 'music' && channel.isAlreadyPlaying(sound))) {
+            channel.setLoop(loop)
             channel.play(sound)
         }
     }
 
-    applyAudios = (audios: Sound[]) =>
-        audios.map(_ => Sound.play(_.elt(this.volumes.sound)))
+    applyAudios = (audios: Listenable[]) =>
+        audios.map(_ => _.soundElt(this.volumes.sound).play())
 
     setVolume = (chanName: keyof Volumes, volume: number) => {
         this.volumes[chanName] = volume

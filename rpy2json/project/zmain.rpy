@@ -1,4 +1,4 @@
-# need to be named zmain so Ren'Py executes it in last position
+# This file has to be named zmain so Ren'Py executes it in last position.
 
 init python:
     import json
@@ -6,69 +6,38 @@ init python:
     from sys import argv
     from os import path
 
-    from nodes_sounds_videos import parse as parse_nodes_sounds_videos
-    from images import parse as parse_images
     from characters import parse as parse_characters
     from fonts import parse as parse_fonts
+    from images import load_default_images
+    from medias import load as load_media
+    from nodes import parse as parse_nodes
     from style import parse as parse_style
-
 
     config.debug_sound = False
 
     GAME_BASE_DIR = path.join(argv[1], 'game')
     RENPY_BASE_DIR = path.dirname(__file__)
 
-    # nodes
-    res = parse_nodes_sounds_videos(renpy.game.script.namemap, renpy.ast, config)
-
-    # correct sound files names (it is easier to do it that uglier way)
-    def correct_media(sounds, key, sound):
-        if sound != None:
-            correct = path.join(GAME_BASE_DIR, sound)
-            if path.isfile(correct):
-                sounds[key] = correct
-                return
-            else:
-                var_name = correct
-        else:
-            var_name = key
-        print('[WARNING] couldn\'t import %s' % var_name)
-
-    sounds = {}
-    for key, value in res['sounds'].iteritems():
-        correct_media(sounds, key, value)
-    res['sounds'] = sounds
-
-    videos = {}
-    for key, value in res['videos'].iteritems():
-        correct_media(videos, key, value)
-    res['videos'] = videos
-
-    # add images and correct them
-    res['images'] = parse_images(GAME_BASE_DIR,
-                                 renpy.game.script.namemap,
-                                 renpy.ast.Image,
-                                 renpy.python.py_eval_bytecode,
-                                 renpy.display.motion.ATLTransform,
-                                 config,
-                                 gui,
-                                 style)
-
     # add fonts
     fonts = parse_fonts(GAME_BASE_DIR, RENPY_BASE_DIR, gui)
-    res['fonts'] = fonts['definitions']
 
-    # add characters
-    res['characters'] = parse_characters(renpy.game.script.namemap, renpy.ast.Define, renpy.python.py_eval_bytecode, renpy.character.ADVCharacter)
+    res = {
+        'game_name': config.name if config.name else path.basename(argv[1]),
+        'lang': game_lang,  # defined in lang.rpy (see ../bin/rpy2json)
+        'style': parse_style(gui, config, fonts['usages'], Borders),
+        'fonts': fonts['definitions'],
+        'characters': parse_characters(renpy),
+        'images': {},
+        'sounds': {},
+        'videos': {},
+        'nodes': {}
+    }
 
-    # add style
-    res['style'] = parse_style(gui, config, fonts['usages'], Borders)
+    load_media(GAME_BASE_DIR, res, 'sounds',
+               'main_menu_music', config.main_menu_music)
 
-    # lang
-    res['lang'] = game_lang # defined in lang.rpy (see ../rpy2json)
+    load_default_images(GAME_BASE_DIR, config, gui, style, res)
+    parse_nodes(GAME_BASE_DIR, renpy, res)
 
-    # game name
-    res['game_name'] = config.name if config.name else path.basename(argv[1])
-
-    with open(output_file, "w") as f:
+    with open(output_file, 'w') as f:
         json.dump(res, f, indent=2)

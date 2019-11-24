@@ -111,8 +111,8 @@ const Game: RefForwardingComponent<KeyUpAble, Props> = (
                 {...{ onClick, onWheel }}
                 css={[gameStyles, stylesOverride.container]}
             >
-                <LayerScene image={gameProps.sceneImg} animate={!isSaveSlot} />
-                <LayerImages images={gameProps.charImgs} />
+                <LayerScene media={gameProps.scene} animate={!isSaveSlot} />
+                <LayerImages medias={gameProps.shown} />
                 <Textbox
                     hide={gameProps.textboxHide}
                     char={gameProps.textboxChar}

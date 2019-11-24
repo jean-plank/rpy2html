@@ -5,19 +5,19 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { FunctionComponent } from 'react'
 import { TransitionStatus } from 'react-transition-group/Transition'
 
-import Image from '../../medias/Image'
+import { Displayable } from '../../medias/Media'
 import AnimateWithDep from '../AnimateWithDep'
 
 const durationMs: number = 1000
 
 interface Props {
-    image: O.Option<Image>
+    media: O.Option<Displayable>
     animate?: boolean
 }
 
-const LayerScene: FunctionComponent<Props> = ({ image, animate = true }) => {
-    const key = pipe(
-        image,
+const LayerScene: FunctionComponent<Props> = ({ media, animate = true }) => {
+    const key: string = pipe(
+        media,
         O.map(_ => _.name),
         O.getOrElse(() => '')
     )
@@ -26,9 +26,11 @@ const LayerScene: FunctionComponent<Props> = ({ image, animate = true }) => {
         <AnimateWithDep key={key} durationMs={durationMs} animate={animate}>
             {status =>
                 pipe(
-                    image,
+                    media,
                     O.map(_ =>
-                        _.elt({ css: [styles.base, stylesFromStatus(status)] })
+                        _.reactNode({
+                            css: [styles.base, stylesFromStatus(status)]
+                        })
                     ),
                     O.toNullable
                 )

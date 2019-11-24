@@ -5,15 +5,25 @@ import * as R from 'fp-ts/lib/Record'
 import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
+import { Listenable } from '../medias/Media'
 import Sound from '../medias/Sound'
 import * as SA from '../sound/SoundAction'
 import NodeWithMedia from './NodeWithMedia'
 
 export default class Play extends NodeWithMedia<Sound> {
-    constructor(private chanName: string, sndName: string, idNexts: string[]) {
+    constructor(
+        private chanName: string,
+        mediaName: string,
+        private loop: boolean,
+        idNexts: string[]
+    ) {
         super(
-            (data, sndName) => R.lookup(sndName, data.sounds),
-            sndName,
+            (data, mediaName) =>
+                pipe(
+                    R.lookup<Listenable>(mediaName, data.sounds),
+                    O.alt(() => R.lookup(mediaName, data.videos))
+                ),
+            mediaName,
             idNexts
         )
     }
@@ -38,11 +48,11 @@ export default class Play extends NodeWithMedia<Sound> {
     private reduceSounds = (gameProps: GameProps): GameProps =>
         pipe(
             this.media,
-            O.map(audio => ({
+            O.map<Sound, GameProps>(audio => ({
                 ...gameProps,
                 sounds: {
                     ...gameProps.sounds,
-                    [this.chanName]: SA.play(audio)
+                    [this.chanName]: SA.play([audio, this.loop])
                 }
             })),
             O.getOrElse(() => gameProps)
@@ -52,8 +62,8 @@ export default class Play extends NodeWithMedia<Sound> {
         pipe(
             PlayType.decode(play),
             E.map(
-                ({ arguments: [chanName, sndName, idNexts] }) =>
-                    new Play(chanName, sndName, idNexts)
+                ({ arguments: [chanName, sndName, loop, idNexts] }) =>
+                    new Play(chanName, sndName, loop, idNexts)
             )
         )
 }
@@ -61,6 +71,6 @@ export default class Play extends NodeWithMedia<Sound> {
 const PlayType = t.exact(
     t.type({
         class_name: t.literal('Play'),
-        arguments: t.tuple([t.string, t.string, t.array(t.string)])
+        arguments: t.tuple([t.string, t.string, t.boolean, t.array(t.string)])
     })
 )
