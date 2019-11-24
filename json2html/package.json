@@ -1,6 +1,6 @@
 {
   "name": "json2html",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Web visual novel game engine using a json.",
   "homepage": "https://github.com/jean-plank/rpy2html/tree/master/json2html",
   "scripts": {
@@ -39,6 +39,8 @@
     "io-ts": "^2.0.1",
     "io-ts-types": "^0.5.2",
     "markdown-loader": "^5.1.0",
+    "monocle-ts": "^2.0.0",
+    "newtype-ts": "^0.3.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-transition-group": "^4.3.0",
@@ -53,7 +55,7 @@
     "@types/enzyme": "^3.10.3",
     "@types/enzyme-adapter-react-16": "^1.0.5",
     "@types/jest": "^24.0.23",
-    "dependency-cruiser": "^5.2.3",
+    "dependency-cruiser": "^5.3.2",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.6.0",
