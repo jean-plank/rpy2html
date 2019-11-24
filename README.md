@@ -18,6 +18,10 @@ Install dependencies of the project (from `.`, but will be installed in `./json2
 
     npm i --production --prefix json2html
 
+Build game `json` loader:
+
+    npm run loader:compile --prefix json2html
+
 
 ## Use
 
