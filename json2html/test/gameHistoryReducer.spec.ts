@@ -34,13 +34,13 @@ describe(gameHistoryReducer, () => {
             titi: new Image('titi', 'fileTiti')
         }
     } as unknown) as AppData
-    const node1 = new Play('music', 'music1', [])
-    const node2 = new Play('sound', 'sound1', [])
+    const node1 = new Play('music', 'music1', false, [])
+    const node2 = new Play('sound', 'sound1', false, [])
     const node3 = new Show('toto', [])
     const node4 = new Show('titi', [])
     const block1: AstNode[] = [node1, node2]
-    const block2: AstNode[] = [node3, node4];
-    [block1, block2].map(_ => _.map(_ => _.init({ id: '', data })))
+    const block2: AstNode[] = [node3, node4]
+    ;[block1, block2].map(_ => _.map(_ => _.init({ id: '', data })))
 
     const block1Props = {
         ...GameProps.empty,

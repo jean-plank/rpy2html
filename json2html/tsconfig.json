@@ -20,5 +20,5 @@
         "noUnusedParameters": true,
         "strictNullChecks": true
     },
-    "include": ["../generated-json/**/*", "./weeb-engine/**/*"]
+    "include": ["../generated-json/**/*", "./weeb-engine/**/*", "./test/**/*"]
 }

@@ -28,7 +28,7 @@ describe(statesFromHistory, () => {
 
         const props: GameProps = {
             ...GameProps.empty,
-            charImgs: [new Image('toto', 'totoFile')]
+            shown: [new Image('toto', 'totoFile')]
         }
         const block: AstNode[] = [node]
 
@@ -58,7 +58,7 @@ describe(statesFromHistory, () => {
 
         const props: GameProps = {
             ...GameProps.empty,
-            charImgs: [
+            shown: [
                 new Image('toto', 'fileToto'),
                 new Image('titi', 'fileTiti')
             ]
@@ -95,8 +95,8 @@ describe(statesFromHistory, () => {
 
         const props1: GameProps = {
             ...GameProps.empty,
-            sceneImg: O.some(new Image('toto', 'fileToto')),
-            charImgs: [new Image('toto', 'fileToto')],
+            scene: O.some(new Image('toto', 'fileToto')),
+            shown: [new Image('toto', 'fileToto')],
             textboxText: 'ouep'
         }
         const block1: AstNode[] = [node0, node1, node2]
@@ -105,14 +105,17 @@ describe(statesFromHistory, () => {
         loadedTiti.load()
         const props2: GameProps = {
             ...GameProps.empty,
-            sceneImg: O.some(new Image('toto', 'fileToto')),
-            charImgs: [new Image('toto', 'fileToto'), loadedTiti],
+            scene: O.some(new Image('toto', 'fileToto')),
+            shown: [new Image('toto', 'fileToto'), loadedTiti],
             textboxText: 'ouep'
         }
         const block2: AstNode[] = [node3]
 
         const got = statesFromHistory(node0, ['0', '1', '2', '3'])
-        const expected = E.right([[props1, block1], [props2, block2]])
+        const expected = E.right([
+            [props1, block1],
+            [props2, block2]
+        ])
         expect(got.toString()).toBe(expected.toString())
     })
 

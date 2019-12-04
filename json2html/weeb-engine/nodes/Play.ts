@@ -1,8 +1,6 @@
-import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
-import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
 import { Listenable } from '../medias/Media'
@@ -57,20 +55,4 @@ export default class Play extends NodeWithMedia<Sound> {
             })),
             O.getOrElse(() => gameProps)
         )
-
-    static decode = (play: unknown): E.Either<t.Errors, Play> =>
-        pipe(
-            PlayType.decode(play),
-            E.map(
-                ({ arguments: [chanName, sndName, loop, idNexts] }) =>
-                    new Play(chanName, sndName, loop, idNexts)
-            )
-        )
 }
-
-const PlayType = t.exact(
-    t.type({
-        class_name: t.literal('Play'),
-        arguments: t.tuple([t.string, t.string, t.boolean, t.array(t.string)])
-    })
-)
