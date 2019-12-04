@@ -1,8 +1,6 @@
-import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
-import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
 import { isDisplayable, Listenable } from '../medias/Media'
@@ -42,20 +40,4 @@ export default class ShowVideo extends AstNode {
             O.getOrElse(() => gameProps)
         )
     }
-
-    static decode = (showVideo: unknown): E.Either<t.Errors, ShowVideo> =>
-        pipe(
-            ShowVideoType.decode(showVideo),
-            E.map(
-                ({ arguments: [vidName, idNexts] }) =>
-                    new ShowVideo(vidName, idNexts)
-            )
-        )
 }
-
-const ShowVideoType = t.exact(
-    t.type({
-        class_name: t.literal('ShowVideo'),
-        arguments: t.tuple([t.string, t.array(t.string)])
-    })
-)

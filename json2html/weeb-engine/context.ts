@@ -1,8 +1,6 @@
-import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as R from 'fp-ts/lib/Record'
-import * as t from 'io-ts'
 
 import Char from '../renpy-json-loader/Char'
 import Font from '../renpy-json-loader/Font'
@@ -74,40 +72,36 @@ export const firstNode: AstNode = pipe(
 export const gameName: string = json.game_name
 
 function parseNode(rawNode: RawNode): AstNode {
-    const res = [
-        E.alt(() => If.decode(rawNode)),
-        E.alt(() => IfBlock.decode(rawNode)),
-        E.alt(() => Menu.decode(rawNode)),
-        E.alt(() => MenuItem.decode(rawNode)),
-        E.alt(() => Pause.decode(rawNode)),
-        E.alt(() => Play.decode(rawNode)),
-        E.alt(() => PlayVideo.decode(rawNode)),
-        E.alt(() => PyExpr.decode(rawNode)),
-        E.alt(() => Say.decode(rawNode)),
-        E.alt(() => Scene.decode(rawNode)),
-        E.alt(() => Show.decode(rawNode)),
-        E.alt(() => ShowVideo.decode(rawNode)),
-        E.alt(() => ShowWindow.decode(rawNode)),
-        E.alt(() => Stop.decode(rawNode))
-    ].reduce<E.Either<t.Errors, AstNode>>(
-        (acc, decode) => pipe(acc, decode),
-        Hide.decode(rawNode)
-    )
-
-    return pipe(
-        res,
-        E.fold(
-            errors => {
-                console.error(
-                    "Couldn't parse node:",
-                    '\nrawNode =',
-                    rawNode,
-                    '\nerrors =',
-                    errors
-                )
-                throw new Error("Couldn't parse nodes")
-            },
-            _ => _
-        )
-    )
+    switch (rawNode.class_name) {
+        case 'Hide':
+            return new Hide(...rawNode.arguments)
+        case 'If':
+            return new If(...rawNode.arguments)
+        case 'IfBlock':
+            return new IfBlock(...rawNode.arguments)
+        case 'Menu':
+            return new Menu(O.none, ...rawNode.arguments)
+        case 'MenuItem':
+            return new MenuItem(...rawNode.arguments)
+        case 'Pause':
+            return new Pause(...rawNode.arguments)
+        case 'Play':
+            return new Play(...rawNode.arguments)
+        case 'Video':
+            return new PlayVideo(...rawNode.arguments)
+        case 'PyExpr':
+            return new PyExpr(...rawNode.arguments)
+        case 'Say':
+            return new Say(...rawNode.arguments)
+        case 'Scene':
+            return new Scene(...rawNode.arguments)
+        case 'Show':
+            return new Show(...rawNode.arguments)
+        case 'ShowVideo':
+            return new ShowVideo(...rawNode.arguments)
+        case 'ShowWindow':
+            return new ShowWindow(...rawNode.arguments)
+        case 'Stop':
+            return new Stop(...rawNode.arguments)
+    }
 }

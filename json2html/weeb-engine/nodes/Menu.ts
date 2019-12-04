@@ -1,8 +1,6 @@
 import * as A from 'fp-ts/lib/Array'
-import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/lib/pipeable'
-import * as t from 'io-ts'
 
 import GameProps from '../history/GameProps'
 import MenuItem from './MenuItem'
@@ -42,23 +40,7 @@ export default class Menu extends NodeWithChar {
     nexts = (): MenuItem[] =>
         pipe(
             this._nexts,
-            O.map(_ => _.filter(_ => _.condition)),
+            O.map(_ => _.filter(_ => _.condition())),
             O.getOrElse(() => [])
         )
-
-    static decode = (menu: unknown): E.Either<t.Errors, Menu> =>
-        pipe(
-            MenuType.decode(menu),
-            E.map(
-                ({ arguments: [what, idNexts] }) =>
-                    new Menu(O.none, what, idNexts)
-            )
-        )
 }
-
-const MenuType = t.exact(
-    t.type({
-        class_name: t.literal('Menu'),
-        arguments: t.tuple([t.string, t.array(t.string)])
-    })
-)

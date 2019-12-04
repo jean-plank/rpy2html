@@ -1,4 +1,4 @@
-import convertToJs from '../weeb-engine/utils/convertToJs'
+import convertToJs from '../renpy-json-loader/convertToJs'
 
 describe(convertToJs, () => {
     it('should convert js', () => {
