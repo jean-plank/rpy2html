@@ -6,7 +6,7 @@ import * as t from 'io-ts'
 
 import Char from '../renpy-json-loader/Char'
 import Font from '../renpy-json-loader/Font'
-import Node from '../renpy-json-loader/Node'
+import RawNode from '../renpy-json-loader/RawNode'
 import RenpyJson from '../renpy-json-loader/RenpyJson'
 import Style from '../renpy-json-loader/Style'
 import Image from './medias/Image'
@@ -73,7 +73,7 @@ export const firstNode: AstNode = pipe(
 )
 export const gameName: string = json.game_name
 
-function parseNode(rawNode: Node): AstNode {
+function parseNode(rawNode: RawNode): AstNode {
     const res = [
         E.alt(() => If.decode(rawNode)),
         E.alt(() => IfBlock.decode(rawNode)),

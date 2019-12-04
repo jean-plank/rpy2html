@@ -2,8 +2,8 @@ import * as t from 'io-ts'
 
 import Char, { CharType } from './Char'
 import Font, { FontType } from './Font'
-import Node, { NodeType } from './Node'
 import Obj, { ObjType } from './Obj'
+import RawNode, { RawNodeType } from './RawNode'
 import Style, { StyleType } from './Style'
 
 export const RawRenpyJsonType = t.strict({
@@ -13,7 +13,7 @@ export const RawRenpyJsonType = t.strict({
     sounds: ObjType(t.string),
     videos: ObjType(t.string),
     characters: ObjType(CharType),
-    nodes: ObjType(NodeType),
+    nodes: ObjType(RawNodeType),
     fonts: ObjType(FontType),
     style: StyleType
 })
@@ -28,7 +28,7 @@ export default interface RenpyJson {
     sounds: Obj<string>
     videos: Obj<string>
     characters: Obj<Char>
-    nodes: Obj<Node>
+    nodes: Obj<RawNode>
     fonts: Obj<Font>
     style: Style
 }
