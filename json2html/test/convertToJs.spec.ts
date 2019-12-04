@@ -23,5 +23,10 @@ describe(convertToJs, () => {
 
         match(`a ++`, `window._a ++`)
         match(`a++`, `window._a++`)
+
+        match(
+            `a == b or c == d or e == f and not g == h`,
+            `window._a === window._b || window._c === window._d || window._e === window._f && ! window._g === window._h`
+        )
     })
 })
