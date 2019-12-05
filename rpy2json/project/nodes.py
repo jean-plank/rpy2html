@@ -176,11 +176,15 @@ def if_to_str(renpy, node, res):
     return nexts_of_blocks
 
 
-VIDEO = re.compile(r'^renpy\.movie_cutscene\((.+)\)$')
+VIDEO = re.compile(r'^\s*renpy\.movie_cutscene\s*\((.+)\)\s*$')
+
+PLAY = re.compile(r'^\s*renpy.sound\.play\s*\((.+)\)\s*$')
+LOOP = re.compile(r'^\s*loop\s*=(.*)$')
 
 
 def python_to_str(GAME_BASE_DIR, renpy, node, res):
     next = real_next(renpy, node.next)
+    id_nexts = [str(id(next))] if next else []
 
     match = re.search(VIDEO, node.code.source)
 
@@ -196,14 +200,37 @@ def python_to_str(GAME_BASE_DIR, renpy, node, res):
             ]
         }
     else:
-        res['nodes'][id(node)] = {
-            'class_name': 'PyExpr',
-            'arguments': [
-                replace_bools(node.code.source),
-                [str(id(next))] if next else []
-            ]
-        }
+        match = re.search(PLAY, node.code.source)
+
+        if match != None and len(match.groups()) == 1:  # it's a sound play
+            args = [arg.strip() for arg in match.group(1).split(',')]
+            loop = find_map(get_loop, args[1:])
+            play_to_str(GAME_BASE_DIR, node, id_nexts,
+                        res, args[0][1:-1], 'sound', loop)
+
+        else:
+            res['nodes'][id(node)] = {
+                'class_name': 'PyExpr',
+                'arguments': [
+                    replace_bools(node.code.source),
+                    id_nexts
+                ]
+            }
+
     return [next]
+
+
+def get_loop(arg):
+    match = re.search(LOOP, arg)
+    if arg != None and len(match.groups()) == 1:
+        return match.group(1) == "True"
+
+
+def find_map(f, coll):
+    for x in coll:
+        res = f(x)
+        if res != None:
+            return res
 
 
 def scene_to_str(GAME_BASE_DIR, renpy, node, res):
@@ -257,10 +284,10 @@ def user_statement_to_str(GAME_BASE_DIR, renpy, node, res):
 
     if cmd[0] == 'play' and len(cmd) >= 3:
         loop = 'loop' in cmd[3:] if len(cmd) >= 4 else False
-        play_to_str(GAME_BASE_DIR, cmd, node, id_nexts,
+        play_to_str(GAME_BASE_DIR, node, id_nexts,
                     res, cmd[2][1:-1], cmd[1], loop)
     elif cmd[0] == 'voice' and len(cmd) >= 2:
-        play_to_str(GAME_BASE_DIR, cmd, node, id_nexts,
+        play_to_str(GAME_BASE_DIR, node, id_nexts,
                     res, cmd[1][1:-1], 'voice', False)
     elif cmd[0] == 'stop' and len(cmd) >= 2:
         stop_to_str(cmd, node, id_nexts, res)
@@ -277,7 +304,7 @@ def user_statement_to_str(GAME_BASE_DIR, renpy, node, res):
 VIDEO_EXTENSION = ['.webm', '.ogv']
 
 
-def play_to_str(GAME_BASE_DIR, cmd, node, id_nexts, res, file, channel, loop):
+def play_to_str(GAME_BASE_DIR, node, id_nexts, res, file, channel, loop):
     snd_name = remove_invalid_chars(file)
 
     _, ext = path.splitext(file)
