@@ -1,5 +1,6 @@
 import { identity } from 'fp-ts/lib/function'
 
+import evalOrLog from '../utils/evalOrLog'
 import AstNode from './AstNode'
 
 export default class MenuItem extends AstNode {
@@ -15,5 +16,6 @@ export default class MenuItem extends AstNode {
 
     reduce = identity
 
-    condition = (): boolean => eval(this.rawCondition) === true
+    condition = (): boolean =>
+        evalOrLog(this.constructor.name, this.rawCondition) === true
 }
