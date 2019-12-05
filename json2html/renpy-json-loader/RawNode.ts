@@ -148,7 +148,7 @@ export const RawNodeType = new t.Type<RawNode, null, unknown>(
             E.alt(() => ShowWindowType.decode(s)),
             E.alt(() => StopType.decode(s))
         ]
-        const res = decoders.reduce<E.Either<t.Errors, RawNode>>(
+        return decoders.reduce<E.Either<t.Errors, RawNode>>(
             (acc, decode) => pipe(acc, decode),
             E.left([
                 {
@@ -158,10 +158,6 @@ export const RawNodeType = new t.Type<RawNode, null, unknown>(
                 }
             ])
         )
-        if (E.isLeft(res)) {
-            console.log('s =', s)
-        }
-        return res
     },
     _ => null
 )

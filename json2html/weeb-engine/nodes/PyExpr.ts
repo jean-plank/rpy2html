@@ -1,4 +1,5 @@
 import GameProps from '../history/GameProps'
+import evalOrLog from '../utils/evalOrLog'
 import AstNode from './AstNode'
 
 export default class PyExpr extends AstNode {
@@ -9,11 +10,7 @@ export default class PyExpr extends AstNode {
     toString = (): string => `PyExpr("${this.code}")`
 
     reduce = (gameProps: GameProps): GameProps => {
-        try {
-            eval(this.code)
-        } catch (e) {
-            console.error('PyExpr evaluation error:', e)
-        }
+        evalOrLog(this.constructor.name, this.code)
         return gameProps
     }
 }
